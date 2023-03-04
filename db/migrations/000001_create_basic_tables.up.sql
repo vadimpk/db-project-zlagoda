@@ -4,7 +4,7 @@ CREATE TABLE employee (
                           empl_name VARCHAR(50) NOT NULL,
                           empl_patronymic VARCHAR(50) NULL,
                           empl_role VARCHAR(10) NOT NULL,
-                          salary DECIMAL(13,4) NO NULL,
+                          salary DECIMAL(13,4) NOT NULL,
                           date_of_birth DATE NOT NULL,
                           date_of_start DATE NOT NULL,
                           phone_number VARCHAR(13) NOT NULL,
@@ -38,8 +38,8 @@ CREATE TABLE product (
 CREATE TABLE checks(
                        check_number VARCHAR(10) PRIMARY KEY,
                        FOREIGN KEY (id_employee) REFERENCES employee (id_employee)
-                           ON UPDATE CASCADE ON DELETE NO ACTION
-                           FOREIGN KEY (card_number) REFERENCES customer_card (card_number)
+                           ON UPDATE CASCADE ON DELETE NO ACTION,
+                       FOREIGN KEY (card_number) REFERENCES customer_card (card_number)
                            ON UPDATE CASCADE ON DELETE NO ACTION,
                        print_date TIMESTAMP NOT NULL,
                        sum_total DECIMAL (13,4) NOT NULL,
