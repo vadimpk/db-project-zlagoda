@@ -29,39 +29,54 @@ CREATE TABLE customer_card(
 );
 CREATE TABLE product (
                          id_product INT PRIMARY KEY,
-                         FOREIGN KEY (category_name) REFERENCES category (category_number)
-                             ON UPDATE CASCADE ON DELETE NO ACTION,
-
+                         fk_category_number INT NOT NULL,
                          product_name VARCHAR(50) NOT NULL,
-                         product_characteristics VARCHAR(100) NOT NULL
+                         product_characteristics VARCHAR(100) NOT NULL,
+
+                         FOREIGN KEY (fk_category_number) REFERENCES category (category_number)
+                             ON UPDATE CASCADE ON DELETE NO ACTION
 );
 CREATE TABLE checks(
                        check_number VARCHAR(10) PRIMARY KEY,
-                       FOREIGN KEY (id_employee) REFERENCES employee (id_employee)
-                           ON UPDATE CASCADE ON DELETE NO ACTION,
-                       FOREIGN KEY (card_number) REFERENCES customer_card (card_number)
-                           ON UPDATE CASCADE ON DELETE NO ACTION,
+                       fk_id_employee VARCHAR(10) NOT NULL,
+                       fk_card_number VARCHAR(13) NOT NULL,
                        print_date TIMESTAMP NOT NULL,
                        sum_total DECIMAL (13,4) NOT NULL,
-                       vat DECIMAL (13,4) NOT NULL
+                       vat DECIMAL (13,4) NOT NULL,
+                       FOREIGN KEY (fk_id_employee) REFERENCES employee (id_employee)
+                           ON UPDATE CASCADE ON DELETE NO ACTION,
+                       FOREIGN KEY (fk_card_number) REFERENCES customer_card (card_number)
+                           ON UPDATE CASCADE ON DELETE NO ACTION
 );
-CREATE TABLE store_product(
-                              UPC VARCHAR(12) PRIMARY KEY,
-                              FOREIGN KEY (UPC_prom) REFERENCES store_product (UPC)
-                                  ON UPDATE CASCADE ON DELETE SET NULL,
-                              FOREIGN KEY (id_product) REFERENCES product (id_product)
-                                  ON UPDATE CASCADE ON DELETE NO ACTION,
-                              selling_price DECIMAL (13,4) NOT NULL,
-                              product_number INT NOT NULL,
-                              promotional_product BOOLEAN NOT NULL
-);
-CREATE TABLE sale(
-                     FOREIGN KEY (UPC) REFERENCES store_product (UPC)
-                         ON UPDATE CASCADE ON DELETE NO ACTION,
-                     FOREIGN KEY (check_number) REFERENCES checks (check_number)
-                         ON UPDATE CASCADE ON DELETE CASCADE,
-                     product_number INT NOT NULL,
-                     selling_price DECIMAL (13,4) NOT NULL,
-                     PRIMARY KEY(UPC,check_number)
+CREATE TABLE contain (
+                         id_product INT REFERENCES product (id_product),
+                         check_number VARCHAR(10) REFERENCES check (check_number),
+                         quantity INTEGER NOT NULL,
+                         price NUMERIC(10,2) NOT NULL,
+                         PRIMARY KEY (id_product, check_number)
 );
 
+CREATE TABLE store_product(
+                              UPC VARCHAR(12) PRIMARY KEY,
+                              fk_UPC_prom VARCHAR(12) NOT NULL,
+                              fk_id_product INT NOT NULL,
+                              selling_price DECIMAL (13,4) NOT NULL,
+                              product_number INT NOT NULL,
+                              promotional_product BOOLEAN NOT NULL,
+                              FOREIGN KEY (fk_UPC_prom) REFERENCES store_product (UPC)
+                                  ON UPDATE CASCADE ON DELETE SET NULL,
+                              FOREIGN KEY (fk_id_product) REFERENCES product (id_product)
+                                  ON UPDATE CASCADE ON DELETE NO ACTION
+);
+CREATE TABLE sale(
+                     fk_UPC VARCHAR(12),
+                     fk_check_number VARCHAR(10),
+                     product_number INT NOT NULL,
+                     selling_price DECIMAL (13,4) NOT NULL,
+                     PRIMARY KEY (fk_UPC, fk_check_number),
+                     FOREIGN KEY (fk_UPC) REFERENCES store_product (UPC)
+                         ON UPDATE CASCADE ON DELETE NO ACTION,
+                     FOREIGN KEY (fk_check_number) REFERENCES checks (check_number)
+                         ON UPDATE CASCADE ON DELETE CASCADE
+
+);
