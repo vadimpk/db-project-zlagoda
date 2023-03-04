@@ -1,64 +1,82 @@
-CREATE TABLE IF NOT EXISTS memberships (
-    id serial PRIMARY KEY,
-    short_name VARCHAR(250) NOT NULL,
-    description VARCHAR,
-    price INT NOT NULL,
-    duration VARCHAR NOT NULL
+CREATE TABLE employee (
+                          id_employee VARCHAR(10) PRIMARY KEY,
+                          empl_surname VARCHAR(50) NOT NULL,
+                          empl_name VARCHAR(50) NOT NULL,
+                          empl_patronymic VARCHAR(50) NULL,
+                          empl_role VARCHAR(10) NOT NULL,
+                          salary DECIMAL(13,4) NOT NULL,
+                          date_of_birth DATE NOT NULL,
+                          date_of_start DATE NOT NULL,
+                          phone_number VARCHAR(13) NOT NULL,
+                          city VARCHAR(50) NOT NULL,
+                          street VARCHAR(50) NOT NULL,
+                          zip_code VARCHAR(9) NOT NULL
+);
+CREATE TABLE category (
+                          category_number INT PRIMARY KEY,
+                          category_name VARCHAR(50) NOT NULL
+);
+CREATE TABLE customer_card(
+                              card_number VARCHAR(13) PRIMARY KEY,
+                              cust_surname VARCHAR(50) NOT NULL,
+                              cust_name VARCHAR(50) NOT NULL,
+                              cust_patronymic VARCHAR(50) NULL,
+                              phone_number VARCHAR(13) NOT NULL,
+                              city VARCHAR(50) NOT NULL,
+                              street VARCHAR(50) NOT NULL,
+                              zip_code VARCHAR(9) NOT NULL,
+                              discount INT NOT NULL
+);
+CREATE TABLE product (
+                         id_product INT PRIMARY KEY,
+                         fk_category_number INT NOT NULL,
+                         product_name VARCHAR(50) NOT NULL,
+                         product_characteristics VARCHAR(100) NOT NULL,
+
+                         FOREIGN KEY (fk_category_number) REFERENCES category (category_number)
+                             ON UPDATE CASCADE ON DELETE NO ACTION
+);
+CREATE TABLE checks(
+                       check_number VARCHAR(10) PRIMARY KEY,
+                       fk_id_employee VARCHAR(10) NOT NULL,
+                       fk_card_number VARCHAR(13) NOT NULL,
+                       print_date TIMESTAMP NOT NULL,
+                       sum_total DECIMAL (13,4) NOT NULL,
+                       vat DECIMAL (13,4) NOT NULL,
+                       FOREIGN KEY (fk_id_employee) REFERENCES employee (id_employee)
+                           ON UPDATE CASCADE ON DELETE NO ACTION,
+                       FOREIGN KEY (fk_card_number) REFERENCES customer_card (card_number)
+                           ON UPDATE CASCADE ON DELETE NO ACTION
+);
+CREATE TABLE contain (
+                         id_product INT REFERENCES product (id_product),
+                         check_number VARCHAR(10) REFERENCES check (check_number),
+                         quantity INTEGER NOT NULL,
+                         price NUMERIC(10,2) NOT NULL,
+                         PRIMARY KEY (id_product, check_number)
 );
 
-CREATE TABLE IF NOT EXISTS trainers (
-    id serial PRIMARY KEY,
-    first_name VARCHAR(250) NOT NULL,
-    last_name VARCHAR(250) NOT NULL,
-    email VARCHAR(250) UNIQUE NOT NULL,
-    phone_number VARCHAR(250) UNIQUE NOT NULL,
-    description VARCHAR(250),
-    price INT NOT NULL
+CREATE TABLE store_product(
+                              UPC VARCHAR(12) PRIMARY KEY,
+                              fk_UPC_prom VARCHAR(12) NOT NULL,
+                              fk_id_product INT NOT NULL,
+                              selling_price DECIMAL (13,4) NOT NULL,
+                              product_number INT NOT NULL,
+                              promotional_product BOOLEAN NOT NULL,
+                              FOREIGN KEY (fk_UPC_prom) REFERENCES store_product (UPC)
+                                  ON UPDATE CASCADE ON DELETE SET NULL,
+                              FOREIGN KEY (fk_id_product) REFERENCES product (id_product)
+                                  ON UPDATE CASCADE ON DELETE NO ACTION
 );
+CREATE TABLE sale(
+                     fk_UPC VARCHAR(12),
+                     fk_check_number VARCHAR(10),
+                     product_number INT NOT NULL,
+                     selling_price DECIMAL (13,4) NOT NULL,
+                     PRIMARY KEY (fk_UPC, fk_check_number),
+                     FOREIGN KEY (fk_UPC) REFERENCES store_product (UPC)
+                         ON UPDATE CASCADE ON DELETE NO ACTION,
+                     FOREIGN KEY (fk_check_number) REFERENCES checks (check_number)
+                         ON UPDATE CASCADE ON DELETE CASCADE
 
-CREATE TABLE IF NOT EXISTS managers (
-    id serial PRIMARY KEY,
-    first_name VARCHAR(250) NOT NULL,
-    last_name VARCHAR(250) NOT NULL,
-    email VARCHAR(250) UNIQUE NOT NULL,
-    phone_number VARCHAR(250) UNIQUE NOT NULL,
-    password VARCHAR(250) NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS sessions (
-    id serial PRIMARY KEY,
-    refresh_token VARCHAR(250) NOT NULL,
-    expires_at TIME NOT NULL,
-    manager_id INT REFERENCES managers(id) ON DELETE CASCADE NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS members (
-    id serial PRIMARY KEY,
-    first_name VARCHAR(250) NOT NULL,
-    last_name VARCHAR(250) NOT NULL,
-    phone_number VARCHAR(250) UNIQUE NOT NULL,
-    joined_at TIMESTAMP NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS members_memberships (
-    id serial PRIMARY KEY,
-    membership_id INT REFERENCES memberships(id) ON DELETE CASCADE NOT NULL,
-    member_id INT REFERENCES members(id) ON DELETE CASCADE NOT NULL,
-    membership_expiration TIMESTAMP NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS members_visits (
-    id serial PRIMARY KEY,
-    arrived_at TIMESTAMP NOT NULL,
-    left_at TIMESTAMP,
-    member_id INT REFERENCES members(id) ON DELETE CASCADE NOT NULL,
-    manager_id INT REFERENCES managers(id) ON DELETE CASCADE NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS trainers_visits (
-    id serial PRIMARY KEY,
-    arrived_at TIMESTAMP NOT NULL,
-    left_at TIMESTAMP,
-    trainer_id INT REFERENCES trainers(id) ON DELETE CASCADE NOT NULL,
-    manager_id INT REFERENCES managers(id) ON DELETE CASCADE NOT NULL
 );
