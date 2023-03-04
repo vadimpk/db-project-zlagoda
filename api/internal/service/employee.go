@@ -2,8 +2,8 @@ package service
 
 import (
 	"github.com/apsdehal/go-logger"
-	"github.com/vadimpk/db-project-zlagoda/config"
-	"github.com/vadimpk/db-project-zlagoda/internal/entity"
+	"github.com/vadimpk/db-project-zlagoda/api/config"
+	"github.com/vadimpk/db-project-zlagoda/api/internal/entity"
 )
 
 type employeeService struct {

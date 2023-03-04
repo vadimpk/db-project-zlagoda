@@ -3,14 +3,14 @@ package http
 import (
 	"github.com/apsdehal/go-logger"
 	"github.com/gin-gonic/gin"
-	"github.com/vadimpk/db-project-zlagoda/config"
-	"github.com/vadimpk/db-project-zlagoda/internal/service"
+	"github.com/vadimpk/db-project-zlagoda/api/config"
+	service2 "github.com/vadimpk/db-project-zlagoda/api/internal/service"
 	"net/http"
 )
 
 type Options struct {
-	Services service.Services
-	Storages service.Storages
+	Services service2.Services
+	Storages service2.Storages
 	Logger   logger.Logger
 	Config   *config.Config
 }

@@ -16,7 +16,7 @@ type (
 
 	// HTTP - represents http configuration.
 	HTTP struct {
-		Port string `env:"GD_HTTP_PORT" env-default:"8082"`
+		Port string `env:"HTTP_PORT" env-default:"8082"`
 	}
 
 	// PostgreSQL - represents PostgreSQL database configuration.

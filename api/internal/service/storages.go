@@ -1,6 +1,8 @@
 package service
 
-import "github.com/vadimpk/db-project-zlagoda/internal/entity"
+import (
+	"github.com/vadimpk/db-project-zlagoda/api/internal/entity"
+)
 
 type Storages struct {
 	Employee EmployeeStorage

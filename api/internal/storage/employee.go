@@ -3,8 +3,8 @@ package storage
 import (
 	"database/sql"
 	"github.com/apsdehal/go-logger"
-	"github.com/vadimpk/db-project-zlagoda/internal/entity"
-	"github.com/vadimpk/db-project-zlagoda/internal/service"
+	"github.com/vadimpk/db-project-zlagoda/api/internal/entity"
+	"github.com/vadimpk/db-project-zlagoda/api/internal/service"
 )
 
 type employeeStorage struct {

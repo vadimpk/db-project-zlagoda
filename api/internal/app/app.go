@@ -5,11 +5,11 @@ import (
 	"fmt"
 	log "github.com/apsdehal/go-logger"
 	_ "github.com/lib/pq"
-	"github.com/vadimpk/db-project-zlagoda/config"
-	"github.com/vadimpk/db-project-zlagoda/internal/controller/http"
-	"github.com/vadimpk/db-project-zlagoda/internal/service"
-	"github.com/vadimpk/db-project-zlagoda/internal/storage"
-	"github.com/vadimpk/db-project-zlagoda/pkg/httpserver"
+	"github.com/vadimpk/db-project-zlagoda/api/config"
+	"github.com/vadimpk/db-project-zlagoda/api/internal/controller/http"
+	service2 "github.com/vadimpk/db-project-zlagoda/api/internal/service"
+	"github.com/vadimpk/db-project-zlagoda/api/internal/storage"
+	"github.com/vadimpk/db-project-zlagoda/api/pkg/httpserver"
 	"os"
 	"os/signal"
 	"syscall"
@@ -39,18 +39,18 @@ func Run(cfg *config.Config) {
 		logger.Info("disconnected from database")
 	}(db)
 
-	storages := service.Storages{
+	storages := service2.Storages{
 		Employee: storage.NewEmployeeStorage(logger, db),
 	}
 
-	serviceOptions := service.Options{
+	serviceOptions := service2.Options{
 		Logger:   logger,
 		Config:   cfg,
 		Storages: storages,
 	}
 
-	services := service.Services{
-		Employee: service.NewEmployeeService(serviceOptions),
+	services := service2.Services{
+		Employee: service2.NewEmployeeService(serviceOptions),
 	}
 
 	httpHandler := http.New(http.Options{
