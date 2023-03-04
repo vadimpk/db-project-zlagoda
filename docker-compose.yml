@@ -9,4 +9,4 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: zlagoda-api
     ports:
-      - '5433:5433'
+      - '5433:5432'
