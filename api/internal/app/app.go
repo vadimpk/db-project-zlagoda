@@ -7,7 +7,7 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/vadimpk/db-project-zlagoda/api/config"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/controller/http"
-	service2 "github.com/vadimpk/db-project-zlagoda/api/internal/service"
+	"github.com/vadimpk/db-project-zlagoda/api/internal/service"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/storage"
 	"github.com/vadimpk/db-project-zlagoda/api/pkg/httpserver"
 	"os"
@@ -39,20 +39,22 @@ func Run(cfg *config.Config) {
 		logger.Info("disconnected from database")
 	}(db)
 
-	storages := service2.Storages{
+	storages := service.Storages{
 		Employee:     storage.NewEmployeeStorage(logger, db),
 		CustomerCard: storage.NewCustomerCardStorage(logger, db),
+		Product:      storage.NewProductStorage(logger, db),
 	}
 
-	serviceOptions := service2.Options{
+	serviceOptions := service.Options{
 		Logger:   logger,
 		Config:   cfg,
 		Storages: storages,
 	}
 
-	services := service2.Services{
-		Employee:     service2.NewEmployeeService(serviceOptions),
-		CustomerCard: service2.NewCustomerCardService(serviceOptions),
+	services := service.Services{
+		Employee:     service.NewEmployeeService(serviceOptions),
+		CustomerCard: service.NewCustomerCardService(serviceOptions),
+		Product:      service.NewProductService(serviceOptions),
 	}
 
 	httpHandler := http.New(http.Options{

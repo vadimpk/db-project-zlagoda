@@ -21,6 +21,8 @@ func New(options Options) http.Handler {
 	{
 		setupEmployeeRoutes(&options, handler)
 		setupCustomerCardRoutes(&options, handler)
+		setupProductRoutes(&options, handler)
+
 	}
 
 	return handler

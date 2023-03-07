@@ -7,6 +7,7 @@ import (
 type Storages struct {
 	Employee     EmployeeStorage
 	CustomerCard CardStorage
+	Product      ProductStorage
 }
 
 type EmployeeStorage interface {
@@ -15,4 +16,22 @@ type EmployeeStorage interface {
 
 type CardStorage interface {
 	Get(id string) (*entity.CustomerCard, error)
+}
+type ProductStorage interface {
+	CreateProduct(product *entity.Product) (*entity.Product, error)
+	GetProduct(id string) (*entity.Product, error)
+	ListProducts(opts ListProductsOptions) ([]*entity.Product, error)
+	UpdateProduct(id string, product *entity.Product) (*entity.Product, error)
+	DeleteProducts(ids []string) error
+
+	CreateProductCategory(category *entity.ProductCategory) (*entity.ProductCategory, error)
+	ListProductCategories() (*entity.Product, error)
+	UpdateProductCategory(id string, product *entity.ProductCategory) (*entity.ProductCategory, error)
+	DeleteProductCategories(ids []string) error
+
+	CreateStoreProduct(storeProduct *entity.StoreProduct) (*entity.StoreProduct, error)
+	GetStoreProduct(id string) (*entity.StoreProduct, error)
+	ListStoreProducts(opts ListStoreProductsOptions) ([]*entity.StoreProduct, error)
+	UpdateStoreProduct(id string, storeProduct *entity.StoreProduct) (*entity.StoreProduct, error)
+	DeleteStoreProducts(ids []string) error
 }
