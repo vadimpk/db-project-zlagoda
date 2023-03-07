@@ -13,9 +13,13 @@ type Options struct {
 }
 
 type Services struct {
-	Employee EmployeeService
+	Employee     EmployeeService
+	CustomerCard CustomerCardService
 }
 
 type EmployeeService interface {
 	Get(id string) (*entity.Employee, error)
+}
+type CustomerCardService interface {
+	Get(id string) (*entity.CustomerCard, error)
 }
