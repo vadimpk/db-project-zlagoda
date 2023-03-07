@@ -1,6 +1,6 @@
 package entity
 
-type CustomerCard struct {
+type Card struct {
 	ID          string `json:"id"`
 	Surname     string `json:"surname"`
 	Name        string `json:"name"`
@@ -8,5 +8,6 @@ type CustomerCard struct {
 	PhoneNumber string `json:"phone_number"`
 	City        string `json:"city"`
 	Street      string `json:"street"`
-	Zip         string `json:"zip"`
+	Zip         string `json:"zip_code"`
+	Discount    int    `json:"discount"`
 }
