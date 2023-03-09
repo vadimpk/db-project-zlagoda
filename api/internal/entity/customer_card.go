@@ -1,6 +1,6 @@
 package entity
 
-type Card struct {
+type CustomerCard struct {
 	ID          string `json:"id"`
 	Surname     string `json:"surname"`
 	Name        string `json:"name"`
