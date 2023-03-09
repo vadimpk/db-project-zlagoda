@@ -40,9 +40,9 @@ func Run(cfg *config.Config) {
 	}(db)
 
 	storages := service.Storages{
-		Employee: storage.NewEmployeeStorage(logger, db),
-		Card:     storage.NewCardStorage(logger, db),
-		Product:  storage.NewProductStorage(logger, db),
+		Employee:     storage.NewEmployeeStorage(logger, db),
+		CustomerCard: storage.NewCustomerCardStorage(logger, db),
+		Product:      storage.NewProductStorage(logger, db),
 	}
 
 	serviceOptions := service.Options{
@@ -52,9 +52,9 @@ func Run(cfg *config.Config) {
 	}
 
 	services := service.Services{
-		Employee: service.NewEmployeeService(serviceOptions),
-		Card:     service.NewCardService(serviceOptions),
-		Product:  service.NewProductService(serviceOptions),
+		Employee:     service.NewEmployeeService(serviceOptions),
+		CustomerCard: service.NewCustomerCardService(serviceOptions),
+		Product:      service.NewProductService(serviceOptions),
 	}
 
 	httpHandler := http.New(http.Options{

@@ -16,7 +16,7 @@ func setupCustomerCardRoutes(options *Options, handler *gin.Engine) {
 		opts: options,
 	}
 
-	customerCardGroup := handler.Group("/customer_card")
+	customerCardGroup := handler.Group("/customer-card")
 	{
 		customerCardGroup.POST("/", routes.createCard)
 		customerCardGroup.GET("/:id", routes.getCard)
@@ -33,7 +33,7 @@ func (r *customerCardRoutes) createCard(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, err)
 		return
 	}
-	createdCard, err := r.opts.Services.Card.Create(&card)
+	createdCard, err := r.opts.Services.CustomerCard.Create(&card)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
@@ -44,7 +44,7 @@ func (r *customerCardRoutes) createCard(c *gin.Context) {
 func (r *customerCardRoutes) getCard(c *gin.Context) {
 	id := c.Param("id")
 
-	card, err := r.opts.Services.Card.Get(id)
+	card, err := r.opts.Services.CustomerCard.Get(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
@@ -53,7 +53,7 @@ func (r *customerCardRoutes) getCard(c *gin.Context) {
 }
 
 func (r *customerCardRoutes) listCards(c *gin.Context) {
-	cards, err := r.opts.Services.Card.List(service.ListCardOptions{})
+	cards, err := r.opts.Services.CustomerCard.List(service.ListCardOptions{})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
@@ -70,7 +70,7 @@ func (r *customerCardRoutes) updateCard(c *gin.Context) {
 		return
 	}
 
-	updatedCard, err := r.opts.Services.Card.Update(id, &card)
+	updatedCard, err := r.opts.Services.CustomerCard.Update(id, &card)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
@@ -88,7 +88,7 @@ func (r *customerCardRoutes) deleteCards(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, err)
 		return
 	}
-	err := r.opts.Services.Card.Delete(body.Ids)
+	err := r.opts.Services.CustomerCard.Delete(body.Ids)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
