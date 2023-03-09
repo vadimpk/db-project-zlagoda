@@ -13,12 +13,21 @@ type Options struct {
 }
 
 type Services struct {
-	Employee EmployeeService
-	Product  ProductService
+	Employee     EmployeeService
+	CustomerCard CustomerCardService
+	Product      ProductService
 }
 
 type EmployeeService interface {
 	Get(id string) (*entity.Employee, error)
+}
+
+type CustomerCardService interface {
+	Create(card *entity.CustomerCard) (*entity.CustomerCard, error)
+	Get(id string) (*entity.CustomerCard, error)
+	List(opts ListCardOptions) ([]*entity.CustomerCard, error)
+	Update(id string, card *entity.CustomerCard) (*entity.CustomerCard, error)
+	Delete(ids []string) error
 }
 
 type ProductService interface {
@@ -38,6 +47,23 @@ type ProductService interface {
 	ListStoreProducts(opts ListStoreProductsOptions) ([]*entity.StoreProduct, error)
 	UpdateStoreProduct(id string, storeProduct *entity.StoreProduct) (*entity.StoreProduct, error)
 	DeleteStoreProducts(ids []string) error
+}
+
+type ListCardOptions struct {
+	Search *string
+	Sort   SortCardOptions
+}
+
+type SortCardOptions struct {
+	Name       *bool
+	Surname    *bool
+	Patronymic *bool
+	Phone      *bool
+	City       *bool
+	Street     *bool
+	Zip        *bool
+	Discount   *bool
+	Ascending  *bool
 }
 
 type ListProductsOptions struct {

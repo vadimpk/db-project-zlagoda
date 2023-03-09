@@ -22,7 +22,7 @@ func NewProductStorage(logger *logger.Logger, db *sql.DB) service.ProductStorage
 var _ service.EmployeeStorage = (*employeeStorage)(nil)
 
 func (s *productStorage) CreateProduct(product *entity.Product) (*entity.Product, error) {
-	_, err := s.db.Exec("INSERT INTO product (id_product, fk_category_name, product_name, product_characteristics) VALUES ($1, $2, $3, $4)",
+	_, err := s.db.Exec("INSERT INTO product (id_product, fk_category_number, product_name, product_characteristics) VALUES ($1, $2, $3, $4)",
 		product.ID, product.CategoryID, product.Name, product.Characteristics)
 	if err != nil {
 		s.logger.Errorf("error while creating product: %s", err)
@@ -46,7 +46,7 @@ func (s *productStorage) ListProducts(opts service.ListProductsOptions) ([]*enti
 }
 
 func (s *productStorage) UpdateProduct(id string, product *entity.Product) (*entity.Product, error) {
-	_, err := s.db.Exec("UPDATE product SET fk_category_name = $1, product_name = $2, product_characteristics = $3 WHERE id_product = $4",
+	_, err := s.db.Exec("UPDATE product SET fk_category_number = $1, product_name = $2, product_characteristics = $3 WHERE id_product = $4",
 		product.CategoryID, product.Name, product.Characteristics, id)
 	if err != nil {
 		s.logger.Errorf("error while updating product: %s", err)

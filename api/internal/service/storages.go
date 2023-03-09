@@ -5,12 +5,21 @@ import (
 )
 
 type Storages struct {
-	Employee EmployeeStorage
-	Product  ProductStorage
+	Employee     EmployeeStorage
+	CustomerCard CustomerCardStorage
+	Product      ProductStorage
 }
 
 type EmployeeStorage interface {
 	Get(id string) (*entity.Employee, error)
+}
+
+type CustomerCardStorage interface {
+	Create(card *entity.CustomerCard) (*entity.CustomerCard, error)
+	Get(id string) (*entity.CustomerCard, error)
+	List(opts ListCardOptions) ([]*entity.CustomerCard, error)
+	Update(id string, card *entity.CustomerCard) (*entity.CustomerCard, error)
+	Delete(ids []string) error
 }
 
 type ProductStorage interface {
