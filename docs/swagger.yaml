@@ -1,0 +1,438 @@
+basePath: /
+definitions:
+  entity.CustomerCard:
+    properties:
+      city:
+        type: string
+      discount:
+        type: integer
+      id:
+        type: string
+      name:
+        type: string
+      patronymic:
+        type: string
+      phone_number:
+        type: string
+      street:
+        type: string
+      surname:
+        type: string
+      zip_code:
+        type: string
+    type: object
+  entity.Product:
+    properties:
+      category_id:
+        type: string
+      characteristics:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  entity.ProductCategory:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  entity.StoreProduct:
+    properties:
+      count:
+        type: integer
+      id:
+        type: string
+      price:
+        type: number
+      product_id:
+        type: string
+      promotional:
+        type: boolean
+      promotional_id:
+        type: string
+    type: object
+  http.deleteCardsRequestBody:
+    properties:
+      ids:
+        items:
+          type: string
+        type: array
+    type: object
+  http.deleteCategoriesRequestBody:
+    properties:
+      ids:
+        items:
+          type: string
+        type: array
+    type: object
+  http.deleteProductsRequestBody:
+    properties:
+      ids:
+        items:
+          type: string
+        type: array
+    type: object
+  http.deleteStoreProductsRequestBody:
+    properties:
+      ids:
+        items:
+          type: string
+        type: array
+    type: object
+host: localhost:8082
+info:
+  contact: {}
+  description: project for db market Zlagoda
+  title: App Zlagoda api
+  version: "1.0"
+paths:
+  /customer-card:
+    delete:
+      description: Delete customer cards
+      operationId: delete-cards
+      parameters:
+      - description: Card IDs
+        in: body
+        name: ids
+        required: true
+        schema:
+          $ref: '#/definitions/http.deleteCardsRequestBody'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomerCard'
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Delete customer cards
+    get:
+      description: List customer cards
+      operationId: list-cards
+      parameters:
+      - description: Card ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomerCard'
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: List customer cards
+    post:
+      description: Create customer card
+      operationId: create-card
+      parameters:
+      - description: Card
+        in: body
+        name: card
+        required: true
+        schema:
+          $ref: '#/definitions/entity.CustomerCard'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomerCard'
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Create customer card
+  /customer-card/{id}:
+    get:
+      description: Get customer card
+      operationId: get-card
+      parameters:
+      - description: Card ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomerCard'
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Get customer card
+    put:
+      description: Update customer card
+      operationId: update-card
+      parameters:
+      - description: Card ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Card
+        in: body
+        name: card
+        required: true
+        schema:
+          $ref: '#/definitions/entity.CustomerCard'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomerCard'
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Update customer card
+  /product:
+    delete:
+      description: Delete products
+      operationId: delete-products
+      parameters:
+      - description: Product IDs
+        in: body
+        name: ids
+        required: true
+        schema:
+          $ref: '#/definitions/http.deleteProductsRequestBody'
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Delete products
+    get:
+      description: List products
+      operationId: list-products
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Product'
+            type: array
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: List products
+    post:
+      description: Create product
+      operationId: create-product
+      parameters:
+      - description: Product
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Product'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Product'
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Create product
+  /product/{id}:
+    get:
+      description: Get product
+      operationId: get-product
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Product'
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Get product
+    put:
+      description: Update product
+      operationId: update-product
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Product
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Product'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Product'
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Update product
+  /product/category:
+    delete:
+      description: Delete product categories
+      operationId: delete-product-categories
+      parameters:
+      - description: Product category IDs
+        in: body
+        name: ids
+        required: true
+        schema:
+          $ref: '#/definitions/http.deleteCategoriesRequestBody'
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Delete product categories
+    get:
+      description: List product categories
+      operationId: list-product-categories
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.ProductCategory'
+            type: array
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: List product categories
+    post:
+      description: Create product category
+      operationId: create-product-category
+      parameters:
+      - description: Product category
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/entity.ProductCategory'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.ProductCategory'
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Create product category
+  /product/category/{id}:
+    put:
+      description: Update product category
+      operationId: update-product-category
+      parameters:
+      - description: Product category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Product category
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/entity.ProductCategory'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.ProductCategory'
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Update product category
+  /product/store:
+    delete:
+      description: Delete store products
+      operationId: delete-store-products
+      parameters:
+      - description: Store product IDs
+        in: body
+        name: ids
+        required: true
+        schema:
+          $ref: '#/definitions/http.deleteStoreProductsRequestBody'
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Delete store products
+    get:
+      description: List store products
+      operationId: list-store-products
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.StoreProduct'
+            type: array
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: List store products
+    post:
+      description: Create store product
+      operationId: create-store-product
+      parameters:
+      - description: Store product
+        in: body
+        name: store_product
+        required: true
+        schema:
+          $ref: '#/definitions/entity.StoreProduct'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.StoreProduct'
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Create store product
+  /product/store/{id}:
+    put:
+      description: Update store product
+      operationId: update-store-product
+      parameters:
+      - description: Store product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Store product
+        in: body
+        name: store_product
+        required: true
+        schema:
+          $ref: '#/definitions/entity.StoreProduct'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.StoreProduct'
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Update store product
+swagger: "2.0"
