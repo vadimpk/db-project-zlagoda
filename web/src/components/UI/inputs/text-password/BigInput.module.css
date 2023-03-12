@@ -1,0 +1,9 @@
+.bigInput {
+    font-family:'Poppins', sans-serif;
+    font-size: 20px;
+    height: 65px;
+    width: 95%;
+    border-radius: 7px;
+    border: 1px solid #D9D9D9;
+    padding-left: 5%;
+}

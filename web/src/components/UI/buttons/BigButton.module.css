@@ -1,0 +1,14 @@
+.button {
+    width: 100%;
+    background-color: #F6D33C;
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+    font-size: 24px;
+    height: 65px;
+    border-radius: 7px;
+    border: transparent;
+}
+.button:hover {
+    background-color: #0C8346;
+}
