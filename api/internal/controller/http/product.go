@@ -5,6 +5,7 @@ import (
 	"github.com/vadimpk/db-project-zlagoda/api/internal/entity"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/service"
 	"net/http"
+	"strconv"
 )
 
 type productRoutes struct {
@@ -72,14 +73,19 @@ func (r *productRoutes) createProduct(c *gin.Context) {
 // @Tags product
 // @Description Get product
 // @Id get-product
-// @Param id path string true "Product ID"
+// @Param id path int true "Product ID"
 // @Success 200 {object} entity.Product
 // @Failure 400 {object} error
 // @Router /product/{id} [get]
 func (r *productRoutes) getProduct(c *gin.Context) {
 	id := c.Param("id")
+	employeeID, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
 
-	employee, err := r.opts.Services.Product.GetProduct(id)
+	employee, err := r.opts.Services.Product.GetProduct(employeeID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
@@ -114,6 +120,11 @@ func (r *productRoutes) listProducts(c *gin.Context) {
 // @Router /product/{id} [put]
 func (r *productRoutes) updateProduct(c *gin.Context) {
 	id := c.Param("id")
+	productID, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
 
 	var product entity.Product
 	if err := c.ShouldBindJSON(&product); err != nil {
@@ -121,7 +132,7 @@ func (r *productRoutes) updateProduct(c *gin.Context) {
 		return
 	}
 
-	updatedProduct, err := r.opts.Services.Product.UpdateProduct(id, &product)
+	updatedProduct, err := r.opts.Services.Product.UpdateProduct(productID, &product)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
@@ -131,7 +142,7 @@ func (r *productRoutes) updateProduct(c *gin.Context) {
 }
 
 type deleteProductsRequestBody struct {
-	Ids []string `json:"ids"`
+	Ids []int `json:"ids"`
 }
 
 // @Summary Delete products
@@ -158,10 +169,10 @@ func (r *productRoutes) deleteProducts(c *gin.Context) {
 	c.JSON(http.StatusOK, nil)
 }
 
+// @Id create-product-category
 // @Summary Create product category
 // @Tags product category
 // @Description Create product category
-// @Id create-product-category
 // @Param category body entity.ProductCategory true "Product category"
 // @Success 200 {object} entity.ProductCategory
 // @Failure 400 {object} error
@@ -202,13 +213,18 @@ func (r *productRoutes) listCategories(c *gin.Context) {
 // @Tags product category
 // @Description Update product category
 // @Id update-product-category
-// @Param id path string true "Product category ID"
+// @Param id path int true "Product category ID"
 // @Param category body entity.ProductCategory true "Product category"
 // @Success 200 {object} entity.ProductCategory
 // @Failure 400 {object} error
 // @Router /product/category/{id} [put]
 func (r *productRoutes) updateCategory(c *gin.Context) {
 	id := c.Param("id")
+	categoryID, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
 
 	var category entity.ProductCategory
 	if err := c.ShouldBindJSON(&category); err != nil {
@@ -216,7 +232,7 @@ func (r *productRoutes) updateCategory(c *gin.Context) {
 		return
 	}
 
-	updatedCategory, err := r.opts.Services.Product.UpdateProductCategory(id, &category)
+	updatedCategory, err := r.opts.Services.Product.UpdateProductCategory(categoryID, &category)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
@@ -226,7 +242,7 @@ func (r *productRoutes) updateCategory(c *gin.Context) {
 }
 
 type deleteCategoriesRequestBody struct {
-	Ids []string `json:"ids"`
+	Ids []int `json:"ids"`
 }
 
 // @Summary Delete product categories
@@ -277,13 +293,13 @@ func (r *productRoutes) createStoreProduct(c *gin.Context) {
 	c.JSON(http.StatusOK, createdStoreProduct)
 }
 
-// @Summary List store products
+// @Id get-store-products
 // @Tags product in store
-// @Description List store products
-// @Id list-store-products
-// @Success 200 {array} entity.StoreProduct
+// @Summary Get store product
+// @Param id path string true "Product ID"
+// @Success 200 {object} entity.StoreProduct
 // @Failure 400 {object} error
-// @Router /product/store [get]
+// @Router /product/store/{id} [get]
 func (r *productRoutes) getStoreProduct(c *gin.Context) {
 	id := c.Param("id")
 
@@ -295,10 +311,10 @@ func (r *productRoutes) getStoreProduct(c *gin.Context) {
 	c.JSON(http.StatusOK, storeProduct)
 }
 
+// @Id list-store-products
 // @Summary List store products
 // @Tags product in store
 // @Description List store products
-// @Id list-store-products
 // @Success 200 {array} entity.StoreProduct
 // @Failure 400 {object} error
 // @Router /product/store [get]

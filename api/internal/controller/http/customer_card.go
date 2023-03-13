@@ -27,10 +27,9 @@ func setupCustomerCardRoutes(options *Options, handler *gin.Engine) {
 	}
 }
 
-// @Summary Create customer card
+// @Id Create customer card
 // @Tags customer-card
-// @Description Create customer card
-// @Id create-card
+// @Summary Create customer card
 // @Param card body entity.CustomerCard true "Card"
 // @Success 200 {object} entity.CustomerCard
 // @Failure 400 {object} error
@@ -116,8 +115,7 @@ type deleteCardsRequestBody struct {
 	Ids []string `json:"ids"`
 }
 
-// @Summary Delete customer cards
-//
+// 	@Summary Delete customer cards
 //	@Tags customer-card
 //	@Description Delete customer cards
 //	@Id delete-cards

@@ -2,13 +2,13 @@ package main
 
 import (
 	"github.com/vadimpk/db-project-zlagoda/api/config"
+	_ "github.com/vadimpk/db-project-zlagoda/api/docs"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/app"
-	_ "github.com/vadimpk/db-project-zlagoda/docs"
 )
 
 // @title App Zlagoda api
 // @version 1.0
-// @description project for db market Zlagoda
+// @description project for db market zlagoda
 
 // @host localhost:8082
 // @BasePath /
