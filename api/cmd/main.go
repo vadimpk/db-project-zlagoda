@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/vadimpk/db-project-zlagoda/api/config"
-	_ "github.com/vadimpk/db-project-zlagoda/api/docs"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/app"
+	_ "github.com/vadimpk/db-project-zlagoda/docs"
 )
 
 // @title App Zlagoda api
