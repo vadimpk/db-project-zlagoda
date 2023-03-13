@@ -1,8 +1,7 @@
-DROP TABLE IF EXISTS members_visits;
-DROP TABLE IF EXISTS members_memberships;
-DROP TABLE IF EXISTS members;
-DROP TABLE IF EXISTS memberships;
-DROP TABLE IF EXISTS trainers_visits;
-DROP TABLE IF EXISTS trainers;
-DROP TABLE IF EXISTS sessions;
-DROP TABLE IF EXISTS managers;
+DROP TABLE IF EXISTS sale;
+DROP TABLE IF EXISTS checks;
+DROP TABLE IF EXISTS store_product;
+DROP TABLE IF EXISTS product;
+DROP TABLE IF EXISTS category;
+DROP TABLE IF EXISTS employee;
+DROP TABLE IF EXISTS customer_card;

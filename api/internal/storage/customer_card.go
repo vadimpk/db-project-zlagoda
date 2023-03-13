@@ -35,7 +35,7 @@ func (s *customerCardStorage) Get(id string) (*entity.CustomerCard, error) {
 	card := entity.CustomerCard{}
 	err := s.db.QueryRow("SELECT * FROM customer_card WHERE card_number = $1", id).
 		Scan(&card.ID, &card.Surname, &card.Name, &card.Patronymic,
-			&card.PhoneNumber, &card.City, &card.Street, &card.Zip)
+			&card.PhoneNumber, &card.City, &card.Street, &card.Zip, card.Discount)
 	if err != nil {
 		s.logger.Errorf("error while getting customer card: %s", err)
 	}
@@ -57,10 +57,12 @@ func (s *customerCardStorage) Update(id string, card *entity.CustomerCard) (*ent
 }
 
 func (s *customerCardStorage) Delete(ids []string) error {
-	_, err := s.db.Exec("DELETE FROM customer_card WHERE card_number = ANY($1)", ids)
-	if err != nil {
-		s.logger.Errorf("error while deleting cards: %s", err)
-		return err
+	for _, id := range ids {
+		_, err := s.db.Exec("DELETE FROM customer_card WHERE card_number = $1", id)
+		if err != nil {
+			s.logger.Errorf("error while deleting card: %s", err)
+			return err
+		}
 	}
 	return nil
 }

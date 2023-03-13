@@ -27,7 +27,7 @@ func (s *productService) CreateProduct(product *entity.Product) (*entity.Product
 	return s.storages.Product.CreateProduct(product)
 }
 
-func (s *productService) GetProduct(id string) (*entity.Product, error) {
+func (s *productService) GetProduct(id int) (*entity.Product, error) {
 	s.logger.Infof("getting product: %#v", id)
 	return s.storages.Product.GetProduct(id)
 }
@@ -37,12 +37,12 @@ func (s *productService) ListProducts(opts ListProductsOptions) ([]*entity.Produ
 	return s.storages.Product.ListProducts(opts)
 }
 
-func (s *productService) UpdateProduct(id string, product *entity.Product) (*entity.Product, error) {
+func (s *productService) UpdateProduct(id int, product *entity.Product) (*entity.Product, error) {
 	s.logger.Infof("updating product: %#v", product)
 	return s.storages.Product.UpdateProduct(id, product)
 }
 
-func (s *productService) DeleteProducts(ids []string) error {
+func (s *productService) DeleteProducts(ids []int) error {
 	s.logger.Infof("deleting products: %#v", ids)
 	return s.storages.Product.DeleteProducts(ids)
 }
@@ -57,12 +57,12 @@ func (s *productService) ListProductCategories() (*entity.Product, error) {
 	return s.storages.Product.ListProductCategories()
 }
 
-func (s *productService) UpdateProductCategory(id string, product *entity.ProductCategory) (*entity.ProductCategory, error) {
+func (s *productService) UpdateProductCategory(id int, product *entity.ProductCategory) (*entity.ProductCategory, error) {
 	s.logger.Infof("updating product category: %#v", product)
 	return s.storages.Product.UpdateProductCategory(id, product)
 }
 
-func (s *productService) DeleteProductCategories(ids []string) error {
+func (s *productService) DeleteProductCategories(ids []int) error {
 	s.logger.Infof("deleting product categories: %#v", ids)
 	return s.storages.Product.DeleteProductCategories(ids)
 }
