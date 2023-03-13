@@ -27,6 +27,13 @@ func setupCustomerCardRoutes(options *Options, handler *gin.Engine) {
 	}
 }
 
+// @Id Create customer card
+// @Tags customer-card
+// @Summary Create customer card
+// @Param card body entity.CustomerCard true "Card"
+// @Success 200 {object} entity.CustomerCard
+// @Failure 400 {object} error
+// @Router /customer-card [post]
 func (r *customerCardRoutes) createCard(c *gin.Context) {
 	var card entity.CustomerCard
 	if err := c.ShouldBindJSON(&card); err != nil {
@@ -41,6 +48,14 @@ func (r *customerCardRoutes) createCard(c *gin.Context) {
 	c.JSON(http.StatusOK, createdCard)
 }
 
+// @Summary Get customer card
+// @Tags customer-card
+// @Description Get customer card
+// @Id get-card
+// @Param id path string true "Card ID"
+// @Success 200 {object} entity.CustomerCard
+// @Failure 400 {object} error
+// @Router /customer-card/{id} [get]
 func (r *customerCardRoutes) getCard(c *gin.Context) {
 	id := c.Param("id")
 
@@ -52,6 +67,14 @@ func (r *customerCardRoutes) getCard(c *gin.Context) {
 	c.JSON(http.StatusOK, card)
 }
 
+// @Summary List customer cards
+// @Tags customer-card
+// @Description List customer cards
+// @Id list-cards
+// @Param id path string true "Card ID"
+// @Success 200 {object} entity.CustomerCard
+// @Failure 400 {object} error
+// @Router /customer-card [get]
 func (r *customerCardRoutes) listCards(c *gin.Context) {
 	cards, err := r.opts.Services.CustomerCard.List(service.ListCardOptions{})
 	if err != nil {
@@ -61,6 +84,16 @@ func (r *customerCardRoutes) listCards(c *gin.Context) {
 	c.JSON(http.StatusOK, cards)
 }
 
+// @Summary Update customer card
+//
+//	@Tags customer-card
+//	@Description Update customer card
+//	@Id update-card
+//	@Param id path string true "Card ID"
+//	@Param card body entity.CustomerCard true "Card"
+//	@Success 200 {object} entity.CustomerCard
+//	@Failure 400 {object} error
+//	@Router /customer-card/{id} [put]
 func (r *customerCardRoutes) updateCard(c *gin.Context) {
 	id := c.Param("id")
 
@@ -82,6 +115,14 @@ type deleteCardsRequestBody struct {
 	Ids []string `json:"ids"`
 }
 
+// 	@Summary Delete customer cards
+//	@Tags customer-card
+//	@Description Delete customer cards
+//	@Id delete-cards
+//	@Param ids body deleteCardsRequestBody true "Card IDs"
+//	@Success 200 {object} entity.CustomerCard
+//	@Failure 400 {object} error
+//	@Router /customer-card [delete]
 func (r *customerCardRoutes) deleteCards(c *gin.Context) {
 	var body deleteCardsRequestBody
 	if err := c.ShouldBindJSON(&body); err != nil {

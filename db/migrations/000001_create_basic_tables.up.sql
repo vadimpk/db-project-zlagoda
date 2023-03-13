@@ -51,7 +51,7 @@ CREATE TABLE checks(
 
 CREATE TABLE store_product(
                               UPC VARCHAR(12) PRIMARY KEY,
-                              fk_UPC_prom VARCHAR(12) NOT NULL,
+                              fk_UPC_prom VARCHAR(12),
                               fk_id_product INT NOT NULL,
                               selling_price DECIMAL (13,4) NOT NULL,
                               product_number INT NOT NULL,
