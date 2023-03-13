@@ -12,6 +12,9 @@
         "/customer-card": {
             "get": {
                 "description": "List customer cards",
+                "tags": [
+                    "customer-card"
+                ],
                 "summary": "List customer cards",
                 "operationId": "list-cards",
                 "parameters": [
@@ -38,6 +41,9 @@
             },
             "post": {
                 "description": "Create customer card",
+                "tags": [
+                    "customer-card"
+                ],
                 "summary": "Create customer card",
                 "operationId": "create-card",
                 "parameters": [
@@ -66,6 +72,9 @@
             },
             "delete": {
                 "description": "Delete customer cards",
+                "tags": [
+                    "customer-card"
+                ],
                 "summary": "Delete customer cards",
                 "operationId": "delete-cards",
                 "parameters": [
@@ -96,6 +105,9 @@
         "/customer-card/{id}": {
             "get": {
                 "description": "Get customer card",
+                "tags": [
+                    "customer-card"
+                ],
                 "summary": "Get customer card",
                 "operationId": "get-card",
                 "parameters": [
@@ -122,6 +134,9 @@
             },
             "put": {
                 "description": "Update customer card",
+                "tags": [
+                    "customer-card"
+                ],
                 "summary": "Update customer card",
                 "operationId": "update-card",
                 "parameters": [
@@ -159,6 +174,9 @@
         "/product": {
             "get": {
                 "description": "List products",
+                "tags": [
+                    "product"
+                ],
                 "summary": "List products",
                 "operationId": "list-products",
                 "responses": {
@@ -178,7 +196,10 @@
                 }
             },
             "post": {
-                "description": "Create product",
+                "description": "Create product (using product category)",
+                "tags": [
+                    "product"
+                ],
                 "summary": "Create product",
                 "operationId": "create-product",
                 "parameters": [
@@ -207,6 +228,9 @@
             },
             "delete": {
                 "description": "Delete products",
+                "tags": [
+                    "product"
+                ],
                 "summary": "Delete products",
                 "operationId": "delete-products",
                 "parameters": [
@@ -234,6 +258,9 @@
         "/product/category": {
             "get": {
                 "description": "List product categories",
+                "tags": [
+                    "product category"
+                ],
                 "summary": "List product categories",
                 "operationId": "list-product-categories",
                 "responses": {
@@ -254,6 +281,9 @@
             },
             "post": {
                 "description": "Create product category",
+                "tags": [
+                    "product category"
+                ],
                 "summary": "Create product category",
                 "operationId": "create-product-category",
                 "parameters": [
@@ -282,6 +312,9 @@
             },
             "delete": {
                 "description": "Delete product categories",
+                "tags": [
+                    "product category"
+                ],
                 "summary": "Delete product categories",
                 "operationId": "delete-product-categories",
                 "parameters": [
@@ -309,6 +342,9 @@
         "/product/category/{id}": {
             "put": {
                 "description": "Update product category",
+                "tags": [
+                    "product category"
+                ],
                 "summary": "Update product category",
                 "operationId": "update-product-category",
                 "parameters": [
@@ -346,6 +382,9 @@
         "/product/store": {
             "get": {
                 "description": "List store products",
+                "tags": [
+                    "product in store"
+                ],
                 "summary": "List store products",
                 "operationId": "list-store-products",
                 "responses": {
@@ -366,6 +405,9 @@
             },
             "post": {
                 "description": "Create store product",
+                "tags": [
+                    "product in store"
+                ],
                 "summary": "Create store product",
                 "operationId": "create-store-product",
                 "parameters": [
@@ -394,6 +436,9 @@
             },
             "delete": {
                 "description": "Delete store products",
+                "tags": [
+                    "product in store"
+                ],
                 "summary": "Delete store products",
                 "operationId": "delete-store-products",
                 "parameters": [
@@ -421,6 +466,9 @@
         "/product/store/{id}": {
             "put": {
                 "description": "Update store product",
+                "tags": [
+                    "product in store"
+                ],
                 "summary": "Update store product",
                 "operationId": "update-store-product",
                 "parameters": [
@@ -458,6 +506,9 @@
         "/product/{id}": {
             "get": {
                 "description": "Get product",
+                "tags": [
+                    "product"
+                ],
                 "summary": "Get product",
                 "operationId": "get-product",
                 "parameters": [
@@ -484,6 +535,9 @@
             },
             "put": {
                 "description": "Update product",
+                "tags": [
+                    "product"
+                ],
                 "summary": "Update product",
                 "operationId": "update-product",
                 "parameters": [

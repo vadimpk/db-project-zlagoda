@@ -55,6 +55,7 @@ type ListCardOptions struct {
 }
 
 type SortCardOptions struct {
+	ID         *bool
 	Name       *bool
 	Surname    *bool
 	Patronymic *bool

@@ -45,7 +45,8 @@ func setupProductRoutes(options *Options, handler *gin.Engine) {
 }
 
 // @Summary Create product
-// @Description Create product
+// @Tags product
+// @Description Create product (using product category)
 // @Id create-product
 // @Param product body entity.Product true "Product"
 // @Success 200 {object} entity.Product
@@ -68,6 +69,7 @@ func (r *productRoutes) createProduct(c *gin.Context) {
 }
 
 // @Summary Get product
+// @Tags product
 // @Description Get product
 // @Id get-product
 // @Param id path string true "Product ID"
@@ -86,6 +88,7 @@ func (r *productRoutes) getProduct(c *gin.Context) {
 }
 
 // @Summary List products
+// @Tags product
 // @Description List products
 // @Id list-products
 // @Success 200 {array} entity.Product
@@ -101,6 +104,7 @@ func (r *productRoutes) listProducts(c *gin.Context) {
 }
 
 // @Summary Update product
+// @Tags product
 // @Description Update product
 // @Id update-product
 // @Param id path string true "Product ID"
@@ -131,6 +135,7 @@ type deleteProductsRequestBody struct {
 }
 
 // @Summary Delete products
+// @Tags product
 // @Description Delete products
 // @Id delete-products
 // @Param ids body deleteProductsRequestBody true "Product IDs"
@@ -154,6 +159,7 @@ func (r *productRoutes) deleteProducts(c *gin.Context) {
 }
 
 // @Summary Create product category
+// @Tags product category
 // @Description Create product category
 // @Id create-product-category
 // @Param category body entity.ProductCategory true "Product category"
@@ -177,6 +183,7 @@ func (r *productRoutes) createCategory(c *gin.Context) {
 }
 
 // @Summary List product categories
+// @Tags product category
 // @Description List product categories
 // @Id list-product-categories
 // @Success 200 {array} entity.ProductCategory
@@ -192,6 +199,7 @@ func (r *productRoutes) listCategories(c *gin.Context) {
 }
 
 // @Summary Update product category
+// @Tags product category
 // @Description Update product category
 // @Id update-product-category
 // @Param id path string true "Product category ID"
@@ -222,6 +230,7 @@ type deleteCategoriesRequestBody struct {
 }
 
 // @Summary Delete product categories
+// @Tags product category
 // @Description Delete product categories
 // @Id delete-product-categories
 // @Param ids body deleteCategoriesRequestBody true "Product category IDs"
@@ -245,6 +254,7 @@ func (r *productRoutes) deleteCategories(c *gin.Context) {
 }
 
 // @Summary Create store product
+// @Tags product in store
 // @Description Create store product
 // @Id create-store-product
 // @Param store_product body entity.StoreProduct true "Store product"
@@ -268,6 +278,7 @@ func (r *productRoutes) createStoreProduct(c *gin.Context) {
 }
 
 // @Summary List store products
+// @Tags product in store
 // @Description List store products
 // @Id list-store-products
 // @Success 200 {array} entity.StoreProduct
@@ -285,6 +296,7 @@ func (r *productRoutes) getStoreProduct(c *gin.Context) {
 }
 
 // @Summary List store products
+// @Tags product in store
 // @Description List store products
 // @Id list-store-products
 // @Success 200 {array} entity.StoreProduct
@@ -300,6 +312,7 @@ func (r *productRoutes) listStoreProducts(c *gin.Context) {
 }
 
 // @Summary Update store product
+// @Tags product in store
 // @Description Update store product
 // @Id update-store-product
 // @Param id path string true "Store product ID"
@@ -330,6 +343,7 @@ type deleteStoreProductsRequestBody struct {
 }
 
 // @Summary Delete store products
+// @Tags product in store
 // @Description Delete store products
 // @Id delete-store-products
 // @Param ids body deleteStoreProductsRequestBody true "Store product IDs"

@@ -28,6 +28,7 @@ func setupCustomerCardRoutes(options *Options, handler *gin.Engine) {
 }
 
 // @Summary Create customer card
+// @Tags customer-card
 // @Description Create customer card
 // @Id create-card
 // @Param card body entity.CustomerCard true "Card"
@@ -49,6 +50,7 @@ func (r *customerCardRoutes) createCard(c *gin.Context) {
 }
 
 // @Summary Get customer card
+// @Tags customer-card
 // @Description Get customer card
 // @Id get-card
 // @Param id path string true "Card ID"
@@ -67,6 +69,7 @@ func (r *customerCardRoutes) getCard(c *gin.Context) {
 }
 
 // @Summary List customer cards
+// @Tags customer-card
 // @Description List customer cards
 // @Id list-cards
 // @Param id path string true "Card ID"
@@ -84,6 +87,7 @@ func (r *customerCardRoutes) listCards(c *gin.Context) {
 
 // @Summary Update customer card
 //
+//	@Tags customer-card
 //	@Description Update customer card
 //	@Id update-card
 //	@Param id path string true "Card ID"
@@ -114,6 +118,7 @@ type deleteCardsRequestBody struct {
 
 // @Summary Delete customer cards
 //
+//	@Tags customer-card
 //	@Description Delete customer cards
 //	@Id delete-cards
 //	@Param ids body deleteCardsRequestBody true "Card IDs"

@@ -18,6 +18,9 @@ const docTemplate = `{
         "/customer-card": {
             "get": {
                 "description": "List customer cards",
+                "tags": [
+                    "customer-card"
+                ],
                 "summary": "List customer cards",
                 "operationId": "list-cards",
                 "parameters": [
@@ -44,6 +47,9 @@ const docTemplate = `{
             },
             "post": {
                 "description": "Create customer card",
+                "tags": [
+                    "customer-card"
+                ],
                 "summary": "Create customer card",
                 "operationId": "create-card",
                 "parameters": [
@@ -72,6 +78,9 @@ const docTemplate = `{
             },
             "delete": {
                 "description": "Delete customer cards",
+                "tags": [
+                    "customer-card"
+                ],
                 "summary": "Delete customer cards",
                 "operationId": "delete-cards",
                 "parameters": [
@@ -102,6 +111,9 @@ const docTemplate = `{
         "/customer-card/{id}": {
             "get": {
                 "description": "Get customer card",
+                "tags": [
+                    "customer-card"
+                ],
                 "summary": "Get customer card",
                 "operationId": "get-card",
                 "parameters": [
@@ -128,6 +140,9 @@ const docTemplate = `{
             },
             "put": {
                 "description": "Update customer card",
+                "tags": [
+                    "customer-card"
+                ],
                 "summary": "Update customer card",
                 "operationId": "update-card",
                 "parameters": [
@@ -165,6 +180,9 @@ const docTemplate = `{
         "/product": {
             "get": {
                 "description": "List products",
+                "tags": [
+                    "product"
+                ],
                 "summary": "List products",
                 "operationId": "list-products",
                 "responses": {
@@ -184,7 +202,10 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "Create product",
+                "description": "Create product (using product category)",
+                "tags": [
+                    "product"
+                ],
                 "summary": "Create product",
                 "operationId": "create-product",
                 "parameters": [
@@ -213,6 +234,9 @@ const docTemplate = `{
             },
             "delete": {
                 "description": "Delete products",
+                "tags": [
+                    "product"
+                ],
                 "summary": "Delete products",
                 "operationId": "delete-products",
                 "parameters": [
@@ -240,6 +264,9 @@ const docTemplate = `{
         "/product/category": {
             "get": {
                 "description": "List product categories",
+                "tags": [
+                    "product category"
+                ],
                 "summary": "List product categories",
                 "operationId": "list-product-categories",
                 "responses": {
@@ -260,6 +287,9 @@ const docTemplate = `{
             },
             "post": {
                 "description": "Create product category",
+                "tags": [
+                    "product category"
+                ],
                 "summary": "Create product category",
                 "operationId": "create-product-category",
                 "parameters": [
@@ -288,6 +318,9 @@ const docTemplate = `{
             },
             "delete": {
                 "description": "Delete product categories",
+                "tags": [
+                    "product category"
+                ],
                 "summary": "Delete product categories",
                 "operationId": "delete-product-categories",
                 "parameters": [
@@ -315,6 +348,9 @@ const docTemplate = `{
         "/product/category/{id}": {
             "put": {
                 "description": "Update product category",
+                "tags": [
+                    "product category"
+                ],
                 "summary": "Update product category",
                 "operationId": "update-product-category",
                 "parameters": [
@@ -352,6 +388,9 @@ const docTemplate = `{
         "/product/store": {
             "get": {
                 "description": "List store products",
+                "tags": [
+                    "product in store"
+                ],
                 "summary": "List store products",
                 "operationId": "list-store-products",
                 "responses": {
@@ -372,6 +411,9 @@ const docTemplate = `{
             },
             "post": {
                 "description": "Create store product",
+                "tags": [
+                    "product in store"
+                ],
                 "summary": "Create store product",
                 "operationId": "create-store-product",
                 "parameters": [
@@ -400,6 +442,9 @@ const docTemplate = `{
             },
             "delete": {
                 "description": "Delete store products",
+                "tags": [
+                    "product in store"
+                ],
                 "summary": "Delete store products",
                 "operationId": "delete-store-products",
                 "parameters": [
@@ -427,6 +472,9 @@ const docTemplate = `{
         "/product/store/{id}": {
             "put": {
                 "description": "Update store product",
+                "tags": [
+                    "product in store"
+                ],
                 "summary": "Update store product",
                 "operationId": "update-store-product",
                 "parameters": [
@@ -464,6 +512,9 @@ const docTemplate = `{
         "/product/{id}": {
             "get": {
                 "description": "Get product",
+                "tags": [
+                    "product"
+                ],
                 "summary": "Get product",
                 "operationId": "get-product",
                 "parameters": [
@@ -490,6 +541,9 @@ const docTemplate = `{
             },
             "put": {
                 "description": "Update product",
+                "tags": [
+                    "product"
+                ],
                 "summary": "Update product",
                 "operationId": "update-product",
                 "parameters": [
