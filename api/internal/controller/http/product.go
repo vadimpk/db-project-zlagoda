@@ -44,10 +44,10 @@ func setupProductRoutes(options *Options, handler *gin.Engine) {
 	}
 }
 
+// @Id create-product
 // @Summary Create product
 // @Tags product
 // @Description Create product (using product category)
-// @Id create-product
 // @Param product body entity.Product true "Product"
 // @Success 200 {object} entity.Product
 // @Failure 400 {object} error
@@ -68,10 +68,10 @@ func (r *productRoutes) createProduct(c *gin.Context) {
 	c.JSON(http.StatusOK, createdProduct)
 }
 
+// @Id get-product
 // @Summary Get product
 // @Tags product
 // @Description Get product
-// @Id get-product
 // @Param id path string true "Product ID"
 // @Success 200 {object} entity.Product
 // @Failure 400 {object} error
@@ -87,10 +87,10 @@ func (r *productRoutes) getProduct(c *gin.Context) {
 	c.JSON(http.StatusOK, employee)
 }
 
+// @Id list-products
 // @Summary List products
 // @Tags product
 // @Description List products
-// @Id list-products
 // @Success 200 {array} entity.Product
 // @Failure 400 {object} error
 // @Router /product [get]
@@ -103,10 +103,10 @@ func (r *productRoutes) listProducts(c *gin.Context) {
 	c.JSON(http.StatusOK, products)
 }
 
+// @Id update-product
 // @Summary Update product
 // @Tags product
 // @Description Update product
-// @Id update-product
 // @Param id path string true "Product ID"
 // @Param product body entity.Product true "Product"
 // @Success 200 {object} entity.Product
@@ -134,10 +134,10 @@ type deleteProductsRequestBody struct {
 	Ids []string `json:"ids"`
 }
 
+// @Id delete-products
 // @Summary Delete products
 // @Tags product
 // @Description Delete products
-// @Id delete-products
 // @Param ids body deleteProductsRequestBody true "Product IDs"
 // @Success 200
 // @Failure 400 {object} error
@@ -158,10 +158,10 @@ func (r *productRoutes) deleteProducts(c *gin.Context) {
 	c.JSON(http.StatusOK, nil)
 }
 
+// @Id create-product-category
 // @Summary Create product category
 // @Tags product category
 // @Description Create product category
-// @Id create-product-category
 // @Param category body entity.ProductCategory true "Product category"
 // @Success 200 {object} entity.ProductCategory
 // @Failure 400 {object} error
@@ -182,10 +182,10 @@ func (r *productRoutes) createCategory(c *gin.Context) {
 	c.JSON(http.StatusOK, createdCategory)
 }
 
+// @Id list-product-categories
 // @Summary List product categories
 // @Tags product category
 // @Description List product categories
-// @Id list-product-categories
 // @Success 200 {array} entity.ProductCategory
 // @Failure 400 {object} error
 // @Router /product/category [get]
@@ -198,10 +198,10 @@ func (r *productRoutes) listCategories(c *gin.Context) {
 	c.JSON(http.StatusOK, categories)
 }
 
+// @Id update-product-category
 // @Summary Update product category
 // @Tags product category
 // @Description Update product category
-// @Id update-product-category
 // @Param id path string true "Product category ID"
 // @Param category body entity.ProductCategory true "Product category"
 // @Success 200 {object} entity.ProductCategory
@@ -229,10 +229,10 @@ type deleteCategoriesRequestBody struct {
 	Ids []string `json:"ids"`
 }
 
+// @Id delete-product-categories
 // @Summary Delete product categories
 // @Tags product category
 // @Description Delete product categories
-// @Id delete-product-categories
 // @Param ids body deleteCategoriesRequestBody true "Product category IDs"
 // @Success 200
 // @Failure 400 {object} error
@@ -253,10 +253,10 @@ func (r *productRoutes) deleteCategories(c *gin.Context) {
 	c.JSON(http.StatusOK, nil)
 }
 
+// @Id create-store-product
 // @Summary Create store product
 // @Tags product in store
 // @Description Create store product
-// @Id create-store-product
 // @Param store_product body entity.StoreProduct true "Store product"
 // @Success 200 {object} entity.StoreProduct
 // @Failure 400 {object} error
@@ -277,10 +277,10 @@ func (r *productRoutes) createStoreProduct(c *gin.Context) {
 	c.JSON(http.StatusOK, createdStoreProduct)
 }
 
+// @Id list-store-products
 // @Summary List store products
 // @Tags product in store
 // @Description List store products
-// @Id list-store-products
 // @Success 200 {array} entity.StoreProduct
 // @Failure 400 {object} error
 // @Router /product/store [get]
@@ -295,10 +295,10 @@ func (r *productRoutes) getStoreProduct(c *gin.Context) {
 	c.JSON(http.StatusOK, storeProduct)
 }
 
+// @Id list-store-products
 // @Summary List store products
 // @Tags product in store
 // @Description List store products
-// @Id list-store-products
 // @Success 200 {array} entity.StoreProduct
 // @Failure 400 {object} error
 // @Router /product/store [get]
@@ -311,10 +311,10 @@ func (r *productRoutes) listStoreProducts(c *gin.Context) {
 	c.JSON(http.StatusOK, storeProducts)
 }
 
+// @Id update-store-product
 // @Summary Update store product
 // @Tags product in store
 // @Description Update store product
-// @Id update-store-product
 // @Param id path string true "Store product ID"
 // @Param store_product body entity.StoreProduct true "Store product"
 // @Success 200 {object} entity.StoreProduct
@@ -342,10 +342,10 @@ type deleteStoreProductsRequestBody struct {
 	Ids []string `json:"ids"`
 }
 
+// @Id delete-store-products
 // @Summary Delete store products
 // @Tags product in store
 // @Description Delete store products
-// @Id delete-store-products
 // @Param ids body deleteStoreProductsRequestBody true "Store product IDs"
 // @Success 200
 // @Failure 400 {object} error

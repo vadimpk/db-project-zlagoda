@@ -43,7 +43,12 @@ func (s *customerCardStorage) Get(id string) (*entity.CustomerCard, error) {
 }
 
 func (s *customerCardStorage) List(opts service.ListCardOptions) ([]*entity.CustomerCard, error) {
-	return nil, nil
+	_, err := s.db.Exec("SELECT * FROM customer_card")
+	if err != nil {
+		s.logger.Errorf("error while listing cards: %s", err)
+		return nil, err
+	}
+	return nil, err // TODO: return cards
 }
 
 func (s *customerCardStorage) Update(id string, card *entity.CustomerCard) (*entity.CustomerCard, error) {

@@ -19,7 +19,7 @@ func NewProductStorage(logger *logger.Logger, db *sql.DB) service.ProductStorage
 	}
 }
 
-var _ service.EmployeeStorage = (*employeeStorage)(nil)
+var _ service.ProductStorage = (*productStorage)(nil)
 
 func (s *productStorage) CreateProduct(product *entity.Product) (*entity.Product, error) {
 	_, err := s.db.Exec("INSERT INTO product (id_product, fk_category_number, product_name, product_characteristics) VALUES ($1, $2, $3, $4)",
@@ -42,7 +42,12 @@ func (s *productStorage) GetProduct(id string) (*entity.Product, error) {
 }
 
 func (s *productStorage) ListProducts(opts service.ListProductsOptions) ([]*entity.Product, error) {
-	return nil, nil
+	_, err := s.db.Exec("SELECT * FROM product")
+	if err != nil {
+		s.logger.Errorf("error while listing products: %s", err)
+		return nil, err
+	}
+	return nil, err // TODO : return LIST OF PRODUCTS
 }
 
 func (s *productStorage) UpdateProduct(id string, product *entity.Product) (*entity.Product, error) {
@@ -65,7 +70,7 @@ func (s *productStorage) DeleteProducts(ids []string) error {
 }
 
 func (s *productStorage) CreateProductCategory(category *entity.ProductCategory) (*entity.ProductCategory, error) {
-	_, err := s.db.Exec("INSERT INTO product_category (category_number, category_name) VALUES ($1, $2)",
+	_, err := s.db.Exec("INSERT INTO category (category_number, category_name) VALUES ($1, $2)",
 		category.ID, category.Name)
 	if err != nil {
 		s.logger.Errorf("error while creating product category: %s", err)
@@ -75,11 +80,16 @@ func (s *productStorage) CreateProductCategory(category *entity.ProductCategory)
 }
 
 func (s *productStorage) ListProductCategories() (*entity.Product, error) {
-	return nil, nil
+	_, err := s.db.Exec("SELECT * FROM category")
+	if err != nil {
+		s.logger.Errorf("error while listing product categories: %s", err)
+		return nil, err
+	}
+	return nil, err // TODO : return LIST OF PRODUCT CATEGORIES
 }
 
 func (s *productStorage) UpdateProductCategory(id string, product *entity.ProductCategory) (*entity.ProductCategory, error) {
-	_, err := s.db.Exec("UPDATE product_category SET category_name = $1 WHERE category_number = $2",
+	_, err := s.db.Exec("UPDATE category SET category_name = $1 WHERE category_number = $2",
 		product.Name, id)
 	if err != nil {
 		s.logger.Errorf("error while updating product category: %s", err)
@@ -89,7 +99,7 @@ func (s *productStorage) UpdateProductCategory(id string, product *entity.Produc
 }
 
 func (s *productStorage) DeleteProductCategories(ids []string) error {
-	_, err := s.db.Exec("DELETE FROM product_category WHERE category_number = ANY($1)", ids)
+	_, err := s.db.Exec("DELETE FROM category WHERE category_number = ANY($1)", ids)
 	if err != nil {
 		s.logger.Errorf("error while deleting product categories: %s", err)
 		return err
@@ -118,7 +128,12 @@ func (s *productStorage) GetStoreProduct(id string) (*entity.StoreProduct, error
 }
 
 func (s *productStorage) ListStoreProducts(opts service.ListStoreProductsOptions) ([]*entity.StoreProduct, error) {
-	return nil, nil
+	_, err := s.db.Exec("SELECT * FROM store_product")
+	if err != nil {
+		s.logger.Errorf("error while listing store products: %s", err)
+		return nil, err
+	}
+	return nil, err // TODO : return LIST OF STORE PRODUCTS
 }
 
 func (s *productStorage) UpdateStoreProduct(id string, storeProduct *entity.StoreProduct) (*entity.StoreProduct, error) {

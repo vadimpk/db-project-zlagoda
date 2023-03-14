@@ -11,7 +11,11 @@ type Storages struct {
 }
 
 type EmployeeStorage interface {
+	Create(employee *entity.Employee) (*entity.Employee, error)
 	Get(id string) (*entity.Employee, error)
+	List(opts ListEmployeeOptions) ([]*entity.Employee, error)
+	Update(id string, employee *entity.Employee) (*entity.Employee, error)
+	Delete(ids []string) error
 }
 
 type CustomerCardStorage interface {
