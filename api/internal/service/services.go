@@ -19,7 +19,11 @@ type Services struct {
 }
 
 type EmployeeService interface {
+	Create(employee *entity.Employee) (*entity.Employee, error)
 	Get(id string) (*entity.Employee, error)
+	List(opts ListEmployeeOptions) ([]*entity.Employee, error)
+	Update(id string, employee *entity.Employee) (*entity.Employee, error)
+	Delete(ids []string) error
 }
 
 type CustomerCardService interface {
@@ -47,6 +51,26 @@ type ProductService interface {
 	ListStoreProducts(opts ListStoreProductsOptions) ([]*entity.StoreProduct, error)
 	UpdateStoreProduct(id string, storeProduct *entity.StoreProduct) (*entity.StoreProduct, error)
 	DeleteStoreProducts(ids []string) error
+}
+
+type ListEmployeeOptions struct {
+	Search *string
+	Sort   SortEmployeeOptions
+}
+
+type SortEmployeeOptions struct {
+	ID          *bool
+	Surname     *bool
+	Name        *bool
+	Patronymic  *bool
+	Role        *bool
+	Salary      *bool
+	DateOfBirth *bool
+	DateOfStart *bool
+	Phone       *bool
+	City        *bool
+	Street      *bool
+	Zip         *bool
 }
 
 type ListCardOptions struct {

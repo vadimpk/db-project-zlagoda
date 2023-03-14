@@ -45,6 +45,10 @@ func (s *employeeStorage) Get(id string) (*entity.Employee, error) {
 	return &employee, nil
 }
 
+func (s *employeeStorage) List(opts service.ListEmployeeOptions) ([]*entity.Employee, error) {
+	return nil, nil
+}
+
 func (s *employeeStorage) Update(id string, employee *entity.Employee) (*entity.Employee, error) {
 	_, err := s.db.Exec("UPDATE employee SET empl_name = $1, empl_surname = $2, empl_patronymic = $3, empl_role = $4, salary = $5, date_of_birth = $6, date_of_start = $7, phone_number = $8, city = $9, street = $10, zip_code = $11 WHERE id_employee = $12",
 		employee.Name, employee.Surname, employee.Patronymic, employee.Role, employee.Salary, employee.DateOfBirth, employee.DateOfStart, employee.Phone, employee.City, employee.Street, employee.Zip, id)
