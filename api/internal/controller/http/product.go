@@ -79,18 +79,18 @@ func (r *productRoutes) createProduct(c *gin.Context) {
 // @Router /product/{id} [get]
 func (r *productRoutes) getProduct(c *gin.Context) {
 	id := c.Param("id")
-	employeeID, err := strconv.Atoi(id)
+	productID, err := strconv.Atoi(id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, err)
 		return
 	}
 
-	employee, err := r.opts.Services.Product.GetProduct(employeeID)
+	product, err := r.opts.Services.Product.GetProduct(productID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
-	c.JSON(http.StatusOK, employee)
+	c.JSON(http.StatusOK, product)
 }
 
 // @Id list-products

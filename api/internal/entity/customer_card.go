@@ -1,7 +1,7 @@
 package entity
 
 type CustomerCard struct {
-	ID          string `json:"id"`
+	ID          int    `json:"id"`
 	Surname     string `json:"surname"`
 	Name        string `json:"name"`
 	Patronymic  string `json:"patronymic"`

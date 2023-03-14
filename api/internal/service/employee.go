@@ -27,7 +27,7 @@ func (s *employeeService) Create(employee *entity.Employee) (*entity.Employee, e
 	return s.storages.Employee.Create(employee)
 }
 
-func (s *employeeService) Get(id string) (*entity.Employee, error) {
+func (s *employeeService) Get(id int) (*entity.Employee, error) {
 	s.logger.Infof("getting employee: %#v", id)
 	return s.storages.Employee.Get(id)
 }
@@ -37,12 +37,12 @@ func (s *employeeService) List(opts ListEmployeeOptions) ([]*entity.Employee, er
 	return s.storages.Employee.List(opts)
 }
 
-func (s *employeeService) Update(id string, employee *entity.Employee) (*entity.Employee, error) {
+func (s *employeeService) Update(id int, employee *entity.Employee) (*entity.Employee, error) {
 	s.logger.Infof("updating employee: %#v", employee)
 	return s.storages.Employee.Update(id, employee)
 }
 
-func (s *employeeService) Delete(ids []string) error {
+func (s *employeeService) Delete(ids []int) error {
 	s.logger.Infof("deleting employees: %#v", ids)
 	return s.storages.Employee.Delete(ids)
 }

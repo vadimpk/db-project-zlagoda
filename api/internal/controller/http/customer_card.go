@@ -5,6 +5,7 @@ import (
 	"github.com/vadimpk/db-project-zlagoda/api/internal/entity"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/service"
 	"net/http"
+	"strconv"
 )
 
 type customerCardRoutes struct {
@@ -59,7 +60,12 @@ func (r *customerCardRoutes) createCard(c *gin.Context) {
 func (r *customerCardRoutes) getCard(c *gin.Context) {
 	id := c.Param("id")
 
-	card, err := r.opts.Services.CustomerCard.Get(id)
+	cardID, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	card, err := r.opts.Services.CustomerCard.Get(cardID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
@@ -71,8 +77,7 @@ func (r *customerCardRoutes) getCard(c *gin.Context) {
 // @Summary List customer cards
 // @Tags customer-card
 // @Description List customer cards
-// @Param id path string true "Card ID"
-// @Success 200 {object} entity.CustomerCard
+// @Success 200 {array} entity.CustomerCard
 // @Failure 400 {object} error
 // @Router /customer-card [get]
 func (r *customerCardRoutes) listCards(c *gin.Context) {
@@ -96,13 +101,19 @@ func (r *customerCardRoutes) listCards(c *gin.Context) {
 func (r *customerCardRoutes) updateCard(c *gin.Context) {
 	id := c.Param("id")
 
+	cardID, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+
 	var card entity.CustomerCard
 	if err := c.ShouldBindJSON(&card); err != nil {
 		c.JSON(http.StatusBadRequest, err)
 		return
 	}
 
-	updatedCard, err := r.opts.Services.CustomerCard.Update(id, &card)
+	updatedCard, err := r.opts.Services.CustomerCard.Update(cardID, &card)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
@@ -111,7 +122,7 @@ func (r *customerCardRoutes) updateCard(c *gin.Context) {
 }
 
 type deleteCardsRequestBody struct {
-	Ids []string `json:"ids"`
+	Ids []int `json:"ids"`
 }
 
 // @Id delete-cards
@@ -119,7 +130,7 @@ type deleteCardsRequestBody struct {
 // @Tags customer-card
 // @Description Delete customer cards
 // @Param ids body deleteCardsRequestBody true "Card IDs"
-// @Success 200 {object} entity.CustomerCard
+// @Success 200
 // @Failure 400 {object} error
 // @Router /customer-card [delete]
 func (r *customerCardRoutes) deleteCards(c *gin.Context) {

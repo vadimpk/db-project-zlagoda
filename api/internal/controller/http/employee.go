@@ -5,6 +5,7 @@ import (
 	"github.com/vadimpk/db-project-zlagoda/api/internal/entity"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/service"
 	"net/http"
+	"strconv"
 )
 
 type employeeRoutes struct {
@@ -53,14 +54,19 @@ func (r *employeeRoutes) createEmployee(c *gin.Context) {
 // @Summary Get employee
 // @Tags employee
 // @Description Get employee
-// @Param id path string true "Employee ID"
+// @Param id path int true "Employee ID"
 // @Success 200 {object} entity.Employee
 // @Failure 400 {object} error
 // @Router /employee/{id} [get]
 func (r *employeeRoutes) getEmployee(c *gin.Context) {
 	id := c.Param("id")
 
-	employee, err := r.opts.Services.Employee.Get(id)
+	employeeID, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	employee, err := r.opts.Services.Employee.Get(employeeID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
@@ -72,7 +78,7 @@ func (r *employeeRoutes) getEmployee(c *gin.Context) {
 // @Summary List employees
 // @Tags employee
 // @Description List employees
-// @Success 200 {object} []entity.Employee
+// @Success 200 {array} entity.Employee
 // @Failure 400 {object} error
 // @Router /employee [get]
 func (r *employeeRoutes) listEmployee(c *gin.Context) {
@@ -96,13 +102,19 @@ func (r *employeeRoutes) listEmployee(c *gin.Context) {
 func (r *employeeRoutes) updateEmployee(c *gin.Context) {
 	id := c.Param("id")
 
+	employeeID, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+
 	var employee entity.Employee
 	if err := c.ShouldBindJSON(&employee); err != nil {
 		c.JSON(http.StatusBadRequest, err)
 		return
 	}
 
-	updatedEmployee, err := r.opts.Services.Employee.Update(id, &employee)
+	updatedEmployee, err := r.opts.Services.Employee.Update(employeeID, &employee)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
@@ -110,22 +122,26 @@ func (r *employeeRoutes) updateEmployee(c *gin.Context) {
 	c.JSON(http.StatusOK, updatedEmployee)
 }
 
+type deleteEmployeeRequestBody struct {
+	Ids []int `json:"ids"`
+}
+
 // @Id delete-employee
 // @Summary Delete employee
 // @Tags employee
 // @Description Delete employee
-// @Param ids body []string true "Employee IDs"
+// @Param ids body deleteEmployeeRequestBody true "Employee IDs"
 // @Success 200
 // @Failure 400 {object} error
 // @Router /employee [delete]
 func (r *employeeRoutes) deleteEmployee(c *gin.Context) {
-	var ids []string
-	if err := c.ShouldBindJSON(&ids); err != nil {
+	var body deleteEmployeeRequestBody
+	if err := c.ShouldBindJSON(&body); err != nil {
 		c.JSON(http.StatusBadRequest, err)
 		return
 	}
 
-	err := r.opts.Services.Employee.Delete(ids)
+	err := r.opts.Services.Employee.Delete(body.Ids)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
