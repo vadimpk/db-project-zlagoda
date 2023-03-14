@@ -31,7 +31,7 @@ func (s *customerCardStorage) Create(card *entity.CustomerCard) (*entity.Custome
 	return card, err
 }
 
-func (s *customerCardStorage) Get(id string) (*entity.CustomerCard, error) {
+func (s *customerCardStorage) Get(id int) (*entity.CustomerCard, error) {
 	card := entity.CustomerCard{}
 	err := s.db.QueryRow("SELECT * FROM customer_card WHERE card_number = $1", id).
 		Scan(&card.ID, &card.Surname, &card.Name, &card.Patronymic,
@@ -46,7 +46,7 @@ func (s *customerCardStorage) List(opts service.ListCardOptions) ([]*entity.Cust
 	return nil, nil
 }
 
-func (s *customerCardStorage) Update(id string, card *entity.CustomerCard) (*entity.CustomerCard, error) {
+func (s *customerCardStorage) Update(id int, card *entity.CustomerCard) (*entity.CustomerCard, error) {
 	_, err := s.db.Exec("UPDATE customer_card SET cust_surname = $1, cust_name = $2, cust_patronymic = $3, phone_number = $4, city = $5, street = $6, zip_code = $7, discount = $8 WHERE card_number = $9",
 		card.Surname, card.Name, card.Patronymic, card.PhoneNumber, card.City, card.Street, card.Zip, card.Discount, id)
 	if err != nil {
@@ -56,7 +56,7 @@ func (s *customerCardStorage) Update(id string, card *entity.CustomerCard) (*ent
 	return card, nil
 }
 
-func (s *customerCardStorage) Delete(ids []string) error {
+func (s *customerCardStorage) Delete(ids []int) error {
 	for _, id := range ids {
 		_, err := s.db.Exec("DELETE FROM customer_card WHERE card_number = $1", id)
 		if err != nil {

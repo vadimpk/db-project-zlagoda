@@ -11,15 +11,19 @@ type Storages struct {
 }
 
 type EmployeeStorage interface {
-	Get(id string) (*entity.Employee, error)
+	Create(employee *entity.Employee) (*entity.Employee, error)
+	Get(id int) (*entity.Employee, error)
+	List(opts ListEmployeeOptions) ([]*entity.Employee, error)
+	Update(id int, employee *entity.Employee) (*entity.Employee, error)
+	Delete(ids []int) error
 }
 
 type CustomerCardStorage interface {
 	Create(card *entity.CustomerCard) (*entity.CustomerCard, error)
-	Get(id string) (*entity.CustomerCard, error)
+	Get(id int) (*entity.CustomerCard, error)
 	List(opts ListCardOptions) ([]*entity.CustomerCard, error)
-	Update(id string, card *entity.CustomerCard) (*entity.CustomerCard, error)
-	Delete(ids []string) error
+	Update(id int, card *entity.CustomerCard) (*entity.CustomerCard, error)
+	Delete(ids []int) error
 }
 
 type ProductStorage interface {
