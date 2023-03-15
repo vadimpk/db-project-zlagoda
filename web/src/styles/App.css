@@ -1,3 +1,6 @@
+*{
+    font-family: 'Poppins', sans-serif;
+}
 .login {
     display: flex;
     justify-content: space-between;
@@ -6,53 +9,50 @@
 }
 .navigation-menu {
     background-color: #F6D33C;
+    padding: 0 20px;
+    font-size: 16px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    align-items: center;
 }
-
-/* Стили для логотипа */
+.nav-left {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
 .logo {
-    display: inline-block;
-    vertical-align: middle;
+    margin-right: 50px;
 }
-
-/* Стили для пунктов навигации */
 .menu-list {
-    display: inline-block;
-    vertical-align: middle;
-    margin-left: 20px;
+    display: flex;
+    flex-direction: row;
 }
-
 .menu-list li {
-    display: inline-block;
     position: relative;
 }
-
 .menu-list li a {
     display: inline-block;
-    padding: 10px;
+    padding: 15px;
     text-decoration: none;
     color: #333;
 }
-
-/* Стили для выпадающего меню */
 .dropdown-menu {
+    width: 163px;
+    font-weight: normal;
     display: none;
     position: absolute;
     top: 100%;
     left: 0;
     z-index: 1;
     background-color: #fff;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+    border-radius: 0 0 7px 7px;
 }
-
 .has-dropdown:hover .dropdown-menu {
     display: block;
 }
-
-.dropdown-menu li a:hover {
-    background-color: #f2f2f2;
-}
-
-/* Стили для линии под пунктом */
 .menu-list li a:hover:after {
     content: "";
     display: block;
@@ -63,6 +63,35 @@
     bottom: 0;
     left: 0;
 }
+#popup-btn{
+    background-color: transparent;
+    border: transparent;
+    cursor: pointer;
+}
+.profile-top {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    align-items: start;
+}
+.profile-name {
+    font-size: 24px;
+    font-weight: bold;
+    margin-right: 30px;
+}
+.profile-nl {
+    background-color: #0C8346;
+    border-radius: 7px;
+    color: white;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.profile-v {
+    margin: 20px;
+}
+
 
 
 

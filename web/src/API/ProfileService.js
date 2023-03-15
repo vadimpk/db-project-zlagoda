@@ -1,9 +1,11 @@
 import axios from "axios";
 
-export default class LoginService {
-    static async getProfession(phone, password) {
+export default class ProfileService {
+    static async getAccountData(phone,password) {
         //const response = await axios.get(`https://jsonplaceholder.typicode.com/posts/${id}/comments`)
-        const response = Math.random() > 0.5 ? 'manager' : 'cashier'
+        const response = {
+
+        }
         return response;
     }
 }

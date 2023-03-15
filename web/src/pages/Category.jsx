@@ -1,13 +1,13 @@
 import React from 'react';
 import Navbar from "../components/UI/Navbar/Navbar";
 
-const Checks = () => {
+const Category = () => {
     return (
         <div>
             <Navbar/>
-            Checks
+            category
         </div>
     );
 };
 
-export default Checks;
+export default Category;

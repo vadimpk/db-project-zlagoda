@@ -19,7 +19,7 @@ const LoginForm = () => {
 
     const handleLogin = async () => {
         if (validatePhoneNumber(phone) && password) {
-            const response = await LoginService.getAccountData(phone, password)
+            const response = await LoginService.getProfession(phone, password)
             if (response.localeCompare('manager')){
                 setIsManager(true)
             }
