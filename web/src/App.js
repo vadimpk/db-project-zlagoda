@@ -6,7 +6,7 @@ import AppRouter from "./components/AppRouter";
 
 function App() {
     //+380687164841
-    const [isManager, setIsManager] = useState(false);
+    const [isManager, setIsManager] = useState(true);
 
     useEffect(() => {
         if (localStorage.getItem('manager')) {

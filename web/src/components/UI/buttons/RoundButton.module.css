@@ -4,6 +4,7 @@
     border-radius: 34px;
     background-color: transparent;
     border: black solid 2px;
+    margin-left: 10px;
 }
 .button:hover {
     color: white;
