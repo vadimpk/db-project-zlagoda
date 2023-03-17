@@ -1,0 +1,11 @@
+.div {
+    margin-left: 30px;
+}
+.date {
+    width: 280px;
+    height: 35px;
+    border: 2px black solid;
+    border-radius: 7px;
+    padding: 0 5px;
+    margin-left: 10px;
+}

@@ -91,6 +91,27 @@
 .profile-v {
     margin: 20px;
 }
+.profile-left{
+    display: inline-flex;
+    flex-direction: column;
+}
+.profile-p{
+    display: inline-flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+.profile-p hr {
+    border: 2px black solid;
+    margin: 5px 0;
+}
+.profile-p h3 {
+    font-size: 16px;
+    font-weight: bold;
+}
+.profile-p p {
+    font-size: 14px;
+    font-weight: normal;
+}
 .searchBar {
     display: inline-flex;
 }
@@ -108,9 +129,15 @@
 }
 .table-1 {
     margin: 0 auto;
-    width: 95%;
     border-collapse: collapse;
 }
+.imaginary-margin {
+    width: 35px;
+}
+.table-1 th, td {
+    padding: 0 15px ;
+}
+
 .table-1 th {
     border-bottom: 2px solid black;
     text-align: center;
@@ -126,6 +153,10 @@
     background-color: #0C8346;
     color: white;
 }
+.two-tables-div {
+    display: inline-flex;
+    width: 100%;
+ }
 
 
 
