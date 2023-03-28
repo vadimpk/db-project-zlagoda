@@ -7,14 +7,120 @@ import edit from "../assets/images/edit.svg";
 import PrintButton from "../components/UI/buttons/PrintButton";
 
 import {ManagerContext} from "../context";
+import Table from "../components/UI/table/Table";
+import EmployeeFormPopup from "../components/popups/EmployeeFormPopup";
+import ModalForm from "../components/UI/Modal/ModalForm";
+import CustomerFormPopup from "../components/popups/CustomerFormPopup";
 
 const Customers = () => {
     const {isManager, setIsManager} = useContext(ManagerContext);
-    const [searchResults, setSearchResults] = useState([]);
-    function handleSearch(searchCust) {
-        setSearchResults(searchCust)
+    const [modal, setModal] = useState(false);
+    const tableData = ['Номер карти','ПІБ','Відсоток','Телефон','Адреса']
+    const [selectedRow, setSelectedRow] = useState({
+        cardNo: '',
+        fullName: '',
+        percent: '',
+        phone: '',
+        address: ''
+    });
+    //EXAMPLE
+    const [customers, setCustomers] = useState([
+        {
+            cardNo: '1234567891',
+            fullName: {
+                surname: 'Горбань',
+                name: 'Ольга',
+                lastName: 'Олександрівна'
+            },
+            percent: '0',
+            phone: '+380956324525',
+            address: {
+                city: 'Кам’янець-Подільський',
+                street: 'Марини Цвєтаєвої',
+                zipCode: '24300'
+            }
+        },
+        {
+            cardNo: '1234567892',
+            fullName: {
+                surname: 'Прізвище',
+                name: 'Ім\'я',
+                lastName: 'По-батькові'
+            },
+            percent: '2',
+            phone: '+380956324525',
+            address: {
+                city: 'Кам’янець-Подільський',
+                street: 'Марини Цвєтаєвої',
+                zipCode: '24300'
+            }
+        },
+        {
+            cardNo: '1234567890',
+            fullName: {
+                surname: 'Прізвище',
+                name: 'Ім\'я',
+                lastName: 'По-батькові'
+            },
+            percent: '8',
+            phone: '+380956324525',
+            address: {
+                city: 'Кам’янець-Подільський',
+                street: 'Марини Цвєтаєвої',
+                zipCode: '24300'
+            }
+        }
+
+    ]);
+    function transformData(data) {
+        return data.map((item) => {
+            const {city, street, zipCode} = item.address;
+            const addressString = Object.values(item.address).join(', ');
+            const {surname, name, lastName} = item.fullName;
+            const fullNameString = [surname, name, lastName].filter(Boolean).join(' ');
+            return {
+                ...item,
+                fullName: fullNameString,
+                address: addressString
+            };
+        });
     }
 
+    function handleSearch(percent) {
+        setCustomers(customers.filter( c => c.percent===percent))
+    }
+    function handleAdd() {
+        setSelectedRow(undefined);
+        setModal(true);
+    }
+    function handleEdit() {
+        if (selectedRow.cardNo===''){
+            alert('Виберіть клієнта для редагування')
+        } else {
+            setModal(true)
+        }
+    }
+    function handleDelete() {
+        if (selectedRow.cardNo===''){
+            alert('Виберіть клієнта для видалення')
+        } else {
+            setCustomers(prevCustomers => prevCustomers.filter(employee => employee.cardNo !== selectedRow.cardNo));
+        }
+    }
+    const createCustomer = (newCustomer) => {
+        setCustomers(prevCustomers => [...prevCustomers, newCustomer]);
+        setModal(false)
+    }
+    const editCustomer = (newCustomer, cardNo) => {
+        newCustomer.cardNo=cardNo
+        setCustomers(customers.map(e => {
+            if (e.cardNo===cardNo){
+                return newCustomer;
+            }
+            return e
+        }));
+        setModal(false)
+    }
     return (
         <div>
             <Navbar/>
@@ -23,54 +129,24 @@ const Customers = () => {
                     <Searchbar onSearch={handleSearch} placeholder={isManager ? "Введіть відсоток із карти клієнта" : "Введіть прізвище клієнта"}/>
                 </div>
                 <div className="filter-left">
-                    <RoundButton>+</RoundButton>
-                    <RoundButton>&minus;</RoundButton>
+                    <RoundButton onClick={handleAdd}>+</RoundButton>
+                    <RoundButton onClick={handleDelete}>&minus;</RoundButton>
                     {
                         isManager
                         ?
-                            <RoundButton><img src={edit} width="14px" height="12px"/></RoundButton>
+                            <>
+                                <RoundButton onClick={handleEdit}><img src={edit} width="14px" height="12px"/></RoundButton>
+                                <PrintButton/>
+                            </>
                             :
                         null
                     }
-                    {
-                        isManager
-                            ?
-                            <PrintButton/>
-                            :
-                            null
-                    }
+                    <ModalForm visible={modal} setVisible={setModal}>
+                        <CustomerFormPopup setVisible={setModal} create={createCustomer} edit={editCustomer} selectedRow={selectedRow===undefined ? undefined : customers.find(customer => customer.cardNo === selectedRow.cardNo)}/>
+                    </ModalForm>
                 </div>
             </div>
-            <table className="table-1">
-                <tr>
-                    <th>Номер карти</th>
-                    <th>ПІБ</th>
-                    <th>Відсоток</th>
-                    <th>Телефон</th>
-                    <th>Адреса</th>
-                </tr>
-                <tr>
-                    <td>1234567890123</td>
-                    <td>Прізвище Ім'я По-батькові</td>
-                    <td>8</td>
-                    <td>+380693546856</td>
-                    <td>Кам’янець-Подільський, Марини Цвєтаєвої, 24300</td>
-                </tr>
-                <tr>
-                    <td>1234567890123</td>
-                    <td>Прізвище Ім'я По-батькові</td>
-                    <td>9</td>
-                    <td>+380693546856</td>
-                    <td>Кам’янець-Подільський, Марини Цвєтаєвої, 24300</td>
-                </tr>
-                <tr>
-                    <td>1234567890123</td>
-                    <td>Прізвище Ім'я По-батькові</td>
-                    <td>2</td>
-                    <td>+380693546856</td>
-                    <td>Кам’янець-Подільський, Марини Цвєтаєвої, 24300</td>
-                </tr>
-            </table>
+            <Table tableData={tableData} rowData={transformData(customers)} setSelectedRow={setSelectedRow}/>
         </div>
     );
 };

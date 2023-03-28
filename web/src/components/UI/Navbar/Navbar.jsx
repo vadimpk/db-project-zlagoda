@@ -2,7 +2,7 @@ import React, {useContext, useState} from 'react';
 import {ManagerContext} from "../../../context";
 import logoPicture from '../../../assets/images/logo-small.png'
 import profile from '../../../assets/images/profile.png'
-import ProfilePopup from "../../ProfilePopup";
+import ProfilePopup from "../../popups/ProfilePopup";
 import Modal from "../Modal/Modal";
 
 const Navbar = () => {

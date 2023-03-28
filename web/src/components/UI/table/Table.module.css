@@ -1,0 +1,23 @@
+.table {
+    margin: 0 20px;
+    border-collapse: collapse;
+}
+.table th, td {
+    padding: 0 15px ;
+}
+
+.table th {
+    border-bottom: 2px solid black;
+    text-align: center;
+    height: 40px;
+}
+.table td {
+    height: 40px;
+    text-align: center;
+    padding: 8px;
+    font-size: 14px;
+}
+.rows tr:active {
+    background-color: #0C8346;
+    color: white;
+}

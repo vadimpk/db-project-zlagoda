@@ -1,7 +1,7 @@
 import React from 'react';
-import RoundButton from "./UI/buttons/RoundButton";
-import phone from '../assets/images/phone.png'
-import location from '../assets/images/address.png'
+import RoundButton from "../UI/buttons/RoundButton";
+import phone from '../../assets/images/phone.png'
+import location from '../../assets/images/address.png'
 
 const ProfilePopup = ({setVisible}) => {
     const st = {

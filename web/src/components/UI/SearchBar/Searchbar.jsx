@@ -8,6 +8,7 @@ function Searchbar(props) {
     function handleSearch(event) {
         event.preventDefault();
         props.onSearch(searchTerm);
+        setSearchTerm('')
     }
 
     function handleInputChange(event) {

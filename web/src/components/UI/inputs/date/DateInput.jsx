@@ -1,7 +1,7 @@
 import React from 'react';
 import classes from "../date/Date.module.css";
 
-const Date = ({children, ...props}) => {
+const DateInput = ({children, ...props}) => {
     return (
         <div className={classes.div}>
             <label htmlFor={props.name}> {children}</label>
@@ -10,4 +10,4 @@ const Date = ({children, ...props}) => {
     );
 };
 
-export default Date;
+export default DateInput;
