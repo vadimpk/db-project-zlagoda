@@ -1,10 +1,16 @@
 import React from 'react';
 import classes from "./PrintButton.module.css"
 
-const PrintButton = ({props}) => {
+const PrintButton = ({label, ...props}) => {
     return (
-        <button className={classes.printb}>
-            Друк
+        <button {...props} className={classes.printb}>
+            {
+                label!==undefined
+                ?
+                    label
+                    :
+                    "Друк"
+            }
         </button>
     );
 };

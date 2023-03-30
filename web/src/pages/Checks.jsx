@@ -1,72 +1,76 @@
 import React, {useContext, useEffect, useState} from 'react';
 import Navbar from "../components/UI/Navbar/Navbar";
 import Searchbar from "../components/UI/SearchBar/Searchbar";
-import Checkbox from "../components/UI/inputs/checkbox/Checkbox";
 import RoundButton from "../components/UI/buttons/RoundButton";
-import edit from "../assets/images/edit.svg";
 import PrintButton from "../components/UI/buttons/PrintButton";
 import {ManagerContext} from "../context";
 import Select from "../components/UI/select/Select";
 import DateInput from "../components/UI/inputs/date/DateInput";
 import Table from "../components/UI/table/Table";
 import moment from "moment";
+import Modal from "../components/UI/Modal/Modal";
+import CheckPopup from "../components/popups/CheckPopup";
+import ModalForm from "../components/UI/Modal/ModalForm";
+import CheckProductFormPopup from "../components/popups/CheckProductFormPopup";
 
 const Checks = () => {
+    const [modal, setModal] = useState(false);
     const {isManager, setIsManager} = useContext(ManagerContext);
     const [startDate, setStartDate] = useState(undefined);
     const [endDate, setEndDate] = useState(undefined);
     const checksHeaders = ['Номер чеку','Дата','Загальна сума','ПДВ'];
     const checkHeaders = ['Назва товару','Кількість','Ціна'];
+    const [isOpenSearch, setOpenSearch] = useState(false);
     //EXAMPLE
     const [check, setCheck] = useState([
         {
             name: 'Хлєб',
-            amount:'36',
-            price: '123'
+            amount:36,
+            price: 123
         },
         {
             name: 'Мача',
-            amount:'1',
-            price: '823'
+            amount:1,
+            price: 823
         },
         {
             name: 'Чай',
-            amount:'13',
-            price: '15'
+            amount:13,
+            price: 15
         }
     ])
     const [check1, set1Check] = useState([
         {
             name: 'Шоколадка',
-            amount:'36',
-            price: '123'
+            amount:36,
+            price: 123
         },
         {
             name: 'Молоко',
-            amount:'1',
-            price: '823'
+            amount:1,
+            price: 823
         },
         {
             name: 'Кава',
-            amount:'13',
-            price: '15'
+            amount:13,
+            price: 15
         }
     ])
     const [check2, set2Check] = useState([
         {
             name: 'Сигарети',
-            amount:'36',
-            price: '123'
+            amount:36,
+            price: 123
         },
         {
             name: 'Сік',
-            amount:'1',
-            price: '823'
+            amount:1,
+            price: 823
         },
         {
             name: 'Рис',
-            amount:'13',
-            price: '15'
+            amount:13,
+            price: 15
         }
     ])
     const [checks, setChecks] = useState([
@@ -110,13 +114,27 @@ const Checks = () => {
         sum,
         pdv,
     }))
-    const [searchResults, setSearchResults] = useState([]);
+    const [newCheck, setNewCheck] = useState({
+        checkNo: '',
+        date: new Date(),
+        sum:0,
+        pdv: 0,
+        cashier: '',
+        items: []
+    })
     const [selectedOption, setSelectedOption] = useState("");
+    const sum = checksFiltered.reduce((total, obj) => total + obj.sum, 0);
 
 
 
-    function handleSearch(searchCheck) {
-        setSearchResults(searchCheck)
+    function handleSearch(checkNo) {
+        const check = checks.find(e => e.checkNo === checkNo)
+        if (check===undefined){
+            alert("Чеків не знайдено");
+        }else {
+            const check = checks.find(e => e.checkNo === checkNo)
+            setChecksFiltered([check]);
+        }
     }
     function handleSelect (category) {
         setSelectedOption(category);
@@ -128,6 +146,13 @@ const Checks = () => {
             setChecks(prevChecks => prevChecks.filter(check => check.checkNo !== selectedRow.checkNo));
         }
     }
+    function handleSum() {
+        if (startDate===undefined||endDate===undefined){
+            alert('Вкажіть дати для підрахунку')
+        } else {
+            setOpenSearch(true)
+        }
+    }
     useEffect(() => {
         const filtered = checks.filter(check => {
             if (selectedOption === 'Касир') {
@@ -136,7 +161,7 @@ const Checks = () => {
             if (selectedOption) {
                 return check.cashier === selectedOption;
             }
-           if (startDate && check.date && endDate) {
+            if (startDate && check.date && endDate) {
                 const checkDate = moment(check.date);
                 const startD = moment(startDate);
                 const endD = moment(endDate);
@@ -147,7 +172,41 @@ const Checks = () => {
 
         setChecksFiltered(filtered);
     }, [checks, selectedOption, startDate, endDate]);
-
+    function handleAddCheck() {
+        setNewCheck({...newCheck, checkNo: '2345678', date: new Date(), cashier: 'Gorban'})
+        setModal(true);
+    }
+    const addProduct = (newProduct) => {
+        const price0 = 10*newProduct.amount;
+        const c = {
+            name: newProduct.name,
+            amount: newProduct.amount,
+            price: price0
+        }
+        setNewCheck({
+            ...newCheck,
+            items: [...newCheck.items, c]
+        });
+        setModal(false)
+    }
+    function handleSaveCheck() {
+        const total = newCheck.items.reduce((accumulator, currentValue) => {
+            return accumulator + currentValue.price;
+        }, 0);
+        console.log(total)
+        newCheck.sum=total;
+        newCheck.pdv=total*1.2;
+        console.log(newCheck)
+        setChecks([...checks, newCheck]);
+        setNewCheck({
+            checkNo: '',
+            date: new Date(),
+            sum:0,
+            pdv: 0,
+            cashier: '',
+            items: []
+        })
+    }
     return (
         <div>
             <Navbar/>
@@ -182,16 +241,24 @@ const Checks = () => {
                 {
                     isManager
                     ?
+                        <>
                         <div className="filter-left">
                             <RoundButton onClick={handleDelete}>&minus;</RoundButton>
-                            <RoundButton>$</RoundButton>
+                            <RoundButton onClick={handleSum}>$</RoundButton>
                             <PrintButton/>
                         </div>
+                            <Modal visible={isOpenSearch} setVisible={setOpenSearch}>
+                                <CheckPopup setVisible={setOpenSearch} startDate={startDate} endDate={endDate} sum={sum} cashier={selectedOption}/>
+                            </Modal>
+                    </>
                         :
                         <div className="filter-left">
-                            <RoundButton>+</RoundButton>
+                            <RoundButton onClick={handleAddCheck}>+</RoundButton>
                         </div>
                 }
+                <ModalForm visible={modal} setVisible={setModal}>
+                    <CheckProductFormPopup setVisible={setModal} create={addProduct}/>
+                </ModalForm>
             </div>
             <div className="two-tables-div">
                 <Table
@@ -204,6 +271,16 @@ const Checks = () => {
                     <Table tableData={checkHeaders} rowData={checks.find(check => check.checkNo===selectedRow.checkNo).items}/>
                     :
                     null
+                }
+                {
+                    newCheck.checkNo!==''
+                    ?
+                        <div style={{ display: 'flex' , flexDirection: "column", alignItems: "center"}}>
+                            <Table tableData={checkHeaders} rowData={newCheck.items}/>
+                            <PrintButton label="Зберегти" onClick={handleSaveCheck}/>
+                        </div>
+                        :
+                        null
                 }
             </div>
         </div>

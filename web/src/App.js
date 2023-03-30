@@ -5,8 +5,7 @@ import { BrowserRouter } from "react-router-dom";
 import AppRouter from "./components/AppRouter";
 
 function App() {
-    //+380687164841
-    const [isManager, setIsManager] = useState(true);
+    const [isManager, setIsManager] = useState(false);
 
     useEffect(() => {
         if (localStorage.getItem('manager')) {

@@ -2,8 +2,6 @@ import React, {useState} from 'react';
 import RoundButton from "../UI/buttons/RoundButton";
 import BigButton from "../UI/buttons/BigButton";
 import InputTextForm from "../UI/inputs/text-password/InputTextForm";
-import Radio from "../UI/inputs/radio/Radio";
-import Checkbox from "../UI/inputs/checkbox/Checkbox";
 
 const ProductFormPopup = ({setVisible, create, selectedRow, edit}) => {
     const [product, setProduct] = useState(selectedRow ||
