@@ -5,7 +5,6 @@ import (
 	"github.com/vadimpk/db-project-zlagoda/api/internal/entity"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/service"
 	"net/http"
-	"strconv"
 )
 
 type customerCardRoutes struct {
@@ -60,12 +59,7 @@ func (r *customerCardRoutes) createCard(c *gin.Context) {
 func (r *customerCardRoutes) getCard(c *gin.Context) {
 	id := c.Param("id")
 
-	cardID, err := strconv.Atoi(id)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, err)
-		return
-	}
-	card, err := r.opts.Services.CustomerCard.Get(cardID)
+	card, err := r.opts.Services.CustomerCard.Get(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
@@ -101,19 +95,13 @@ func (r *customerCardRoutes) listCards(c *gin.Context) {
 func (r *customerCardRoutes) updateCard(c *gin.Context) {
 	id := c.Param("id")
 
-	cardID, err := strconv.Atoi(id)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, err)
-		return
-	}
-
 	var card entity.CustomerCard
 	if err := c.ShouldBindJSON(&card); err != nil {
 		c.JSON(http.StatusBadRequest, err)
 		return
 	}
 
-	updatedCard, err := r.opts.Services.CustomerCard.Update(cardID, &card)
+	updatedCard, err := r.opts.Services.CustomerCard.Update(id, &card)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
@@ -122,7 +110,7 @@ func (r *customerCardRoutes) updateCard(c *gin.Context) {
 }
 
 type deleteCardsRequestBody struct {
-	Ids []int `json:"ids"`
+	Ids []string `json:"ids"`
 }
 
 // @Id delete-cards

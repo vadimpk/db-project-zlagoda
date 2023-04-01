@@ -5,7 +5,6 @@ import (
 	"github.com/vadimpk/db-project-zlagoda/api/internal/entity"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/service"
 	"net/http"
-	"strconv"
 )
 
 type employeeRoutes struct {
@@ -61,12 +60,7 @@ func (r *employeeRoutes) createEmployee(c *gin.Context) {
 func (r *employeeRoutes) getEmployee(c *gin.Context) {
 	id := c.Param("id")
 
-	employeeID, err := strconv.Atoi(id)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, err)
-		return
-	}
-	employee, err := r.opts.Services.Employee.Get(employeeID)
+	employee, err := r.opts.Services.Employee.Get(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
@@ -78,7 +72,7 @@ func (r *employeeRoutes) getEmployee(c *gin.Context) {
 // @Summary List employees
 // @Tags employee
 // @Description List employees
-// @Success 200 {array} entity.Employee
+// @Success 200 {slice} entity.Employee
 // @Failure 400 {object} error
 // @Router /employee [get]
 func (r *employeeRoutes) listEmployee(c *gin.Context) {
@@ -102,19 +96,13 @@ func (r *employeeRoutes) listEmployee(c *gin.Context) {
 func (r *employeeRoutes) updateEmployee(c *gin.Context) {
 	id := c.Param("id")
 
-	employeeID, err := strconv.Atoi(id)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, err)
-		return
-	}
-
 	var employee entity.Employee
 	if err := c.ShouldBindJSON(&employee); err != nil {
 		c.JSON(http.StatusBadRequest, err)
 		return
 	}
 
-	updatedEmployee, err := r.opts.Services.Employee.Update(employeeID, &employee)
+	updatedEmployee, err := r.opts.Services.Employee.Update(id, &employee)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
@@ -123,7 +111,7 @@ func (r *employeeRoutes) updateEmployee(c *gin.Context) {
 }
 
 type deleteEmployeeRequestBody struct {
-	Ids []int `json:"ids"`
+	Ids []string `json:"ids"`
 }
 
 // @Id delete-employee

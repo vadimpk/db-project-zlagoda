@@ -27,7 +27,7 @@ func (s *customerCardService) Create(card *entity.CustomerCard) (*entity.Custome
 	return s.storages.CustomerCard.Create(card)
 }
 
-func (s *customerCardService) Get(id int) (*entity.CustomerCard, error) {
+func (s *customerCardService) Get(id string) (*entity.CustomerCard, error) {
 	s.logger.Infof("getting card: %#v", id)
 	return s.storages.CustomerCard.Get(id)
 }
@@ -37,12 +37,12 @@ func (s *customerCardService) List(opts ListCardOptions) ([]*entity.CustomerCard
 	return s.storages.CustomerCard.List(opts)
 }
 
-func (s *customerCardService) Update(id int, card *entity.CustomerCard) (*entity.CustomerCard, error) {
+func (s *customerCardService) Update(id string, card *entity.CustomerCard) (*entity.CustomerCard, error) {
 	s.logger.Infof("updating card: %#v", card)
 	return s.storages.CustomerCard.Update(id, card)
 }
 
-func (s *customerCardService) Delete(ids []int) error {
+func (s *customerCardService) Delete(ids []string) error {
 	s.logger.Infof("deleting cards: %#v", ids)
 	return s.storages.CustomerCard.Delete(ids)
 }
