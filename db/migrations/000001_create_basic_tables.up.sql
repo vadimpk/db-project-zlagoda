@@ -48,17 +48,10 @@ CREATE TABLE checks(
                        FOREIGN KEY (fk_card_number) REFERENCES customer_card (card_number)
                            ON UPDATE CASCADE ON DELETE NO ACTION
 );
-CREATE TABLE contain (
-                         id_product INT REFERENCES product (id_product),
-                         check_number VARCHAR(10) REFERENCES check (check_number),
-                         quantity INTEGER NOT NULL,
-                         price NUMERIC(10,2) NOT NULL,
-                         PRIMARY KEY (id_product, check_number)
-);
 
 CREATE TABLE store_product(
                               UPC VARCHAR(12) PRIMARY KEY,
-                              fk_UPC_prom VARCHAR(12) NOT NULL,
+                              fk_UPC_prom VARCHAR(12),
                               fk_id_product INT NOT NULL,
                               selling_price DECIMAL (13,4) NOT NULL,
                               product_number INT NOT NULL,
