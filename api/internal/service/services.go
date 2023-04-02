@@ -16,6 +16,7 @@ type Services struct {
 	Employee     EmployeeService
 	CustomerCard CustomerCardService
 	Product      ProductService
+	Check        CheckStorage
 }
 
 type EmployeeService interface {
@@ -121,4 +122,26 @@ type SortStoreProductsOptions struct {
 	Name      *bool
 	Price     *bool
 	Ascending *bool
+}
+
+type CheckService interface {
+	CreateCheck(check *entity.Check) (*entity.Check, error)
+	GetCheck(id string) (*entity.Check, error)
+	ListChecks(opts ListChecksOptions) ([]*entity.Check, error)
+	UpdateCheck(id string, check *entity.Check) (*entity.Check, error)
+	DeleteChecks(ids []string) error
+
+	CreateCheckItem(checkItem *entity.CheckItem) (*entity.CheckItem, error)
+	GetCheckItem(id entity.CheckItemID) (*entity.CheckItem, error)
+	ListCheckItems(opts ListCheckItemsOptions) ([]*entity.CheckItem, error)
+	UpdateCheckItem(id entity.CheckItemID, checkItem *entity.CheckItem) (*entity.CheckItem, error)
+	DeleteCheckItems(ids []entity.CheckItemID) error
+}
+
+type ListChecksOptions struct {
+	Search *string
+}
+
+type ListCheckItemsOptions struct {
+	Search *string
 }

@@ -24,6 +24,7 @@ func New(options Options) http.Handler {
 		setupEmployeeRoutes(&options, handler)
 		setupCustomerCardRoutes(&options, handler)
 		setupProductRoutes(&options, handler)
+		setupCheckRoutes(&options, handler)
 	}
 
 	handler.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
