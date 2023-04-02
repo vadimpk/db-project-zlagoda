@@ -8,6 +8,7 @@ type Storages struct {
 	Employee     EmployeeStorage
 	CustomerCard CustomerCardStorage
 	Product      ProductStorage
+	Check        CheckStorage
 }
 
 type EmployeeStorage interface {
@@ -43,4 +44,18 @@ type ProductStorage interface {
 	ListStoreProducts(opts ListStoreProductsOptions) ([]*entity.StoreProduct, error)
 	UpdateStoreProduct(id string, storeProduct *entity.StoreProduct) (*entity.StoreProduct, error)
 	DeleteStoreProducts(ids []string) error
+}
+
+type CheckStorage interface {
+	CreateCheck(check *entity.Check) (*entity.Check, error)
+	GetCheck(id string) (*entity.Check, error)
+	ListChecks(opts ListChecksOptions) ([]*entity.Check, error)
+	UpdateCheck(id string, check *entity.Check) (*entity.Check, error)
+	DeleteChecks(ids []string) error
+
+	CreateCheckItem(checkItem *entity.CheckItem) (*entity.CheckItem, error)
+	GetCheckItem(id entity.CheckItemID) (*entity.CheckItem, error)
+	ListCheckItems(opts ListCheckItemsOptions) ([]*entity.CheckItem, error)
+	UpdateCheckItem(id entity.CheckItemID, checkItem *entity.CheckItem) (*entity.CheckItem, error)
+	DeleteCheckItems(ids []entity.CheckItemID) error
 }
