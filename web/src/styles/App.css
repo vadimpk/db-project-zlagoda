@@ -1,0 +1,266 @@
+*{
+    font-family: 'Poppins', sans-serif;
+}
+.login {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 150px 105px;
+}
+.navigation-menu {
+    background-color: #F6D33C;
+    padding: 0 20px;
+    font-size: 16px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    align-items: center;
+}
+.nav-left {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.logo {
+    margin-right: 50px;
+}
+.menu-list {
+    display: flex;
+    flex-direction: row;
+}
+.menu-list li {
+    position: relative;
+}
+.menu-list li a {
+    display: inline-block;
+    padding: 15px;
+    text-decoration: none;
+    color: black;
+}
+.dropdown-menu {
+    width: 163px;
+    font-weight: normal;
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1;
+    background-color: #fff;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+    border-radius: 0 0 7px 7px;
+}
+.has-dropdown:hover .dropdown-menu {
+    display: block;
+}
+.menu-list li a:hover:after {
+    content: "";
+    display: block;
+    height: 2px;
+    width: 100%;
+    background-color: black;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+}
+#popup-btn{
+    background-color: transparent;
+    border: transparent;
+    cursor: pointer;
+}
+.profile-top {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    align-items: start;
+}
+.profile-name {
+    font-size: 24px;
+    font-weight: bold;
+    margin-right: 30px;
+}
+.profile-nl {
+    background-color: #0C8346;
+    border-radius: 7px;
+    color: white;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px;
+}
+.profile-v {
+    margin: 20px;
+}
+.profile-left{
+    display: inline-flex;
+    flex-direction: column;
+}
+.profile-p{
+    display: inline-flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+.profile-p hr {
+    border: 2px black solid;
+    margin: 5px 0;
+}
+.profile-p h3 {
+    font-size: 16px;
+    font-weight: bold;
+}
+.profile-p p {
+    font-size: 14px;
+    font-weight: normal;
+}
+.searchBar {
+    display: inline-flex;
+}
+.filter {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin: 30px 35px;
+}
+.filter-right{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.table-1 {
+    margin: 0 auto;
+    border-collapse: collapse;
+}
+.imaginary-margin {
+    width: 35px;
+}
+.table-1 th, td {
+    padding: 0 15px ;
+}
+.table-1 th {
+    border-bottom: 2px solid black;
+    text-align: center;
+    height: 40px;
+}
+.table-1 td {
+    height: 40px;
+    text-align: center;
+    padding: 8px;
+    font-size: 14px;
+}
+.table-1 tr:not(:first-child):hover {
+    background-color: #0C8346;
+    color: white;
+}
+.two-tables-div {
+    display: inline-flex;
+    align-items: start;
+    width: 100%;
+ }
+.form-top {
+    display: flex;
+    background-color: #F6D33C;
+    height: 50px;
+    align-items: center;
+    justify-content: space-between;
+    margin: -10px;
+    border-radius: 20px 20px 0 0;
+    padding: 0 10px;
+}
+.form-main {
+    margin: 30px 0;
+    display: flex;
+    justify-content: space-between;
+}
+.form-width {
+    display: flex;
+}
+.form-content {
+    display: inline-flex;
+    flex-direction: column;
+    margin: 0 10px;
+}
+
+
+
+
+
+/* Указываем box sizing */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+/* Убираем внутренние отступы */
+ul[class],
+ol[class] {
+    padding: 0;
+}
+
+/* Убираем внешние отступы */
+body,
+h1,
+h2,
+h3,
+h4,
+p,
+ul[class],
+ol[class],
+li,
+figure,
+figcaption,
+blockquote,
+dl,
+dd {
+    margin: 0;
+}
+
+/* Выставляем основные настройки по-умолчанию для body */
+body {
+    min-height: 100vh;
+    scroll-behavior: smooth;
+    text-rendering: optimizeSpeed;
+    line-height: 1.5;
+}
+
+/* Удаляем стандартную стилизацию для всех ul и il, у которых есть атрибут class*/
+ul[class],
+ol[class] {
+    list-style: none;
+}
+
+/* Элементы a, у которых нет класса, сбрасываем до дефолтных стилей */
+a:not([class]) {
+    text-decoration-skip-ink: auto;
+}
+
+/* Упрощаем работу с изображениями */
+img {
+    max-width: 100%;
+    display: block;
+}
+
+/* Указываем понятную периодичность в потоке данных у article*/
+article > * + * {
+    margin-top: 1em;
+}
+
+/* Наследуем шрифты для инпутов и кнопок */
+input,
+button,
+textarea,
+select {
+    font: inherit;
+}
+
+/* Удаляем все анимации и переходы для людей, которые предпочитай их не использовать */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

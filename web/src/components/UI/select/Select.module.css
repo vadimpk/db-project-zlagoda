@@ -1,0 +1,7 @@
+.select {
+    width: 280px;
+    height: 35px;
+    border-radius: 7px;
+    border: 2px black solid;
+    padding: 0 5px;
+}

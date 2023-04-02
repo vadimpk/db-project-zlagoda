@@ -1,0 +1,22 @@
+.div {
+    margin-left: 30px;
+}
+.divForm{
+    width: 280px;
+}
+.date {
+    width: 280px;
+    height: 35px;
+    border: 2px black solid;
+    border-radius: 7px;
+    padding: 0 5px;
+    margin-left: 10px;
+}
+.dateForm {
+    height: 35px;
+    width: 100%;
+    border: 1px solid #D9D9D9;
+    border-radius: 7px;
+    padding: 0 5px;
+    color: #757575;
+}

@@ -1,0 +1,13 @@
+.printb {
+    width: 100px;
+    height: 35px;
+    background-color: black;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 7px;
+    margin-left: 30px;
+}
+.printb:hover {
+    background-color: #0C8346;
+}
