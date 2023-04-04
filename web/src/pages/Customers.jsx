@@ -17,22 +17,34 @@ const Customers = () => {
     const [modal, setModal] = useState(false);
     const tableData = ['Номер карти','ПІБ','Відсоток','Телефон','Адреса']
     const [selectedRow, setSelectedRow] = useState({
-        cardNo: '',
+        id: '',
         fullName: '',
-        percent: '',
+        discount: 0,
         phone: '',
         address: ''
     });
-    //EXAMPLE
+    /*
+    {
+    "city": "string",
+    "discount": 0,
+    "id": "string",
+    "name": "string",
+    "patronymic": "string",
+    "phone_number": "string",
+    "street": "string",
+    "surname": "string",
+    "zip_code": "string"
+  }
+     */
     const [customers, setCustomers] = useState([
         {
-            cardNo: '1234567891',
+            id: '1234567891',
             fullName: {
                 surname: 'Горбань',
                 name: 'Ольга',
                 lastName: 'Олександрівна'
             },
-            percent: '0',
+            discount: 0,
             phone: '+380956324525',
             address: {
                 city: 'Кам’янець-Подільський',
@@ -41,13 +53,13 @@ const Customers = () => {
             }
         },
         {
-            cardNo: '1234567892',
+            id: '1234567892',
             fullName: {
                 surname: 'Прізвище',
                 name: 'Ім\'я',
                 lastName: 'По-батькові'
             },
-            percent: '2',
+            discount: '2',
             phone: '+380956324525',
             address: {
                 city: 'Кам’янець-Подільський',
@@ -56,13 +68,13 @@ const Customers = () => {
             }
         },
         {
-            cardNo: '1234567890',
+            id: '1234567890',
             fullName: {
                 surname: 'Прізвище',
                 name: 'Ім\'я',
                 lastName: 'По-батькові'
             },
-            percent: '8',
+            discount: '8',
             phone: '+380956324525',
             address: {
                 city: 'Кам’янець-Подільський',
@@ -86,35 +98,35 @@ const Customers = () => {
         });
     }
 
-    function handleSearch(percent) {
-        setCustomers(customers.filter( c => c.percent===percent))
+    function handleSearch(discount) {
+        setCustomers(customers.filter( c => c.discount===discount))
     }
     function handleAdd() {
         setSelectedRow(undefined);
         setModal(true);
     }
     function handleEdit() {
-        if (selectedRow.cardNo===''){
+        if (selectedRow.id===''){
             alert('Виберіть клієнта для редагування')
         } else {
             setModal(true)
         }
     }
     function handleDelete() {
-        if (selectedRow.cardNo===''){
+        if (selectedRow.id===''){
             alert('Виберіть клієнта для видалення')
         } else {
-            setCustomers(prevCustomers => prevCustomers.filter(employee => employee.cardNo !== selectedRow.cardNo));
+            setCustomers(prevCustomers => prevCustomers.filter(employee => employee.id !== selectedRow.id));
         }
     }
     const createCustomer = (newCustomer) => {
         setCustomers(prevCustomers => [...prevCustomers, newCustomer]);
         setModal(false)
     }
-    const editCustomer = (newCustomer, cardNo) => {
-        newCustomer.cardNo=cardNo
+    const editCustomer = (newCustomer, id) => {
+        newCustomer.id=id
         setCustomers(customers.map(e => {
-            if (e.cardNo===cardNo){
+            if (e.id===id){
                 return newCustomer;
             }
             return e
@@ -142,7 +154,7 @@ const Customers = () => {
                         null
                     }
                     <ModalForm visible={modal} setVisible={setModal}>
-                        <CustomerFormPopup setVisible={setModal} create={createCustomer} edit={editCustomer} selectedRow={selectedRow===undefined ? undefined : customers.find(customer => customer.cardNo === selectedRow.cardNo)}/>
+                        <CustomerFormPopup setVisible={setModal} create={createCustomer} edit={editCustomer} selectedRow={selectedRow===undefined ? undefined : customers.find(customer => customer.id === selectedRow.id)}/>
                     </ModalForm>
                 </div>
             </div>
