@@ -11,10 +11,10 @@ const ProductStoreFormPopup = ({setVisible, create, selectedRow, edit}) => {
     }
     const [product, setProduct] = useState(selectedRow ||
         {
-            UPC:  '',
+            id:  '',
             price: '',
-            ID: '',
-            amount: '',
+            product_id: '',
+            count: '',
             sale: false
         });
 
@@ -25,33 +25,45 @@ const ProductStoreFormPopup = ({setVisible, create, selectedRow, edit}) => {
             create(product)
         }
         setProduct({
-            UPC:  '',
+            id:  '',
             price: '',
-            ID: '',
-            amount: '',
+            product_id: '',
+            count: '',
             sale: false
         });
         setVisible(false)
     }
     const editProduct = (e) => {
         e.preventDefault()
-        setProduct({...product, UPC: selectedRow.UPC})
+        setProduct({...product, id: selectedRow.id})
         console.log(product)
         if (validateForm()) {
-            edit(product, selectedRow.UPC)
+            edit(product, selectedRow.id)
         }
         setProduct({
-            UPC:  '',
+            id:  '',
             price: '',
-            ID: '',
-            amount: '',
+            product_id: '',
+            count: '',
             sale: false
         })
         setVisible(false)
     }
     const validateForm = () => {
-        const nameRegex = /^[іїа-яА-Я]+$/;
+        const idPattern = /^\d+$/; // дозволено тільки цифри
+        const pricePattern = /^\d+(\.\d+)?$/; // дозволено тільки цифри та десяткові точки
+        const namePattern = /^[\p{L}0-9\s,.]+$/u; // дозволено букви українського алфавіту, цифри, кома та пробіл
+        const countPattern = /^-?\d+(\.\d+)?$/; // дозволено тільки цифри та десяткові точки, включаючи від'ємні числа
         const errors = {};
+
+        if (!idPattern.test(product.id) || !idPattern.test(product.product_id) || !countPattern.test(product.count) || !pricePattern.test(product.price)) {
+            errors.id='Будь ласка, введіть коректні числові значення для id, product_id, count та price.';
+            return false;
+        }
+        if (!namePattern.test(product.name)) {
+            errors.name='Будь ласка, введіть коректні значення для поля name. Дозволено букви українського алфавіту, цифри, кома та пробіл.';
+            return false;
+        }
 
         if (Object.keys(errors).length > 0) {
             const errorMessages = Object.values(errors).join('\n');
@@ -78,8 +90,8 @@ const ProductStoreFormPopup = ({setVisible, create, selectedRow, edit}) => {
                     <InputTextForm
                         name={"upc"}
                         placeholder={"UPC"}
-                        value={ selectedRow===undefined ? product.UPC : selectedRow.UPC}
-                        onChange={e => setProduct({...product, UPC: e.target.value})}>UPC</InputTextForm>
+                        value={ selectedRow===undefined ? product.id : selectedRow.id}
+                        onChange={e => setProduct({...product, id: e.target.value})}>id</InputTextForm>
                     <InputTextForm
                         name={"price"}
                         placeholder={"Ціна"}
@@ -93,13 +105,13 @@ const ProductStoreFormPopup = ({setVisible, create, selectedRow, edit}) => {
                     <InputTextForm
                         name={"ID"}
                         placeholder={"ID"}
-                        value={ selectedRow===undefined ? product.ID : selectedRow.ID}
-                        onChange={e => setProduct({...product, ID: e.target.value})}>ID</InputTextForm>
+                        value={ selectedRow===undefined ? product.product_id : selectedRow.product_id}
+                        onChange={e => setProduct({...product, product_id: e.target.value})}>product_id</InputTextForm>
                     <InputTextForm
-                        name={"amount"}
+                        name={"count"}
                         placeholder={"Кількість"}
-                        value={product.amount}
-                        onChange={e => setProduct({...product, amount: e.target.value})}>Кількість</InputTextForm>
+                        value={product.count}
+                        onChange={e => setProduct({...product, count: e.target.value})}>Кількість</InputTextForm>
                 </div>
             </div>
             <Checkbox
