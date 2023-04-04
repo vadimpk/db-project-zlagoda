@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useState} from 'react';
 import Navbar from "../components/UI/Navbar/Navbar";
 import Searchbar from "../components/UI/SearchBar/Searchbar";
 import Checkbox from "../components/UI/inputs/checkbox/Checkbox";
@@ -11,61 +11,95 @@ import Table from "../components/UI/table/Table";
 import EmployeeFormPopup from "../components/popups/EmployeeFormPopup";
 import ModalForm from "../components/UI/Modal/ModalForm";
 import CustomerFormPopup from "../components/popups/CustomerFormPopup";
-import axios from "axios";
 
 const Customers = () => {
-    const authToken = localStorage.getItem('authToken');
     const {isManager, setIsManager} = useContext(ManagerContext);
     const [modal, setModal] = useState(false);
-    const tableData = ['Номер карти','Прізвище','Ім\'я','По-батькові','Телефон','Місто','Вулиця','Індекс','Відсоток']
+    const tableData = ['Номер карти','ПІБ','Відсоток','Телефон','Адреса']
     const [selectedRow, setSelectedRow] = useState({
         id: '',
-        name: '',
-        surname:'',
-        patronymic:'',
+        fullName: '',
         discount: 0,
-        phone_number: '',
-        city: '',
-        street: '',
-        zip_code: ''
+        phone: '',
+        address: ''
     });
-
-    const [customers, setCustomers] = useState([]);
-    useEffect(() => {
-        axios.get('http://localhost:8082/customer-card', {
-            headers: {
-                Authorization: `Bearer ${authToken}`
+    /*
+    {
+    "city": "string",
+    "discount": 0,
+    "id": "string",
+    "name": "string",
+    "patronymic": "string",
+    "phone_number": "string",
+    "street": "string",
+    "surname": "string",
+    "zip_code": "string"
+  }
+     */
+    const [customers, setCustomers] = useState([
+        {
+            id: '1234567891',
+            fullName: {
+                surname: 'Горбань',
+                name: 'Ольга',
+                lastName: 'Олександрівна'
             },
-            params: {
-                sortAscending: true,
-                sortSurname: true
+            discount: 0,
+            phone: '+380956324525',
+            address: {
+                city: 'Кам’янець-Подільський',
+                street: 'Марини Цвєтаєвої',
+                zipCode: '24300'
             }
-        })
-            .then(response => {
-                setCustomers(response.data);
-            })
-            .catch(error => {
-                console.log(error);
-            });
-    }, []);
+        },
+        {
+            id: '1234567892',
+            fullName: {
+                surname: 'Прізвище',
+                name: 'Ім\'я',
+                lastName: 'По-батькові'
+            },
+            discount: '2',
+            phone: '+380956324525',
+            address: {
+                city: 'Кам’янець-Подільський',
+                street: 'Марини Цвєтаєвої',
+                zipCode: '24300'
+            }
+        },
+        {
+            id: '1234567890',
+            fullName: {
+                surname: 'Прізвище',
+                name: 'Ім\'я',
+                lastName: 'По-батькові'
+            },
+            discount: '8',
+            phone: '+380956324525',
+            address: {
+                city: 'Кам’янець-Подільський',
+                street: 'Марини Цвєтаєвої',
+                zipCode: '24300'
+            }
+        }
+
+    ]);
+    function transformData(data) {
+        return data.map((item) => {
+            const {city, street, zipCode} = item.address;
+            const addressString = Object.values(item.address).join(', ');
+            const {surname, name, lastName} = item.fullName;
+            const fullNameString = [surname, name, lastName].filter(Boolean).join(' ');
+            return {
+                ...item,
+                fullName: fullNameString,
+                address: addressString
+            };
+        });
+    }
 
     function handleSearch(discount) {
-        axios.get('http://localhost:8082/customer-card', {
-            headers: {
-                Authorization: `Bearer ${authToken}`
-            },
-            params: {
-                sortAscending: true,
-                sortSurname: true,
-                discount: discount
-            }
-        })
-            .then(response => {
-                setCustomers(response.data);
-            })
-            .catch(error => {
-                console.log(error);
-            });
+        setCustomers(customers.filter( c => c.discount===discount))
     }
     function handleAdd() {
         setSelectedRow(undefined);
@@ -82,50 +116,21 @@ const Customers = () => {
         if (selectedRow.id===''){
             alert('Виберіть клієнта для видалення')
         } else {
-            axios.delete('http://localhost:8082/customer-card',{
-                headers: {
-                    Authorization: `Bearer ${authToken}`
-                },
-                data: {
-                    ids: [selectedRow.id]
-                }
-            })
-                .then(response => {
-                    console.log(response.data);
-                })
-                .catch(error => {
-                    console.log(error);
-                });
+            setCustomers(prevCustomers => prevCustomers.filter(employee => employee.id !== selectedRow.id));
         }
     }
     const createCustomer = (newCustomer) => {
-        axios.post('http://localhost:8082/customer-card', newCustomer, {
-            headers: {
-                Authorization: `Bearer ${authToken}`
-            }
-        })
-            .then(response => {
-                console.log(response.data);
-            })
-            .catch(error => {
-                console.log(error);
-            });
-
+        setCustomers(prevCustomers => [...prevCustomers, newCustomer]);
         setModal(false)
     }
     const editCustomer = (newCustomer, id) => {
         newCustomer.id=id
-        axios.put(`http://localhost:8082/customer-card/${id}`, newCustomer,{
-            headers: {
-                Authorization: `Bearer ${authToken}`
+        setCustomers(customers.map(e => {
+            if (e.id===id){
+                return newCustomer;
             }
-        })
-            .then(response => {
-                console.log(response.data);
-            })
-            .catch(error => {
-                console.log(error);
-            });
+            return e
+        }));
         setModal(false)
     }
     return (
@@ -153,7 +158,7 @@ const Customers = () => {
                     </ModalForm>
                 </div>
             </div>
-            <Table tableData={tableData} rowData={customers} setSelectedRow={setSelectedRow}/>
+            <Table tableData={tableData} rowData={transformData(customers)} setSelectedRow={setSelectedRow}/>
         </div>
     );
 };
