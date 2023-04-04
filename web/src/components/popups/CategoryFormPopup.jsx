@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import RoundButton from "../UI/buttons/RoundButton";
 import BigButton from "../UI/buttons/BigButton";
 import InputTextForm from "../UI/inputs/text-password/InputTextForm";
@@ -10,17 +10,9 @@ const CategoryFormPopup = ({setVisible, create, selectedRow, edit}) => {
             name: ''
         });
 
-    useEffect(() => {
-        if (selectedRow!==undefined) {
-            setCategory(selectedRow)
-        }
-    },[selectedRow]);
-
     const addNewCategory = (e) => {
         e.preventDefault()
         if (validateForm()) {
-            const id = parseFloat(category.id)
-            category.id=id
             create(category)
         }
         setCategory({
@@ -33,8 +25,6 @@ const CategoryFormPopup = ({setVisible, create, selectedRow, edit}) => {
         e.preventDefault()
         setCategory({...category, id: selectedRow.id})
         if (validateForm()) {
-            const id = parseFloat(category.id)
-            category.id=id
             edit(category, selectedRow.id)
         }
         setCategory({
@@ -44,15 +34,15 @@ const CategoryFormPopup = ({setVisible, create, selectedRow, edit}) => {
         setVisible(false)
     }
     const validateForm = () => {
+        const nameRegex = /^[іїа-яА-Я\s]+$/;
         const numberRegex = /^\d+$/;
         const errors = {};
 
-        if (!category.name.length > 50) {
-            errors.name = 'Назва повинна бути не більше 50 символів';
+        if (!category.name || !nameRegex.test(category.name.trim())) {
+            errors.name = 'Некоректна назва категорії';
         }
-        if(selectedRow===undefined)
-        if (!numberRegex.test(category.id.trim())) {
-            errors.id = 'Номер категорії має складатись лише з чисел';
+        if ((!numberRegex.test(category.id.trim()))&&selectedRow===undefined) {
+            errors.id = 'Некоректний номер категорії';
         }
 
         if (Object.keys(errors).length > 0) {
@@ -80,7 +70,7 @@ const CategoryFormPopup = ({setVisible, create, selectedRow, edit}) => {
                     <InputTextForm
                         name={"id"}
                         placeholder={"Номер категорії"}
-                        value={category.id}
+                        value={ selectedRow===undefined ? category.id : selectedRow.id}
                         onChange={e => setCategory({...category, id: e.target.value})}>Номер категорії</InputTextForm>
                     <InputTextForm
                         name={"name"}

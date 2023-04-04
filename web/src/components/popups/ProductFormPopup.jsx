@@ -1,10 +1,10 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import RoundButton from "../UI/buttons/RoundButton";
 import BigButton from "../UI/buttons/BigButton";
 import InputTextForm from "../UI/inputs/text-password/InputTextForm";
 
 const ProductFormPopup = ({setVisible, create, selectedRow, edit}) => {
-    const [product, setProduct] = useState(
+    const [product, setProduct] = useState(selectedRow ||
         {
             id:0,
             name:'',
@@ -12,27 +12,9 @@ const ProductFormPopup = ({setVisible, create, selectedRow, edit}) => {
             characteristics:''
         });
 
-    useEffect(() => {
-        if (selectedRow!==undefined) {
-            setProduct(selectedRow)
-        }else {
-            setProduct({
-                id:0,
-                name:'',
-                category_id: 0,
-                characteristics:''
-            })
-        }
-
-    },[selectedRow]);
-
     const addNewProduct = (e) => {
         e.preventDefault()
         if (validateForm()) {
-            const id = parseFloat(product.id)
-            product.id=id
-            const category_id = parseFloat(product.category_id)
-            product.category_id=category_id
             create(product)
         }
         setProduct({
@@ -47,10 +29,6 @@ const ProductFormPopup = ({setVisible, create, selectedRow, edit}) => {
         e.preventDefault()
         setProduct({...product, id: selectedRow.id})
         if (validateForm()) {
-            const id = parseFloat(product.id)
-            product.id=id
-            const category_id = parseFloat(product.category_id)
-            product.category_id=category_id
             edit(product, selectedRow.id)
         }
         setProduct({
@@ -67,14 +45,17 @@ const ProductFormPopup = ({setVisible, create, selectedRow, edit}) => {
         if (!/^\d+$/.test(product.id)) {
             errors.id = "ID повинен складатися тільки з цифр";
         }
-        if (!/^\d+$/.test(product.category_id)) {
-            errors.category_id = "ID категорії повинен складатися тільки з цифр";
-        }
         if (product.name.length > 50) {
             errors.name = "Назва повинна бути не більше 50 символів";
         }
         if (product.characteristics.length > 100) {
             errors.characteristics = "Характеристика повинна бути не більше 100 символів";
+        }
+        if (!/^[\p{L}\d\s.,-]+$/u.test(product.name)) {
+            errors.name = "Назва має містити тільки букви, цифри, коми, крапки та тире";
+        }
+        if (!/^[\p{L}\d\s.,-]+$/u.test(product.characteristics)) {
+            errors.characteristics = "Характеристика має містити тільки букви, цифри, коми, крапки та тире";
         }
         if (Object.keys(errors).length > 0) {
             const errorMessages = Object.values(errors).join('\n');
@@ -100,8 +81,8 @@ const ProductFormPopup = ({setVisible, create, selectedRow, edit}) => {
                     <InputTextForm
                         name={"ID"}
                         placeholder={"ID"}
-                        value={product.id}
-                        onChange={e => setProduct({...product, id: e.target.value})}>ID</InputTextForm>
+                        value={ selectedRow===undefined ? product.id : selectedRow.id}
+                        onChange={e => setProduct({...product, id: e.target.value})}>id</InputTextForm>
                     <InputTextForm
                         name={"name"}
                         placeholder={"Назва"}
@@ -120,11 +101,6 @@ const ProductFormPopup = ({setVisible, create, selectedRow, edit}) => {
                         ...product,
                         manufacturer : e.target.value
                     })}>Виробник</InputTextForm>*/}
-                    <InputTextForm
-                        name={"ID"}
-                        placeholder={"ID"}
-                        value={ product.category_id}
-                        onChange={e => setProduct({...product, category_id: e.target.value})}>ID категорії</InputTextForm>
                     <InputTextForm
                         name={"characteristics"}
                         placeholder={"Характеристика"}
