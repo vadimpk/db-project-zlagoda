@@ -46,6 +46,7 @@ func setupProductRoutes(options *Options, handler *gin.Engine) {
 }
 
 // @Id create-product
+// @Security BearerAuth
 // @Summary Create product
 // @Tags product
 // @Description Create product (using product category)
@@ -70,6 +71,7 @@ func (r *productRoutes) createProduct(c *gin.Context) {
 }
 
 // @Id get-product
+// @Security BearerAuth
 // @Summary Get product
 // @Tags product
 // @Description Get product
@@ -94,6 +96,7 @@ func (r *productRoutes) getProduct(c *gin.Context) {
 }
 
 // @Id list-products
+// @Security BearerAuth
 // @Summary List products
 // @Tags product
 // @Description List products
@@ -110,6 +113,7 @@ func (r *productRoutes) listProducts(c *gin.Context) {
 }
 
 // @Id update-product
+// @Security BearerAuth
 // @Summary Update product
 // @Tags product
 // @Description Update product
@@ -146,6 +150,7 @@ type deleteProductsRequestBody struct {
 }
 
 // @Id delete-products
+// @Security BearerAuth
 // @Summary Delete products
 // @Tags product
 // @Description Delete products
@@ -170,6 +175,7 @@ func (r *productRoutes) deleteProducts(c *gin.Context) {
 }
 
 // @Id create-product-category
+// @Security BearerAuth
 // @Summary Create product category
 // @Tags product category
 // @Description Create product category
@@ -194,6 +200,7 @@ func (r *productRoutes) createCategory(c *gin.Context) {
 }
 
 // @Id list-product-categories
+// @Security BearerAuth
 // @Summary List product categories
 // @Tags product category
 // @Description List product categories
@@ -210,6 +217,7 @@ func (r *productRoutes) listCategories(c *gin.Context) {
 }
 
 // @Id update-product-category
+// @Security BearerAuth
 // @Summary Update product category
 // @Tags product category
 // @Description Update product category
@@ -246,6 +254,7 @@ type deleteCategoriesRequestBody struct {
 }
 
 // @Id delete-product-categories
+// @Security BearerAuth
 // @Summary Delete product categories
 // @Tags product category
 // @Description Delete product categories
@@ -270,6 +279,7 @@ func (r *productRoutes) deleteCategories(c *gin.Context) {
 }
 
 // @Id create-store-product
+// @Security BearerAuth
 // @Summary Create store product
 // @Tags product in store
 // @Description Create store product
@@ -294,6 +304,7 @@ func (r *productRoutes) createStoreProduct(c *gin.Context) {
 }
 
 // @Id get-store-products
+// @Security BearerAuth
 // @Tags product in store
 // @Summary Get store product
 // @Param id path string true "Product ID"
@@ -312,6 +323,7 @@ func (r *productRoutes) getStoreProduct(c *gin.Context) {
 }
 
 // @Id list-store-products
+// @Security BearerAuth
 // @Summary List store products
 // @Tags product in store
 // @Description List store products
@@ -328,6 +340,7 @@ func (r *productRoutes) listStoreProducts(c *gin.Context) {
 }
 
 // @Id update-store-product
+// @Security BearerAuth
 // @Summary Update store product
 // @Tags product in store
 // @Description Update store product
@@ -359,6 +372,7 @@ type deleteStoreProductsRequestBody struct {
 }
 
 // @Id delete-store-products
+// @Security BearerAuth
 // @Summary Delete store products
 // @Tags product in store
 // @Description Delete store products

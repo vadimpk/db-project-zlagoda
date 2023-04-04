@@ -2,9 +2,11 @@ package storage
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/apsdehal/go-logger"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/entity"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/service"
+	"strings"
 )
 
 type customerCardStorage struct {
@@ -43,7 +45,51 @@ func (s *customerCardStorage) Get(id string) (*entity.CustomerCard, error) {
 }
 
 func (s *customerCardStorage) List(opts service.ListCardOptions) ([]*entity.CustomerCard, error) {
-	return nil, nil
+	var cards []*entity.CustomerCard
+	var query strings.Builder
+	var args []interface{}
+
+	query.WriteString("SELECT * FROM customer_card WHERE 1=1")
+
+	if opts.Search != nil {
+		query.WriteString(" AND (surname ILIKE ? OR name ILIKE ?)")
+		searchString := fmt.Sprintf("%%%s%%", *opts.Search)
+		args = append(args, searchString, searchString)
+	}
+
+	if opts.Discount != nil {
+		query.WriteString(" AND discount = ?")
+		args = append(args, *opts.Discount)
+	}
+
+	if opts.SortSurname != nil {
+		query.WriteString(" ORDER BY surname")
+		if opts.SortAscending != nil && *opts.SortAscending {
+			query.WriteString(" ASC")
+		} else {
+			query.WriteString(" DESC")
+		}
+	}
+
+	rows, err := s.db.Query(query.String(), args...)
+	if err != nil {
+		s.logger.Errorf("error while listing customer cards: %s", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		card := entity.CustomerCard{}
+		err := rows.Scan(&card.ID, &card.Surname, &card.Name, &card.Patronymic,
+			&card.PhoneNumber, &card.City, &card.Street, &card.Zip, &card.Discount)
+		if err != nil {
+			s.logger.Errorf("error while scanning customer card row: %s", err)
+			return nil, err
+		}
+		cards = append(cards, &card)
+	}
+
+	return cards, nil
 }
 
 func (s *customerCardStorage) Update(id string, card *entity.CustomerCard) (*entity.CustomerCard, error) {

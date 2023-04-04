@@ -29,6 +29,7 @@ func setupCustomerCardRoutes(options *Options, handler *gin.Engine) {
 }
 
 // @Id Create customer card
+// @Security BearerAuth
 // @Tags customer-card
 // @Summary Create customer card
 // @Param card body entity.CustomerCard true "Card"
@@ -50,6 +51,7 @@ func (r *customerCardRoutes) createCard(c *gin.Context) {
 }
 
 // @Id get-card
+// @Security BearerAuth
 // @Summary Get customer card
 // @Tags customer-card
 // @Description Get customer card
@@ -68,15 +70,21 @@ func (r *customerCardRoutes) getCard(c *gin.Context) {
 	c.JSON(http.StatusOK, card)
 }
 
-// @Id list-cards
-// @Summary List customer cards
+// @Id List customer cards
+// @Security BearerAuth
 // @Tags customer-card
-// @Description List customer cards
+// @Summary List customer cards
+// @Param listOptions query service.ListCardOptions true "List options"
 // @Success 200 {array} entity.CustomerCard
 // @Failure 400 {object} error
 // @Router /customer-card [get]
 func (r *customerCardRoutes) listCards(c *gin.Context) {
-	cards, err := r.opts.Services.CustomerCard.List(service.ListCardOptions{})
+	var listOptions service.ListCardOptions
+	if err := c.ShouldBindJSON(&listOptions); err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	cards, err := r.opts.Services.CustomerCard.List(listOptions)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
@@ -85,6 +93,7 @@ func (r *customerCardRoutes) listCards(c *gin.Context) {
 }
 
 // @Id update-card
+// @Security BearerAuth
 // @Summary Update customer card
 // @Tags customer-card
 // @Description Update customer card
@@ -115,6 +124,7 @@ type deleteCardsRequestBody struct {
 }
 
 // @Id delete-cards
+// @Security BearerAuth
 // @Summary Delete customer cards
 // @Tags customer-card
 // @Description Delete customer cards

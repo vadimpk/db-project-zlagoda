@@ -73,14 +73,22 @@ func (r *employeeRoutes) getEmployee(c *gin.Context) {
 }
 
 // @Id list-employee
+// @Security BearerAuth
 // @Summary List employees
 // @Tags employee
 // @Description List employees
+// @Param listOptions query service.ListEmployeeOptions true "List options"
 // @Success 200 {slice} entity.Employee
 // @Failure 400 {object} error
 // @Router /employee [get]
 func (r *employeeRoutes) listEmployee(c *gin.Context) {
-	employees, err := r.opts.Services.Employee.List(service.ListEmployeeOptions{})
+	var listOptions service.ListEmployeeOptions
+	if err := c.ShouldBindQuery(&listOptions); err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	employees, err := r.opts.Services.Employee.List(listOptions)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return

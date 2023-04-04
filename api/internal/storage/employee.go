@@ -5,6 +5,7 @@ import (
 	"github.com/apsdehal/go-logger"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/entity"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/service"
+	"strings"
 )
 
 type employeeStorage struct {
@@ -45,7 +46,46 @@ func (s *employeeStorage) Get(id string) (*entity.Employee, error) {
 }
 
 func (s *employeeStorage) List(opts service.ListEmployeeOptions) ([]*entity.Employee, error) {
-	return nil, nil
+	var employees []*entity.Employee
+	var query strings.Builder
+	var args []interface{}
+
+	query.WriteString("SELECT * FROM employee WHERE 1=1")
+
+	if opts.Role != nil {
+		query.WriteString(" AND role = ?")
+		args = append(args, *opts.Role)
+	}
+
+	if opts.SortSurname != nil {
+		query.WriteString(" ORDER BY surname")
+		if opts.SortAscending != nil && *opts.SortAscending {
+			query.WriteString(" ASC")
+		} else {
+			query.WriteString(" DESC")
+		}
+	}
+
+	rows, err := s.db.Query(query.String(), args...)
+	if err != nil {
+		s.logger.Errorf("error while listing employees: %s", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		employee := entity.Employee{}
+		err := rows.Scan(&employee.ID, &employee.Surname, &employee.Name, &employee.Patronymic,
+			&employee.Role, &employee.Salary, &employee.DateOfBirth, &employee.DateOfStart,
+			&employee.Phone, &employee.City, &employee.Street, &employee.Zip, &employee.Password)
+		if err != nil {
+			s.logger.Errorf("error while scanning employee row: %s", err)
+			return nil, err
+		}
+		employees = append(employees, &employee)
+	}
+
+	return employees, nil
 }
 
 func (s *employeeStorage) Update(id string, employee *entity.Employee) (*entity.Employee, error) {

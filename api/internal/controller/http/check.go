@@ -36,6 +36,7 @@ func setupCheckRoutes(options *Options, handler *gin.Engine) {
 }
 
 // @Id Create check
+// @Security BearerAuth
 // @Tags check
 // @Summary Create check
 // @Param check body entity.Check true "Check"
@@ -59,6 +60,7 @@ func (r *checkRoutes) createCheck(c *gin.Context) {
 }
 
 // @Id get-check
+// @Security BearerAuth
 // @Summary Get check
 // @Tags check
 // @Description Get check
@@ -83,6 +85,7 @@ func (r *checkRoutes) listChecks(c *gin.Context) {
 }
 
 // @Id update-check
+// @Security BearerAuth
 // @Summary Update check
 // @Tags check
 // @Description Update check
@@ -118,6 +121,7 @@ type deleteChecksResponseBody struct {
 }
 
 // @Id delete-checks
+// @Security BearerAuth
 // @Summary Delete checks
 // @Tags check
 // @Description Delete checks
@@ -145,6 +149,7 @@ func (r *checkRoutes) deleteChecks(c *gin.Context) {
 }
 
 // @Id Create check item
+// @Security BearerAuth
 // @Tags check-item
 // @Summary Create check item
 // @Param check-item body entity.CheckItem true "Check item"
@@ -173,6 +178,7 @@ type getCheckItemRequestQuery struct {
 }
 
 // @Id get-check-item
+// @Security BearerAuth
 // @Summary Get check item
 // @Tags check-item
 // @Description Get check item
@@ -209,6 +215,7 @@ type updateCheckItemRequestQuery struct {
 }
 
 // @Id update-check-item
+// @Security BearerAuth
 // @Summary Update check item
 // @Tags check-item
 // @Description Update check item
@@ -251,6 +258,7 @@ type deleteCheckItemsResponseBody struct {
 }
 
 // @Id delete-check-items
+// @Security BearerAuth
 // @Summary Delete check items
 // @Tags check-item
 // @Description Delete check items
