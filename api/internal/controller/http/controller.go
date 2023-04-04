@@ -21,7 +21,7 @@ type Options struct {
 
 func New(options Options) http.Handler {
 	handler := gin.New()
-	handler.Use(gin.Logger(), gin.Recovery(), corsMiddleware)
+	handler.Use(corsMiddleware)
 
 	{
 		setupEmployeeRoutes(&options, handler)
@@ -78,10 +78,4 @@ func corsMiddleware(c *gin.Context) {
 	c.Header("Access-Control-Allow-Methods", "*")
 	c.Header("Access-Control-Allow-Headers", "*")
 	c.Header("Content-Type", "application/json")
-
-	if c.Request.Method != "OPTIONS" {
-		c.Next()
-	} else {
-		c.AbortWithStatus(http.StatusOK)
-	}
 }
