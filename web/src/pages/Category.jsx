@@ -14,6 +14,7 @@ import ProductFormPopup from "../components/popups/ProductFormPopup";
 import axios from "axios";
 
 const Category = () => {
+
     const [categories, setCategories] = useState( []);
     useEffect(() => {
         axios.get('http://localhost:8082/product/category')
@@ -23,6 +24,7 @@ const Category = () => {
             .catch(error => {
                 console.log(error);
             });
+
     }, []);
     const [selectedRowCategory, setSelectedRowCategory] = useState({
         id:0,
