@@ -5,6 +5,7 @@ go 1.19
 require (
 	github.com/apsdehal/go-logger v0.0.0-20190515212710-b0d6ccfee0e6
 	github.com/gin-gonic/gin v1.9.0
+	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/ilyakaznacheev/cleanenv v1.4.2
 	github.com/lib/pq v1.10.7
 	github.com/swaggo/files v1.0.1
@@ -14,6 +15,7 @@ require (
 
 require (
 	github.com/BurntSushi/toml v1.1.0 // indirect
+	github.com/DataDog/gostackparse v0.6.0 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect

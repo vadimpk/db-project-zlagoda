@@ -19,15 +19,18 @@ func setupEmployeeRoutes(options *Options, handler *gin.Engine) {
 
 	group := handler.Group("/employee")
 	{
-		group.POST("/", routes.createEmployee)
-		group.GET("/:id", routes.getEmployee)
-		group.GET("/", routes.listEmployee)
-		group.PUT("/:id", routes.updateEmployee)
-		group.DELETE("/", routes.deleteEmployee)
+		group.POST("/", newAuthMiddleware(options), routes.createEmployee)
+		group.GET("/:id", newAuthMiddleware(options), routes.getEmployee)
+		group.GET("/", newAuthMiddleware(options), routes.listEmployee)
+		group.PUT("/:id", newAuthMiddleware(options), routes.updateEmployee)
+		group.DELETE("/", newAuthMiddleware(options), routes.deleteEmployee)
+
+		group.POST("/login", routes.login)
 	}
 }
 
 // @Id create-employee
+// @Security BearerAuth
 // @Summary Create employee
 // @Tags employee
 // @Description Create employee
@@ -50,10 +53,11 @@ func (r *employeeRoutes) createEmployee(c *gin.Context) {
 }
 
 // @Id get-employee
+// @Security BearerAuth
 // @Summary Get employee
 // @Tags employee
 // @Description Get employee
-// @Param id path int true "Employee ID"
+// @Param id path string true "Employee ID"
 // @Success 200 {object} entity.Employee
 // @Failure 400 {object} error
 // @Router /employee/{id} [get]
@@ -85,6 +89,7 @@ func (r *employeeRoutes) listEmployee(c *gin.Context) {
 }
 
 // @Id update-employee
+// @Security BearerAuth
 // @Summary Update employee
 // @Tags employee
 // @Description Update employee
@@ -115,6 +120,7 @@ type deleteEmployeeRequestBody struct {
 }
 
 // @Id delete-employee
+// @Security BearerAuth
 // @Summary Delete employee
 // @Tags employee
 // @Description Delete employee
@@ -135,4 +141,40 @@ func (r *employeeRoutes) deleteEmployee(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, nil)
+}
+
+type loginRequestBody struct {
+	EmployeeID string `form:"employeeId" binding:"required"`
+	Password   string `form:"password" binding:"required"`
+}
+
+type loginResponseBody struct {
+	Employee  entity.Employee `json:"employee"`
+	AuthToken string          `json:"authToken"`
+}
+
+// @Id login
+// @Summary Login
+// @Tags employee
+// @Description Login
+// @Param fields body loginRequestBody true "login data"
+// @Success 200 {object} loginResponseBody
+// @Failure 400 {object} error
+// @Router /employee/login [post]
+func (r *employeeRoutes) login(c *gin.Context) {
+	var body loginRequestBody
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	employee, token, err := r.opts.Services.Employee.Login(body.EmployeeID, body.Password)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	c.JSON(http.StatusOK, loginResponseBody{
+		Employee:  *employee,
+		AuthToken: token,
+	})
 }

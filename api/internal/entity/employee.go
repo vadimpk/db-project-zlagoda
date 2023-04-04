@@ -15,4 +15,5 @@ type Employee struct {
 	City        string    `json:"city"`
 	Street      string    `json:"street"`
 	Zip         string    `json:"zip"`
+	Password    string    `json:"password"`
 }
