@@ -6,10 +6,9 @@ import InputTextForm from "../UI/inputs/text-password/InputTextForm";
 const ProductFormPopup = ({setVisible, create, selectedRow, edit}) => {
     const [product, setProduct] = useState(selectedRow ||
         {
-            ID:'',
+            id:0,
             name:'',
-            category: '',
-            manufacturer:'',
+            category_id: 0,
             characteristics:''
         });
 
@@ -19,33 +18,45 @@ const ProductFormPopup = ({setVisible, create, selectedRow, edit}) => {
             create(product)
         }
         setProduct({
-            ID:'',
+            id:0,
             name:'',
-            category: '',
-            manufacturer:'',
+            category_id: 0,
             characteristics:''
         });
         setVisible(false)
     }
     const editProduct = (e) => {
         e.preventDefault()
-        setProduct({...product, ID: selectedRow.ID})
+        setProduct({...product, id: selectedRow.id})
         if (validateForm()) {
-            edit(product, selectedRow.ID)
+            edit(product, selectedRow.id)
         }
         setProduct({
-            ID:'',
+            id:0,
             name:'',
-            category: '',
-            manufacturer:'',
+            category_id: 0,
             characteristics:''
         })
         setVisible(false)
     }
     const validateForm = () => {
-        const nameRegex = /^[іїа-яА-Я]+$/;
         const errors = {};
 
+        if (!/^\d+$/.test(product.id)) {
+            errors.id = "ID повинен складатися тільки з цифр";
+        }
+        if (product.name.length > 50) {
+            errors.name = "Назва повинна бути не більше 50 символів";
+        }
+        if (product.characteristics.length > 100) {
+            errors.characteristics = "Характеристика повинна бути не більше 100 символів";
+        }
+        if (!/^[\p{L}\d\s.,-]+$/u.test(product.name)) {
+            errors.name = "Назва має містити тільки букви, цифри, коми, крапки та тире";
+        }
+        if (!/^[\p{L}\d\s.,-]+$/u.test(product.characteristics)) {
+            errors.characteristics = "Характеристика має містити тільки букви, цифри, коми, крапки та тире";
+        }
         if (Object.keys(errors).length > 0) {
             const errorMessages = Object.values(errors).join('\n');
             alert(errorMessages);
@@ -53,7 +64,6 @@ const ProductFormPopup = ({setVisible, create, selectedRow, edit}) => {
         }
         return true;
     }
-
     return (
         <form>
             <div className="form-top">
@@ -71,8 +81,8 @@ const ProductFormPopup = ({setVisible, create, selectedRow, edit}) => {
                     <InputTextForm
                         name={"ID"}
                         placeholder={"ID"}
-                        value={ selectedRow===undefined ? product.ID : selectedRow.ID}
-                        onChange={e => setProduct({...product, ID: e.target.value})}>ID</InputTextForm>
+                        value={ selectedRow===undefined ? product.id : selectedRow.id}
+                        onChange={e => setProduct({...product, id: e.target.value})}>id</InputTextForm>
                     <InputTextForm
                         name={"name"}
                         placeholder={"Назва"}
@@ -83,14 +93,14 @@ const ProductFormPopup = ({setVisible, create, selectedRow, edit}) => {
                         })}>Назва</InputTextForm>
                 </div>
                 <div className="form-content">
-                <InputTextForm
-                    name={"manufacturer"}
+                    {/*<InputTextForm
+                    name={""}
                     placeholder={"Виробник"}
                     value={product.manufacturer}
                     onChange={e => setProduct({
                         ...product,
-                        manufacturer: e.target.value
-                    })}>Виробник</InputTextForm>
+                        manufacturer : e.target.value
+                    })}>Виробник</InputTextForm>*/}
                     <InputTextForm
                         name={"characteristics"}
                         placeholder={"Характеристика"}
