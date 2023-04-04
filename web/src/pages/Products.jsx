@@ -15,185 +15,102 @@ import CustomerFormPopup from "../components/popups/CustomerFormPopup";
 import ModalForm from "../components/UI/Modal/ModalForm";
 import ProductFormPopup from "../components/popups/ProductStoreFormPopup";
 import axios from "axios";
+
 const Products = () => {
-    const authToken = localStorage.getItem('authToken');
-    const employee = JSON.parse(localStorage.getItem('employee'));
-    const isManager = employee.role!=='Касир';
+    const {isManager, setIsManager} = useContext(ManagerContext);
     const [products, setProducts] = useState( []);
-    const [selectPromotion, setSelectPromotion] = useState('');
-    const [selectSort, setSelectSort] = useState('');
-    const [isEditing, setIsEditing] = useState(false);
+    useEffect(() => {
+        axios.get('http://localhost:8082/product/store')
+            .then(response => {
+                setProducts(response.data);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }, []);
+
     const [product, setProduct] = useState({
+        id:0,
+        product_id:0,
         name:'',
         count:0,
         price:0,
-        product_id:0,
-        characteristics: ''
+        promotional: false,
+        promotional_id: 0
     });
-    const [selectedRow, setSelectedRow] = useState({});
+    const [selectedRow, setSelectedRow] = useState({
+        id:0,
+        product_id:0,
+        name:'',
+        count:0,
+        price:0,
+        promotional: false,
+        promotional_id: 0
+    });
     const tableData = ["UPC", "ID", 'Назва', "Кількість", "Ціна", "Акційний товар"];
     const [modal, setModal] = useState(false);
     const [isOpenSearch, setOpenSearch] = useState(false);
+    const [onSale, setOnSale] = useState(false);
+    const [notOnSale, setNotOnSale] = useState(false);
+    const [filteredP, setFilteredP] = useState(products);
 
     function handleSearch(upc) {
-        axios.get(`http://localhost:8082/product/store/${upc}`, {
-            headers: {
-                Authorization: `Bearer ${authToken}`
-            }
-        })
-            .then(response => {
-                const productId = response.data.product_id;
-                Promise.all([getProductName(productId), getCharacteristics(productId)])
-                    .then(responses => {
-                        const [name, characteristics] = responses;
-                        const updatedProduct = {
-                            ...product,
-                            product_id: productId,
-                            count: response.data.count,
-                            price: response.data.price,
-                            name,
-                            characteristics
-                        };
-                        setProduct(updatedProduct);
-                        setOpenSearch(true);
-                    })
-                    .catch(error => {
-                        console.log(error);
-                    });
-            })
-            .catch(error => {
-                alert('Товар не знайдено')
-                console.log(error);
-            });
+        const product = products.find( e => e.id===upc)
+        setProduct(product)
+        setOpenSearch(true)
     }
-    const getCharacteristics = (id) => {
-        return axios.get(`http://localhost:8082/product/${id}`, {
-            headers: {
-                Authorization: `Bearer ${authToken}`
-            }
-        })
-            .then(response => {
-                return response.data.characteristics;
-            })
-            .catch(error => {
-                console.log(error);
-            });
+
+    function handleSale(){
+        setOnSale(!onSale)
     }
-    const getProductName = async (id) => {
-        try {
-            const response = await axios.get(`http://localhost:8082/product/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${authToken}`
-                }
-            });
-            return response.data.name;
-        } catch (error) {
-            console.log(error);
-        }
-    };
+    function handleNotSale(){
+        setNotOnSale(!notOnSale)
+    }
 
     useEffect(() => {
-            const params = {
-                sortAscending: true,
-            };
-        if (isManager) {
-            params.sortCount = true;
-        } else {
-            params.sortName = true;
-        }
-            if (selectPromotion==='promotional') {
-                params.promotion = true;
+        const filtered = products.filter(item => {
+            if (onSale && item.promotional) {
+                return true;
             }
-            if (selectPromotion==='not-promotional') {
-                params.promotion = false;
+            if (notOnSale && !item.promotional) {
+                return true;
             }
-        if (selectSort==='name-sort') {
-            params.sortName = true;
-        }
-        if (selectSort==='count-sort') {
-            params.sortCount = true;
-        }
-            axios.get('http://localhost:8082/product/store', {
-                headers: {
-                    Authorization: `Bearer ${authToken}`
-                },
-                params
-            })
-                .then(response => {
-                    const products = response.data;
-                    const promises = products.map(product => getProductName(product.product_id));
-                    Promise.all(promises).then(names => {
-                        const productsWithNames = products.map((product, index) => {
-                            return { ...product, name: names[index] };
-                        });
-                        setProducts(productsWithNames);
-                    });
-                })
-                .catch(error => {
-                    console.log(error);
-                });
-    }, [selectPromotion, selectSort]);
+            return  !onSale && !notOnSale;
+        });
+
+        setFilteredP(filtered);
+    }, [products, onSale, notOnSale]);
 
     function handleAdd() {
-        setIsEditing(false);
+        setSelectedRow(undefined);
         setModal(true);
     }
     function handleEdit() {
-        if (selectedRow.id===undefined){
+        if (selectedRow.id===''){
             alert('Виберіть товар для редагування')
         } else {
-            setIsEditing(true);
             setModal(true)
         }
     }
     function handleDelete() {
-        if (selectedRow.id===undefined){
+        if (selectedRow.id===''){
             alert('Виберіть товар для видалення')
         } else {
-            axios.delete(`http://localhost:8082/product/store/${selectedRow.id}`,{
-                headers: {
-                    Authorization: `Bearer ${authToken}`
-                }
-            })
-                .then(response => {
-                    console.log(response.data);
-                })
-                .catch(error => {
-                    alert('Сервер відхилив ваш запит на видалення')
-                    console.log(error);
-                });
+            setProducts(prevProducts => prevProducts.filter(product => product.id !== selectedRow.id));
         }
     }
-
     const createProduct = (newProduct) => {
-         axios.post('http://localhost:8082/product/store', newProduct, {
-            headers: {
-                Authorization: `Bearer ${authToken}`
-            }
-        })
-            .then(response => {
-                console.log(response.data);
-            })
-            .catch(error => {
-                alert('Такий товар уже існує')
-                console.log(error);
-            });
+        setProducts(prevProduct => [...prevProduct, newProduct]);
         setModal(false)
     }
     const editProduct = (newProduct, upc) => {
         newProduct.id=upc
-        axios.put(`http://localhost:8082/product/store/${upc}`, newProduct,{
-            headers: {
-                Authorization: `Bearer ${authToken}`
+        setProducts(products.map(e => {
+            if (e.id===upc){
+                return newProduct;
             }
-        })
-            .then(response => {
-                console.log(response.data);
-            })
-            .catch(error => {
-                alert('Такий товар уже існує')
-                console.log(error);
-            });
+            return e
+        }));
         setModal(false)
     }
     function changeFieldsOrder(arr) {
@@ -203,7 +120,7 @@ const Products = () => {
             name,
             count,
             price,
-            promotional1 : promotional? 'Так' : 'Ні'
+            promotional
         }));
     }
     return (
@@ -215,22 +132,14 @@ const Products = () => {
                     <Modal visible={isOpenSearch} setVisible={setOpenSearch}>
                         <ProductPopup product={product} setVisible={setOpenSearch}/>
                     </Modal>
-                    <Select style={{ marginLeft: '15px' }} onChange={(e) => setSelectPromotion(e.target.value)}>
-                        <option key={1} value={'promotional'}>
-                            Акційний
-                        </option>
-                        <option key={2} value={'not-promotional'}>
-                            Не акційний
-                        </option>
-                    </Select>
-                    <Select style={{ marginLeft: '15px' }} onChange={(e) => setSelectSort(e.target.value)}>
-                        <option key={1} value={'name-sort'}>
-                            За алфавітом
-                        </option>
-                        <option key={2} value={'count-sort'}>
-                            За кількістю
-                        </option>
-                    </Select>
+                    <Checkbox
+                        name={"sale"}
+                        checked={onSale}
+                        onChange={handleSale}>Акційні товари</Checkbox>
+                    <Checkbox
+                        name={"nosale"}
+                        checked={notOnSale}
+                        onChange={handleNotSale}>Не акційні товари</Checkbox>
                 </div>
                     {
                      isManager
@@ -245,10 +154,10 @@ const Products = () => {
                          null
                     }
                 <ModalForm visible={modal} setVisible={setModal}>
-                    <ProductFormPopup setVisible={setModal} create={createProduct} edit={editProduct} selectedRow={isEditing ? products.find(product => product.id === selectedRow.id):undefined }/>
+                    <ProductFormPopup setVisible={setModal} create={createProduct} edit={editProduct} selectedRow={selectedRow===undefined ? undefined : products.find(product => product.id === selectedRow.id)}/>
                 </ModalForm>
             </div>
-            <Table tableData={tableData} rowData={changeFieldsOrder(products)} setSelectedRow={setSelectedRow}/>
+            <Table tableData={tableData} rowData={changeFieldsOrder(filteredP)} setSelectedRow={setSelectedRow}/>
         </div>
     );
 };
