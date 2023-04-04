@@ -15,14 +15,19 @@ import CustomerFormPopup from "../components/popups/CustomerFormPopup";
 import ModalForm from "../components/UI/Modal/ModalForm";
 import ProductFormPopup from "../components/popups/ProductStoreFormPopup";
 import axios from "axios";
-const Products = () => {
-    const authToken = localStorage.getItem('authToken');
 
+const Products = () => {
     const {isManager, setIsManager} = useContext(ManagerContext);
-    const [productsInStore, setProductsInStore] = useState( []);
     const [products, setProducts] = useState( []);
-    const [selectPromotion, setSelectPromotion] = useState('');
-    const [selectSort, setSelectSort] = useState('');
+    useEffect(() => {
+        axios.get('http://localhost:8082/product/store')
+            .then(response => {
+                setProducts(response.data);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }, []);
 
     const [product, setProduct] = useState({
         id:0,
@@ -45,47 +50,36 @@ const Products = () => {
     const tableData = ["UPC", "ID", 'Назва', "Кількість", "Ціна", "Акційний товар"];
     const [modal, setModal] = useState(false);
     const [isOpenSearch, setOpenSearch] = useState(false);
+    const [onSale, setOnSale] = useState(false);
+    const [notOnSale, setNotOnSale] = useState(false);
+    const [filteredP, setFilteredP] = useState(products);
 
     function handleSearch(upc) {
-            const product = productsInStore.find(e => e.id === upc)
-            setProduct(product)
-            setOpenSearch(true)
+        const product = products.find( e => e.id===upc)
+        setProduct(product)
+        setOpenSearch(true)
+    }
+
+    function handleSale(){
+        setOnSale(!onSale)
+    }
+    function handleNotSale(){
+        setNotOnSale(!notOnSale)
     }
 
     useEffect(() => {
-            const params = {
-                sortAscending: true,
-            };
-        if (isManager) {
-            params.sortCount = true;
-        } else {
-            params.sortName = true;
-        }
-            if (selectPromotion==='promotional') {
-                params.promotion = true;
+        const filtered = products.filter(item => {
+            if (onSale && item.promotional) {
+                return true;
             }
-            if (selectPromotion==='not-promotional') {
-                params.promotion = false;
+            if (notOnSale && !item.promotional) {
+                return true;
             }
-        if (selectSort==='name-sort') {
-            params.sortName = true;
-        }
-        if (selectSort==='count-sort') {
-            params.sortCount = true;
-        }
-            axios.get('http://localhost:8082/product/store', {
-                headers: {
-                    Authorization: `Bearer ${authToken}`
-                },
-                params
-            })
-                .then(response => {
-                    setProductsInStore(response.data);
-                })
-                .catch(error => {
-                    console.log(error);
-                });
-    }, [ selectPromotion, selectSort]);
+            return  !onSale && !notOnSale;
+        });
+
+        setFilteredP(filtered);
+    }, [products, onSale, notOnSale]);
 
     function handleAdd() {
         setSelectedRow(undefined);
@@ -102,16 +96,16 @@ const Products = () => {
         if (selectedRow.id===''){
             alert('Виберіть товар для видалення')
         } else {
-            setProductsInStore(prevProducts => prevProducts.filter(product => product.id !== selectedRow.id));
+            setProducts(prevProducts => prevProducts.filter(product => product.id !== selectedRow.id));
         }
     }
     const createProduct = (newProduct) => {
-        setProductsInStore(prevProduct => [...prevProduct, newProduct]);
+        setProducts(prevProduct => [...prevProduct, newProduct]);
         setModal(false)
     }
     const editProduct = (newProduct, upc) => {
         newProduct.id=upc
-        setProductsInStore(productsInStore.map(e => {
+        setProducts(products.map(e => {
             if (e.id===upc){
                 return newProduct;
             }
@@ -126,7 +120,7 @@ const Products = () => {
             name,
             count,
             price,
-            promotional1 : promotional? 'Так' : 'Ні'
+            promotional
         }));
     }
     return (
@@ -138,22 +132,14 @@ const Products = () => {
                     <Modal visible={isOpenSearch} setVisible={setOpenSearch}>
                         <ProductPopup product={product} setVisible={setOpenSearch}/>
                     </Modal>
-                    <Select style={{ marginLeft: '15px' }} onChange={(e) => setSelectPromotion(e.target.value)}>
-                        <option key={1} value={'promotional'}>
-                            Акційний
-                        </option>
-                        <option key={2} value={'not-promotional'}>
-                            Не акційний
-                        </option>
-                    </Select>
-                    <Select style={{ marginLeft: '15px' }} onChange={(e) => setSelectSort(e.target.value)}>
-                        <option key={1} value={'name-sort'}>
-                            За алфавітом
-                        </option>
-                        <option key={2} value={'count-sort'}>
-                            За кількістю
-                        </option>
-                    </Select>
+                    <Checkbox
+                        name={"sale"}
+                        checked={onSale}
+                        onChange={handleSale}>Акційні товари</Checkbox>
+                    <Checkbox
+                        name={"nosale"}
+                        checked={notOnSale}
+                        onChange={handleNotSale}>Не акційні товари</Checkbox>
                 </div>
                     {
                      isManager
@@ -171,7 +157,7 @@ const Products = () => {
                     <ProductFormPopup setVisible={setModal} create={createProduct} edit={editProduct} selectedRow={selectedRow===undefined ? undefined : products.find(product => product.id === selectedRow.id)}/>
                 </ModalForm>
             </div>
-            <Table tableData={tableData} rowData={changeFieldsOrder(productsInStore)} setSelectedRow={setSelectedRow}/>
+            <Table tableData={tableData} rowData={changeFieldsOrder(filteredP)} setSelectedRow={setSelectedRow}/>
         </div>
     );
 };
