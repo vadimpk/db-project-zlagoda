@@ -15,7 +15,6 @@ import CustomerFormPopup from "../components/popups/CustomerFormPopup";
 import ModalForm from "../components/UI/Modal/ModalForm";
 import ProductFormPopup from "../components/popups/ProductStoreFormPopup";
 import axios from "axios";
-
 const Products = () => {
     const {isManager, setIsManager} = useContext(ManagerContext);
     const [products, setProducts] = useState( []);
