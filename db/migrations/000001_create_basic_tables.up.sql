@@ -10,7 +10,8 @@ CREATE TABLE employee (
                           phone_number VARCHAR(13) NOT NULL,
                           city VARCHAR(50) NOT NULL,
                           street VARCHAR(50) NOT NULL,
-                          zip_code VARCHAR(9) NOT NULL
+                          zip_code VARCHAR(9) NOT NULL,
+                          password VARCHAR(50) NOT NULL
 );
 CREATE TABLE category (
                           category_number INT PRIMARY KEY,
@@ -39,7 +40,7 @@ CREATE TABLE product (
 CREATE TABLE checks(
                        check_number VARCHAR(10) PRIMARY KEY,
                        fk_id_employee VARCHAR(10) NOT NULL,
-                       fk_card_number VARCHAR(13) NOT NULL,
+                       fk_card_number VARCHAR(13) NULL,
                        print_date TIMESTAMP NOT NULL,
                        sum_total DECIMAL (13,4) NOT NULL,
                        vat DECIMAL (13,4) NOT NULL,
@@ -71,5 +72,4 @@ CREATE TABLE sale(
                          ON UPDATE CASCADE ON DELETE NO ACTION,
                      FOREIGN KEY (fk_check_number) REFERENCES checks (check_number)
                          ON UPDATE CASCADE ON DELETE CASCADE
-
 );

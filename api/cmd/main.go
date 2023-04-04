@@ -10,6 +10,10 @@ import (
 // @version 1.0
 // @description project for db market zlagoda
 
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+
 // @host localhost:8082
 // @BasePath /
 func main() {

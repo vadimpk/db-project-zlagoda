@@ -17,6 +17,7 @@ func setupCustomerCardRoutes(options *Options, handler *gin.Engine) {
 	}
 
 	customerCardGroup := handler.Group("/customer-card")
+	customerCardGroup.Use(newAuthMiddleware(options))
 	{
 		customerCardGroup.POST("/", routes.createCard)
 		customerCardGroup.GET("/:id", routes.getCard)

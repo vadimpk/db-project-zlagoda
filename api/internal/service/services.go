@@ -4,6 +4,7 @@ import (
 	"github.com/apsdehal/go-logger"
 	"github.com/vadimpk/db-project-zlagoda/api/config"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/entity"
+	"github.com/vadimpk/db-project-zlagoda/api/pkg/errs"
 )
 
 type Options struct {
@@ -25,7 +26,18 @@ type EmployeeService interface {
 	List(opts ListEmployeeOptions) ([]*entity.Employee, error)
 	Update(id string, employee *entity.Employee) (*entity.Employee, error)
 	Delete(ids []string) error
+
+	Login(id string, password string) (*entity.Employee, string, error)
+	VerifyAccessToken(authToken string) (*entity.Employee, error)
 }
+
+var (
+	ErrLoginEmployeeNotFound        = errs.New("employee not found")
+	ErrLoginEmployeeInvalidPassword = errs.New("invalid password")
+
+	ErrVerifyAccessTokenInvalidAccessToken = errs.New("invalid access token")
+	ErrVerifyAccessTokenEmployeeNotFound   = errs.New("employee not found")
+)
 
 type CustomerCardService interface {
 	Create(card *entity.CustomerCard) (*entity.CustomerCard, error)
