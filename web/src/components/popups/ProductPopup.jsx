@@ -29,7 +29,7 @@ const ProductPopup = ({setVisible, product}) => {
                                 </h3>
                                 <hr width="116px"/>
                                 <p>
-                                    {product.amount}
+                                    {product.count}
                                 </p>
                             </div>
                             <div className="profile-p">
