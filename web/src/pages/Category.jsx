@@ -14,35 +14,11 @@ import ProductFormPopup from "../components/popups/ProductFormPopup";
 import axios from "axios";
 
 const Category = () => {
-    const authToken = localStorage.getItem('authToken');
     const [categories, setCategories] = useState( []);
     useEffect(() => {
-        axios.get('http://localhost:8082/product/category', {
-            headers: {
-                Authorization: `Bearer ${authToken}`
-            },
-            params: {
-                sortAscending: true,
-                sortName: true
-            }
-        })
+        axios.get('http://localhost:8082/product/category')
             .then(response => {
                 setCategories(response.data);
-            })
-            .catch(error => {
-                console.log(error);
-            });
-        axios.get('http://localhost:8082/product', {
-            headers: {
-                Authorization: `Bearer ${authToken}`
-            },
-            params: {
-                sortAscending: true,
-                sortName: true
-            }
-        })
-            .then(response => {
-                setProducts(response.data);
             })
             .catch(error => {
                 console.log(error);
@@ -53,8 +29,19 @@ const Category = () => {
         name:''
     });
     const tableDataCategory = ["Номер", 'Назва'];
-    const [select, setSelect] = useState("")
+    const [select, setSelect] = useState("Категорія")
     const [products, setProducts] = useState( []);
+    useEffect(() => {
+        axios.get('http://localhost:8082/product/category')
+            .then(response => {
+                setProducts(response.data);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }, []);
+
+    const filteredProducts = select!=="Категорія" ? products.filter(product => product.category_id===select) : products
     const [selectedRowProduct, setSelectedRowProduct] = useState({
         category_id:0,
         characteristics:'',
@@ -155,25 +142,7 @@ const Category = () => {
             characteristics
         }));
     }
-    useEffect(() => {
-        const id = categories.find(cat => cat.name === select)?.id;
-        axios.get('http://localhost:8082/product', {
-            headers: {
-                Authorization: `Bearer ${authToken}`
-            },
-            params: {
-                sortAscending: true,
-                sortName: true,
-                categoryID: id
-            }
-        })
-            .then(response => {
-                setProducts(response.data);
-            })
-            .catch(error => {
-                console.log(error);
-            });
-    }, [select]);
+
     return (
         <div>
             <Navbar/>
@@ -189,6 +158,7 @@ const Category = () => {
                 </ModalForm>
                 <div className="filter-left">
                     <Select onChange={(e) => setSelect(e.target.value)}>
+                        <option key={-1} value={"Категорія"}>Категорія</option>
                         {
                             categories.map((item, index) => (
                                 <option key={index} value={item.name}>
@@ -212,7 +182,7 @@ const Category = () => {
             </div>
             <div className="two-tables-div">
                 <Table tableData={tableDataCategory} rowData={categories} setSelectedRow={setSelectedRowCategory}/>
-                <Table tableData={tableDataProduct} rowData={transformProducts(products)} setSelectedRow={setSelectedRowProduct}/>
+                <Table tableData={tableDataProduct} rowData={transformProducts(filteredProducts)} setSelectedRow={setSelectedRowProduct}/>
             </div>
         </div>
     );
