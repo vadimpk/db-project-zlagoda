@@ -6,7 +6,7 @@ import InputTextForm from "../UI/inputs/text-password/InputTextForm";
 const CategoryFormPopup = ({setVisible, create, selectedRow, edit}) => {
     const [category, setCategory] = useState(selectedRow ||
         {
-            catNo:  '',
+            id:  0,
             name: ''
         });
 
@@ -16,32 +16,33 @@ const CategoryFormPopup = ({setVisible, create, selectedRow, edit}) => {
             create(category)
         }
         setCategory({
-            catNo:  '',
+            id:  0,
             name: ''
             })
         setVisible(false)
     }
     const editCategory = (e) => {
         e.preventDefault()
-        setCategory({...category, catNo: selectedRow.catNo})
+        setCategory({...category, id: selectedRow.id})
         if (validateForm()) {
-            edit(category, selectedRow.catNo)
+            edit(category, selectedRow.id)
         }
         setCategory({
-            catNo:  '',
+            id:  0,
             name: ''
             })
         setVisible(false)
     }
     const validateForm = () => {
-        const nameRegex = /^[іїа-яА-Я]+$/;
+        const nameRegex = /^[іїа-яА-Я\s]+$/;
+        const numberRegex = /^\d+$/;
         const errors = {};
 
         if (!category.name || !nameRegex.test(category.name.trim())) {
             errors.name = 'Некоректна назва категорії';
         }
-        if ((!category.catNo)&&selectedRow===undefined) {
-            errors.cardNo = 'Некоректний номер категорії';
+        if ((!numberRegex.test(category.id.trim()))&&selectedRow===undefined) {
+            errors.id = 'Некоректний номер категорії';
         }
 
         if (Object.keys(errors).length > 0) {
@@ -67,10 +68,10 @@ const CategoryFormPopup = ({setVisible, create, selectedRow, edit}) => {
             <div className="form-main">
                 <div className="form-content">
                     <InputTextForm
-                        name={"catNo"}
+                        name={"id"}
                         placeholder={"Номер категорії"}
-                        value={ selectedRow===undefined ? category.catNo : selectedRow.catNo}
-                        onChange={e => setCategory({...category, catNo: e.target.value})}>Номер категорії</InputTextForm>
+                        value={ selectedRow===undefined ? category.id : selectedRow.id}
+                        onChange={e => setCategory({...category, id: e.target.value})}>Номер категорії</InputTextForm>
                     <InputTextForm
                         name={"name"}
                         placeholder={"Назва категорії"}

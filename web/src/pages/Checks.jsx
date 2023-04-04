@@ -12,6 +12,7 @@ import Modal from "../components/UI/Modal/Modal";
 import CheckPopup from "../components/popups/CheckPopup";
 import ModalForm from "../components/UI/Modal/ModalForm";
 import CheckProductFormPopup from "../components/popups/CheckProductFormPopup";
+import axios from "axios";
 
 const Checks = () => {
     const [modal, setModal] = useState(false);
@@ -172,10 +173,12 @@ const Checks = () => {
 
         setChecksFiltered(filtered);
     }, [checks, selectedOption, startDate, endDate]);
+
     function handleAddCheck() {
         setNewCheck({...newCheck, checkNo: '2345678', date: new Date(), cashier: 'Gorban'})
         setModal(true);
     }
+
     const addProduct = (newProduct) => {
         const price0 = 10*newProduct.amount;
         const c = {
@@ -189,6 +192,7 @@ const Checks = () => {
         });
         setModal(false)
     }
+
     function handleSaveCheck() {
         const total = newCheck.items.reduce((accumulator, currentValue) => {
             return accumulator + currentValue.price;
@@ -207,6 +211,14 @@ const Checks = () => {
             items: []
         })
     }
+    const postCheck = async (check) => {
+        try {
+            const response = await axios.post('http://localhost:8082/check', check);
+            return response.data;
+        } catch (error) {
+            console.error(error);
+        }
+    };
     return (
         <div>
             <Navbar/>
