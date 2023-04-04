@@ -19,28 +19,28 @@ func setupProductRoutes(options *Options, handler *gin.Engine) {
 
 	productGroup := handler.Group("/product")
 	{
-		productGroup.POST("/", routes.createProduct)
-		productGroup.GET("/:id", routes.getProduct)
-		productGroup.GET("/", routes.listProducts)
-		productGroup.PUT("/:id", routes.updateProduct)
-		productGroup.DELETE("/", routes.deleteProducts)
+		productGroup.POST("/", newAuthMiddleware(options), routes.createProduct)
+		productGroup.GET("/:id", newAuthMiddleware(options), routes.getProduct)
+		productGroup.GET("/", newAuthMiddleware(options), routes.listProducts)
+		productGroup.PUT("/:id", newAuthMiddleware(options), routes.updateProduct)
+		productGroup.DELETE("/", newAuthMiddleware(options), routes.deleteProducts)
 	}
 
 	categoryGroup := productGroup.Group("/category")
 	{
-		categoryGroup.POST("/", routes.createCategory)
-		categoryGroup.GET("/", routes.listCategories)
-		categoryGroup.PUT("/:id", routes.updateCategory)
-		categoryGroup.DELETE("/", routes.deleteCategories)
+		categoryGroup.POST("/", newAuthMiddleware(options), routes.createCategory)
+		categoryGroup.GET("/", newAuthMiddleware(options), routes.listCategories)
+		categoryGroup.PUT("/:id", newAuthMiddleware(options), routes.updateCategory)
+		categoryGroup.DELETE("/", newAuthMiddleware(options), routes.deleteCategories)
 	}
 
 	storeProductGroup := productGroup.Group("/store")
 	{
-		storeProductGroup.POST("/", routes.createStoreProduct)
-		storeProductGroup.GET("/:id", routes.getStoreProduct)
-		storeProductGroup.GET("/", routes.listStoreProducts)
-		storeProductGroup.PUT("/:id", routes.updateStoreProduct)
-		storeProductGroup.DELETE("/", routes.deleteStoreProducts)
+		storeProductGroup.POST("/", newAuthMiddleware(options), routes.createStoreProduct)
+		storeProductGroup.GET("/:id", newAuthMiddleware(options), routes.getStoreProduct)
+		storeProductGroup.GET("/", newAuthMiddleware(options), routes.listStoreProducts)
+		storeProductGroup.PUT("/:id", newAuthMiddleware(options), routes.updateStoreProduct)
+		storeProductGroup.DELETE("/", newAuthMiddleware(options), routes.deleteStoreProducts)
 
 	}
 }

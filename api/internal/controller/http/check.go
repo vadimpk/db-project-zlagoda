@@ -16,6 +16,7 @@ func setupCheckRoutes(options *Options, handler *gin.Engine) {
 	}
 
 	checkGroup := handler.Group("/check")
+	checkGroup.Use(newAuthMiddleware(options))
 	{
 		checkGroup.POST("/", routes.createCheck)
 		checkGroup.GET("/:id", routes.getCheck)
