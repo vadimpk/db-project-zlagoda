@@ -80,7 +80,7 @@ func (r *customerCardRoutes) getCard(c *gin.Context) {
 // @Router /customer-card [get]
 func (r *customerCardRoutes) listCards(c *gin.Context) {
 	var listOptions service.ListCardOptions
-	if err := c.ShouldBindJSON(&listOptions); err != nil {
+	if err := c.ShouldBindQuery(&listOptions); err != nil {
 		c.JSON(http.StatusBadRequest, err)
 		return
 	}
