@@ -16,16 +16,23 @@ import ModalForm from "../components/UI/Modal/ModalForm";
 import ProductFormPopup from "../components/popups/ProductStoreFormPopup";
 import axios from "axios";
 const Products = () => {
+    const authToken = localStorage.getItem('authToken');
+
     const {isManager, setIsManager} = useContext(ManagerContext);
     const [products, setProducts] = useState( []);
     useEffect(() => {
-        axios.get('http://localhost:8082/product/store')
+        axios.get('http://localhost:8082/product/store', {
+            headers: {
+                Authorization: `Bearer ${authToken}`
+            },
+        })
             .then(response => {
-                setProducts(response.data);
+                console.log(response.data);
             })
             .catch(error => {
                 console.log(error);
             });
+
     }, []);
 
     const [product, setProduct] = useState({
@@ -54,9 +61,9 @@ const Products = () => {
     const [filteredP, setFilteredP] = useState(products);
 
     function handleSearch(upc) {
-        const product = products.find( e => e.id===upc)
-        setProduct(product)
-        setOpenSearch(true)
+            const product = products.find(e => e.id === upc)
+            setProduct(product)
+            setOpenSearch(true)
     }
 
     function handleSale(){
