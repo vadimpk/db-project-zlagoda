@@ -4,6 +4,7 @@ import BigButton from "../UI/buttons/BigButton";
 import InputTextForm from "../UI/inputs/text-password/InputTextForm";
 import Radio from "../UI/inputs/radio/Radio";
 import DateForm from "../UI/inputs/date/DateForm";
+import employees from "../../pages/Employees";
 
 const EmployeeFormPopup = ({setVisible, create, selectedRow, edit}) => {
     const [employee, setEmployee] = useState(selectedRow ||
@@ -14,18 +15,26 @@ const EmployeeFormPopup = ({setVisible, create, selectedRow, edit}) => {
         patronymic: '',
         role: '',
         salary: 0,
-        date_of_birth: new Date(),
-        date_of_start: new Date(),
+        date_of_birth: '',
+        date_of_start: '',
         phone: '',
         city: '',
         street: '',
-        zip: ''
+        zip: '',
+        password: ''
     });
 
     const addNewEmployee = (e) => {
         e.preventDefault()
         if (validateForm()) {
+        const dateB = employee.date_of_birth
+        employee.date_of_birth=new Date(dateB)
+        const dateS = employee.date_of_start
+        employee.date_of_start = new Date(dateS)
+        const salary = parseFloat(employee.salary)
+        employee.salary=salary
         create(employee)
+
     }
         setEmployee({
             id:  '',
@@ -34,20 +43,26 @@ const EmployeeFormPopup = ({setVisible, create, selectedRow, edit}) => {
             patronymic: '',
             role: '',
             salary: 0,
-            date_of_birth: new Date(),
-            date_of_start: new Date(),
+            date_of_birth: '',
+            date_of_start: '',
             phone: '',
             city: '',
             street: '',
-            zip: ''
+            zip: '',
+            password: ''
         })
         setVisible(false)
     }
     const editEmployee = (e) => {
         e.preventDefault()
         setEmployee({...employee, id: selectedRow.id})
-        console.log(selectedRow.id)
         if (validateForm()) {
+            const dateB = employee.date_of_birth
+            employee.date_of_birth=new Date(dateB)
+            const dateS = employee.date_of_start
+            employee.date_of_start = new Date(dateS)
+            const salary = parseFloat(employee.salary)
+            employee.salary=salary
             edit(employee, selectedRow.id)
         }
         setEmployee({
@@ -57,12 +72,13 @@ const EmployeeFormPopup = ({setVisible, create, selectedRow, edit}) => {
             patronymic: '',
             role: '',
             salary: 0,
-            date_of_birth: new Date(),
-            date_of_start: new Date(),
+            date_of_birth: '',
+            date_of_start: '',
             phone: '',
             city: '',
             street: '',
-            zip: ''
+            zip: '',
+            password: ''
         })
         setVisible(false)
     }
@@ -95,9 +111,9 @@ const EmployeeFormPopup = ({setVisible, create, selectedRow, edit}) => {
                 errors.patronymic="По-батькові має містити від 1 до 50 букв українського алфавіту";
             }
 
-            if (!idRegExp.test(employee.id)) {
+            /*if (!idRegExp.test(employee.id)) {
                 errors.id="id має містити 10 цифр";
-            }
+            }*/
 
             if (!salaryRegExp.test(employee.salary)) {
                 errors.salary="Зарплата має бути числом";
@@ -115,12 +131,16 @@ const EmployeeFormPopup = ({setVisible, create, selectedRow, edit}) => {
                 errors.street="Вулиця має містити від 1 до 50 букв, цифр та знаків пунктуації";
             }
 
-            if (!zipRegExp.test(employee.zip)) {
+            /*if (!zipRegExp.test(employee.zip)) {
                 errors.zip="Індекс має містити 5 цифр (або 9, якщо використовується формат XXXXX-XXXX)";
-            }
+            }*/
 
             if (!employee.date_of_start) {
                 errors.date_of_start="Вкажіть дату початку роботи";
+            }
+
+            if (!employee.password) {
+                errors.password="Вкажіть пароль";
             }
 
             if (age < 18) {
@@ -188,11 +208,11 @@ const EmployeeFormPopup = ({setVisible, create, selectedRow, edit}) => {
                             <Radio
                                 name={"position"}
                                 id={"cashier"}
-                                onClick={() => setEmployee({...employee, role: 'Касир'})}>Касир</Radio>
+                                onChange={() => setEmployee({...employee, role: 'Касир'})}>Касир</Radio>
                             <Radio
                                 name={"position"}
                                 id={"manager"}
-                                onClick={() => setEmployee({...employee, role: 'Менеджер'})}>Менеджер</Radio>
+                                onChange={() => setEmployee({ ...employee, role: 'Менеджер' })}>Менеджер</Radio>
                         </div>
                         <div className="form-main">
                             <div className="form-content">
@@ -219,7 +239,14 @@ const EmployeeFormPopup = ({setVisible, create, selectedRow, edit}) => {
                                 <DateForm
                                     name={"birth"}
                                     value={employee.date_of_birth}
-                                    onChange={e => setEmployee({...employee, date_of_birth: e.target.value})}>Дата народження</DateForm>
+                                    onChange={e => setEmployee({...employee, date_of_birth: e.target.value})}>
+                                    Дата народження
+                                </DateForm>
+                                <InputTextForm
+                                    name={"street"}
+                                    placeholder={"Пароль"}
+                                    value={employee.password}
+                                    onChange={e => setEmployee({...employee, password: e.target.value})}>Пароль</InputTextForm>
                             </div>
                         </div>
             {selectedRow===undefined
