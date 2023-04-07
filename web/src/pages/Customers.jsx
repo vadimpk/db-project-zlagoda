@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import Navbar from "../components/UI/Navbar/Navbar";
 import Searchbar from "../components/UI/SearchBar/Searchbar";
 import Checkbox from "../components/UI/inputs/checkbox/Checkbox";
@@ -11,8 +11,10 @@ import Table from "../components/UI/table/Table";
 import EmployeeFormPopup from "../components/popups/EmployeeFormPopup";
 import ModalForm from "../components/UI/Modal/ModalForm";
 import CustomerFormPopup from "../components/popups/CustomerFormPopup";
+import axios from "axios";
 
 const Customers = () => {
+    const authToken = localStorage.getItem('authToken');
     const {isManager, setIsManager} = useContext(ManagerContext);
     const [modal, setModal] = useState(false);
     const tableData = ['Номер карти','ПІБ','Відсоток','Телефон','Адреса']
@@ -23,67 +25,23 @@ const Customers = () => {
         phone: '',
         address: ''
     });
-    /*
-    {
-    "city": "string",
-    "discount": 0,
-    "id": "string",
-    "name": "string",
-    "patronymic": "string",
-    "phone_number": "string",
-    "street": "string",
-    "surname": "string",
-    "zip_code": "string"
-  }
-     */
-    const [customers, setCustomers] = useState([
-        {
-            id: '1234567891',
-            fullName: {
-                surname: 'Горбань',
-                name: 'Ольга',
-                lastName: 'Олександрівна'
+    const [customers, setCustomers] = useState([]);
+    useEffect(() => {
+        axios.get('http://localhost:8082/customer-card', {
+            headers: {
+                Authorization: `Bearer ${authToken}`
             },
-            discount: 0,
-            phone: '+380956324525',
-            address: {
-                city: 'Кам’янець-Подільський',
-                street: 'Марини Цвєтаєвої',
-                zipCode: '24300'
+            params: {
+                ascending: true
             }
-        },
-        {
-            id: '1234567892',
-            fullName: {
-                surname: 'Прізвище',
-                name: 'Ім\'я',
-                lastName: 'По-батькові'
-            },
-            discount: '2',
-            phone: '+380956324525',
-            address: {
-                city: 'Кам’янець-Подільський',
-                street: 'Марини Цвєтаєвої',
-                zipCode: '24300'
-            }
-        },
-        {
-            id: '1234567890',
-            fullName: {
-                surname: 'Прізвище',
-                name: 'Ім\'я',
-                lastName: 'По-батькові'
-            },
-            discount: '8',
-            phone: '+380956324525',
-            address: {
-                city: 'Кам’янець-Подільський',
-                street: 'Марини Цвєтаєвої',
-                zipCode: '24300'
-            }
-        }
-
-    ]);
+        })
+            .then(response => {
+                setCustomers(response.data);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }, []);
     function transformData(data) {
         return data.map((item) => {
             const {city, street, zipCode} = item.address;
