@@ -1,17 +1,17 @@
-import React, {useContext, useState} from 'react';
+import React, {useState} from 'react';
 import BigButton from "../buttons/BigButton";
 import classes from './LoginForm.module.css'
 import BigInput from "../inputs/text-password/BigInput";
 import {useNavigate} from "react-router-dom";
 import axios from "axios";
-import {ManagerContext} from "../../../context";
 
 const LoginForm = () => {
     const [id, setId] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
-    const {isManager, setIsManager} = useContext(ManagerContext);
-
+    const [isManager, setIsManager] = useState(false);
+    const [employee, setEmployee] = useState(null);
+    const [authToken, setAuthToken] = useState(null);
 
     const handleLogin = async () => {
             const requestBody = {
@@ -21,14 +21,15 @@ const LoginForm = () => {
             axios.post('http://localhost:8082/employee/login', requestBody)
                 .then(response => {
                     const { employee, authToken } = response.data;
-                    if(employee.role==='Касир'){
-                        setIsManager(false);
-                    }else {
+                    setEmployee(employee);
+                    setAuthToken(authToken);
+                    if(employee.role==='manager'){
                         setIsManager(true);
                     }
                     navigate('/products');
                     localStorage.setItem('authToken', authToken);
-                    localStorage.setItem('employee', JSON.stringify(employee));
+                    console.log(employee)
+                    console.log(authToken)
                 })
                 .catch(error => {
                     console.error(error);

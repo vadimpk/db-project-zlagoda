@@ -13,16 +13,40 @@ import ModalForm from "../components/UI/Modal/ModalForm";
 import axios from "axios";
 
 const Employees = () => {
+    const authToken = localStorage.getItem('authToken');
     const [modal, setModal] = useState(false);
     const [employees, setEmployees] = useState([]);
     useEffect(() => {
-        axios.get('http://localhost:8082/employee')
+        axios.get('http://localhost:8082/employee', {
+            headers: {
+                Authorization: `Bearer ${authToken}`
+            },
+            params: {
+            ascending: true
+        }
+        })
             .then(response => {
                 setEmployees(response.data);
             })
             .catch(error => {
                 console.log(error);
             });
+
+        /*axios.get('http://localhost:8082/employee', {
+            headers: {
+                Authorization: `Bearer ${authToken}`
+            },
+            params: {
+                role: 'Касир'
+            }
+        })
+            .then(function (response) {
+                console.log(response.data);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });*/
+
     }, []);
     const tableData = ['ID','Прізвище','Ім\'я','По-батькові','Посада','Зарплата','Початок роботи','Дата народження','Телефон','Місто','Вулиця','Індекс']
     const [employee, setEmployee] = useState({
@@ -37,7 +61,8 @@ const Employees = () => {
         phone: '',
         city: '',
         street: '',
-        zip: ''
+        zip: '',
+        password: ''
     });
     const [isOpenSearch, setOpenSearch] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
@@ -53,32 +78,51 @@ const Employees = () => {
         phone: '',
         city: '',
         street: '',
-        zip: ''
+        zip: '',
+        password: ''
     });
-    const filteredEmployees = isChecked ? employees.filter(employee => employee.role==='Касир') : employees
+    const filteredEmployees = isChecked ? employees.filter(employee => employee.role.toLowerCase()==='касир') : employees
 
     function handleSearch(surname) {
-        console.log(surname)
         const employee = employees.find( e => e.surname.toLowerCase().includes(surname.toLowerCase()))
         setEmployee(employee)
         setOpenSearch(true)
     }
     const createEmployee = (newEmployee) => {
-        setEmployees(prevEmployees => [...prevEmployees, newEmployee]);
+        axios.post('http://localhost:8082/employee', newEmployee, {
+            headers: {
+                Authorization: `Bearer ${authToken}`
+            }
+        })
+            .then(response => {
+                console.log(response.data);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+
         setModal(false)
     }
     const editEmployee = (newEmployee, id) => {
+        console.log(newEmployee)
         newEmployee.id=id
-        setEmployees(employees.map(e => {
-            if (e.id===id){
-                return newEmployee;
+        console.log(newEmployee)
+        axios.put(`http://localhost:8082/employee/${id}`, newEmployee, {
+            headers: {
+                Authorization: `Bearer ${authToken}`
             }
-            return e
-        }));
+        })
+            .then(response => {
+                console.log(response.data);
+            })
+            .catch(error => {
+                console.log(error);
+            });
         setModal(false)
     }
     function handleAdd() {
         setSelectedRow(undefined);
+        console.log(new Date())
         setModal(true);
     }
     function handleEdit() {
@@ -92,10 +136,28 @@ const Employees = () => {
         if (selectedRow.id===''){
             alert('Виберіть працівника для видалення')
         } else {
-            console.log(selectedRow)
-            setEmployees(prevEmployees => prevEmployees.filter(employee => employee.id !== selectedRow.id));
+            axios.delete('http://localhost:8082/employee',{
+                headers: {
+                    Authorization: `Bearer ${authToken}`
+                },
+                data: {
+                    id: selectedRow.id
+                }
+            })
+                .then(response => {
+                    console.log(response.data);
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+
         }
     }
+    const transformEmployees = filteredEmployees.map(employee => {
+        const { password, ...rest } = employee;
+        return rest;
+    });
+
     return (
         <div>
             <Navbar/>
@@ -120,7 +182,7 @@ const Employees = () => {
             <ModalForm visible={modal} setVisible={setModal}>
                 <EmployeeFormPopup setVisible={setModal} create={createEmployee} edit={editEmployee}selectedRow={selectedRow===undefined ? undefined : employees.find(employee => employee.id === selectedRow.id)}/>
             </ModalForm>
-            <Table tableData={tableData} rowData={filteredEmployees} setSelectedRow={setSelectedRow}/>
+            <Table tableData={tableData} rowData={transformEmployees} setSelectedRow={setSelectedRow}/>
         </div>
     );
 };
