@@ -89,7 +89,7 @@ const EmployeeFormPopup = ({setVisible, create, selectedRow, edit}) => {
             const idRegExp = /^\d{10}$/;
             const phoneRegExp = /^\+380\d{9}$/;
             const salaryRegExp = /^\d+(\.\d+)?$/;
-            const zipRegExp = /^\d{5}-?\d{4}$/;
+            const zipRegExp = /^\d{5}$/;
             const addressRegExp = /^[а-щА-ЩЬьЮюЯяЇїІіЄєҐґ0-9'.,\s-]{1,50}$/;
         const now = new Date();
         const birthDate = new Date(employee.date_of_birth);
@@ -111,9 +111,9 @@ const EmployeeFormPopup = ({setVisible, create, selectedRow, edit}) => {
                 errors.patronymic="По-батькові має містити від 1 до 50 букв українського алфавіту";
             }
 
-            /*if (!idRegExp.test(employee.id)) {
+            if (!idRegExp.test(employee.id)) {
                 errors.id="id має містити 10 цифр";
-            }*/
+            }
 
             if (!salaryRegExp.test(employee.salary)) {
                 errors.salary="Зарплата має бути числом";
@@ -131,9 +131,9 @@ const EmployeeFormPopup = ({setVisible, create, selectedRow, edit}) => {
                 errors.street="Вулиця має містити від 1 до 50 букв, цифр та знаків пунктуації";
             }
 
-            /*if (!zipRegExp.test(employee.zip)) {
+            if (!zipRegExp.test(employee.zip)) {
                 errors.zip="Індекс має містити 5 цифр (або 9, якщо використовується формат XXXXX-XXXX)";
-            }*/
+            }
 
             if (!employee.date_of_start) {
                 errors.date_of_start="Вкажіть дату початку роботи";
