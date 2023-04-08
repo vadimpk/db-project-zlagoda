@@ -111,9 +111,9 @@ const EmployeeFormPopup = ({setVisible, create, selectedRow, edit}) => {
                 errors.patronymic="По-батькові має містити від 1 до 50 букв українського алфавіту";
             }
 
-            if (!idRegExp.test(employee.id)) {
+            /*if (!idRegExp.test(employee.id)) {
                 errors.id="id має містити 10 цифр";
-            }
+            }*/
 
             if (!salaryRegExp.test(employee.salary)) {
                 errors.salary="Зарплата має бути числом";
