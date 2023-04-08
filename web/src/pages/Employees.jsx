@@ -16,6 +16,10 @@ const Employees = () => {
     const authToken = localStorage.getItem('authToken');
     const [modal, setModal] = useState(false);
     const [employees, setEmployees] = useState([]);
+    const [isOpenSearch, setOpenSearch] = useState(false);
+    const [isChecked, setIsChecked] = useState(false);
+    //const filteredEmployees = isChecked ? employees.filter(employee => employee.role.toLowerCase()==='касир') : employees
+    let filteredEmployees = employees;
     useEffect(() => {
         axios.get('http://localhost:8082/employee', {
             headers: {
@@ -32,22 +36,26 @@ const Employees = () => {
                 console.log(error);
             });
 
-        /*axios.get('http://localhost:8082/employee', {
-            headers: {
-                Authorization: `Bearer ${authToken}`
-            },
-            params: {
-                role: 'Касир'
-            }
-        })
-            .then(function (response) {
-                console.log(response.data);
+        if (isChecked) {
+            axios.get('http://localhost:8082/employee', {
+                headers: {
+                    Authorization: `Bearer ${authToken}`
+                },
+                params: {
+                    ascending: true,
+                    role: 'Касир',
+                    surname: true
+                }
             })
-            .catch(function (error) {
-                console.log(error);
-            });*/
-
-    }, []);
+                .then(response => {
+                    filteredEmployees=response.data
+                    console.log(response.data);
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+        }
+    }, [isChecked]);
     const tableData = ['ID','Прізвище','Ім\'я','По-батькові','Посада','Зарплата','Початок роботи','Дата народження','Телефон','Місто','Вулиця','Індекс']
     const [employee, setEmployee] = useState({
         id: '',
@@ -64,8 +72,6 @@ const Employees = () => {
         zip: '',
         password: ''
     });
-    const [isOpenSearch, setOpenSearch] = useState(false);
-    const [isChecked, setIsChecked] = useState(false);
     const [selectedRow, setSelectedRow] = useState({
         id: '',
         surname: '',
@@ -81,7 +87,6 @@ const Employees = () => {
         zip: '',
         password: ''
     });
-    const filteredEmployees = isChecked ? employees.filter(employee => employee.role.toLowerCase()==='касир') : employees
 
     function handleSearch(surname) {
         const employee = employees.find( e => e.surname.toLowerCase().includes(surname.toLowerCase()))
@@ -104,10 +109,8 @@ const Employees = () => {
         setModal(false)
     }
     const editEmployee = (newEmployee, id) => {
-        console.log(newEmployee)
         newEmployee.id=id
-        console.log(newEmployee)
-        axios.put(`http://localhost:8082/employee/${id}`, newEmployee, {
+        axios.put(`http://localhost:8082/employee/${id}`, newEmployee,{
             headers: {
                 Authorization: `Bearer ${authToken}`
             }
@@ -141,7 +144,7 @@ const Employees = () => {
                     Authorization: `Bearer ${authToken}`
                 },
                 data: {
-                    id: selectedRow.id
+                    ids: [selectedRow.id]
                 }
             })
                 .then(response => {
