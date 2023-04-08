@@ -69,7 +69,7 @@ const CustomerFormPopup = ({setVisible, create, selectedRow, edit}) => {
         const addressRegExp = /^[а-щА-ЩЬьЮюЯяЇїІіЄєҐґ0-9'.,\s-]{1,50}$/;
         const errors = {};
 
-        if (!idRegExp.test(customer.id)&&selectedRow===undefined) {
+        if (!idRegExp.test(customer.id)) {
             errors.id="id має містити 13 цифр";
         }
 
