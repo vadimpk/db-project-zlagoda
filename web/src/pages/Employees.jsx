@@ -26,7 +26,8 @@ const Employees = () => {
                 Authorization: `Bearer ${authToken}`
             },
             params: {
-            ascending: true
+                sortAscending: true,
+                sortSurname: true
         }
         })
             .then(response => {
@@ -42,14 +43,13 @@ const Employees = () => {
                     Authorization: `Bearer ${authToken}`
                 },
                 params: {
-                    ascending: true,
+                    sortAscending: true,
                     role: 'Касир',
-                    surname: true
+                    sortSurname: true
                 }
             })
                 .then(response => {
-                    filteredEmployees=response.data
-                    console.log(response.data);
+                    setEmployees(response.data);
                 })
                 .catch(error => {
                     console.log(error);
@@ -89,9 +89,25 @@ const Employees = () => {
     });
 
     function handleSearch(surname) {
-        const employee = employees.find( e => e.surname.toLowerCase().includes(surname.toLowerCase()))
-        setEmployee(employee)
-        setOpenSearch(true)
+        //const employee = employees.find( e => e.surname.toLowerCase().includes(surname.toLowerCase()))
+        //setEmployee(employee)
+        axios.get('http://localhost:8082/employee', {
+            headers: {
+                Authorization: `Bearer ${authToken}`
+            },
+            params: {
+                search: surname
+            }
+        })
+            .then(response => {
+                console.log(response.data);
+                const employee = response.data
+                setEmployee(employee)
+                setOpenSearch(true)
+            })
+            .catch(error => {
+                console.log(error);
+            });
     }
     const createEmployee = (newEmployee) => {
         axios.post('http://localhost:8082/employee', newEmployee, {
