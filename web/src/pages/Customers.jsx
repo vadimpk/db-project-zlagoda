@@ -37,7 +37,8 @@ const Customers = () => {
                 Authorization: `Bearer ${authToken}`
             },
             params: {
-                ascending: true
+                sortAscending: true,
+                sortSurname: true
             }
         })
             .then(response => {
@@ -49,7 +50,22 @@ const Customers = () => {
     }, []);
 
     function handleSearch(discount) {
-        setCustomers(customers.filter( c => c.discount===discount))
+        axios.get('http://localhost:8082/customer-card', {
+            headers: {
+                Authorization: `Bearer ${authToken}`
+            },
+            params: {
+                sortAscending: true,
+                sortSurname: true,
+                discount: discount
+            }
+        })
+            .then(response => {
+                setCustomers(response.data);
+            })
+            .catch(error => {
+                console.log(error);
+            });
     }
     function handleAdd() {
         setSelectedRow(undefined);
@@ -66,7 +82,6 @@ const Customers = () => {
         if (selectedRow.id===''){
             alert('Виберіть клієнта для видалення')
         } else {
-            //setCustomers(prevCustomers => prevCustomers.filter(employee => employee.id !== selectedRow.id));
             axios.delete('http://localhost:8082/customer-card',{
                 headers: {
                     Authorization: `Bearer ${authToken}`
@@ -100,12 +115,17 @@ const Customers = () => {
     }
     const editCustomer = (newCustomer, id) => {
         newCustomer.id=id
-        setCustomers(customers.map(e => {
-            if (e.id===id){
-                return newCustomer;
+        axios.put(`http://localhost:8082/customer-card/${id}`, newCustomer,{
+            headers: {
+                Authorization: `Bearer ${authToken}`
             }
-            return e
-        }));
+        })
+            .then(response => {
+                console.log(response.data);
+            })
+            .catch(error => {
+                console.log(error);
+            });
         setModal(false)
     }
     return (

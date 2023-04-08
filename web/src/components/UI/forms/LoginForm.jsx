@@ -9,7 +9,7 @@ const LoginForm = () => {
     const [id, setId] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
-    const [isManager, setIsManager] = useState(false);
+    const [isManager, setIsManager] = useState(true);
     const [employee, setEmployee] = useState(null);
     const [authToken, setAuthToken] = useState(null);
 
@@ -23,11 +23,12 @@ const LoginForm = () => {
                     const { employee, authToken } = response.data;
                     setEmployee(employee);
                     setAuthToken(authToken);
-                    if(employee.role==='manager'){
-                        setIsManager(true);
+                    if(employee.role==='Касир'){
+                        setIsManager(false);
                     }
                     navigate('/products');
                     localStorage.setItem('authToken', authToken);
+                    localStorage.setItem('employee', employee);
                     console.log(employee)
                     console.log(authToken)
                 })
