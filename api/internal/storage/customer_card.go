@@ -6,6 +6,7 @@ import (
 	"github.com/apsdehal/go-logger"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/entity"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/service"
+	"log"
 	"strings"
 )
 
@@ -52,24 +53,28 @@ func (s *customerCardStorage) List(opts service.ListCardOptions) ([]*entity.Cust
 	query.WriteString("SELECT * FROM customer_card WHERE 1=1")
 
 	if opts.Search != nil {
-		query.WriteString(" AND (surname ILIKE ? OR name ILIKE ?)")
-		searchString := fmt.Sprintf("%%%s%%", *opts.Search)
-		args = append(args, searchString, searchString)
+		query.WriteString(" AND (cust_surname ILIKE $1 OR cust_name ILIKE $2)")
+		args = append(args, "%"+*opts.Search+"%", "%"+*opts.Search+"%")
 	}
 
+	nextArgIndex := len(args) + 1
+
 	if opts.Discount != nil {
-		query.WriteString(" AND discount = ?")
+		query.WriteString(fmt.Sprintf(" AND discount = $%d", nextArgIndex))
 		args = append(args, *opts.Discount)
+		nextArgIndex++
 	}
 
 	if opts.SortSurname != nil {
-		query.WriteString(" ORDER BY surname")
+		query.WriteString(" ORDER BY cust_surname")
 		if opts.SortAscending != nil && *opts.SortAscending {
 			query.WriteString(" ASC")
 		} else {
 			query.WriteString(" DESC")
 		}
 	}
+
+	log.Println(query.String(), args)
 
 	rows, err := s.db.Query(query.String(), args...)
 	if err != nil {

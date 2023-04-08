@@ -32,9 +32,10 @@ type EmployeeService interface {
 }
 
 type ListEmployeeOptions struct {
+	Search        *string `form:"search"`
 	Role          *string `form:"role"`
-	SortSurname   *bool   `form:"surname"`
-	SortAscending *bool   `form:"ascending"`
+	SortSurname   *bool   `form:"sortSurname"`
+	SortAscending *bool   `form:"sortAscending"`
 }
 
 var (
@@ -56,8 +57,8 @@ type CustomerCardService interface {
 type ListCardOptions struct {
 	Search        *string `form:"search"`
 	Discount      *int    `form:"discount"`
-	SortSurname   *bool   `form:"surname"`
-	SortAscending *bool   `form:"ascending"`
+	SortSurname   *bool   `form:"sortSurname"`
+	SortAscending *bool   `form:"sortAscending"`
 }
 
 type ProductService interface {

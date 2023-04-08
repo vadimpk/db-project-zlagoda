@@ -2,6 +2,7 @@ package storage
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/apsdehal/go-logger"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/entity"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/service"
@@ -52,20 +53,27 @@ func (s *employeeStorage) List(opts service.ListEmployeeOptions) ([]*entity.Empl
 
 	query.WriteString("SELECT * FROM employee WHERE 1=1")
 
+	if opts.Search != nil {
+		query.WriteString(" AND (empl_surname ILIKE $1 OR empl_name ILIKE $2 OR empl_patronymic ILIKE $3)")
+		args = append(args, "%"+*opts.Search+"%", "%"+*opts.Search+"%", "%"+*opts.Search+"%")
+	}
+
+	nextArgIndex := len(args) + 1
+
 	if opts.Role != nil {
-		query.WriteString(" AND role = ?")
+		query.WriteString(fmt.Sprintf(" AND empl_role = $%d", nextArgIndex))
 		args = append(args, *opts.Role)
+		nextArgIndex++
 	}
 
 	if opts.SortSurname != nil {
-		query.WriteString(" ORDER BY surname")
+		query.WriteString(" ORDER BY empl_surname")
 		if opts.SortAscending != nil && *opts.SortAscending {
 			query.WriteString(" ASC")
 		} else {
 			query.WriteString(" DESC")
 		}
 	}
-
 	rows, err := s.db.Query(query.String(), args...)
 	if err != nil {
 		s.logger.Errorf("error while listing employees: %s", err)
