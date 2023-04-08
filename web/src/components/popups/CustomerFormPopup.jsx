@@ -1,30 +1,25 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import RoundButton from "../UI/buttons/RoundButton";
 import BigButton from "../UI/buttons/BigButton";
 import InputTextForm from "../UI/inputs/text-password/InputTextForm";
-import axios from "axios";
 
 const CustomerFormPopup = ({setVisible, create, selectedRow, edit}) => {
-    const [customer, setCustomer] = useState({
-        id: '',
-        name: '',
-        surname:'',
-        patronymic:'',
-        discount: 0,
-        phone_number: '',
-        city: '',
-        street: '',
-        zip_code: ''
-    });
-
-    useEffect(() => {
-        if (selectedRow!==undefined) {
-            setCustomer(selectedRow)
-        }
-    },[selectedRow]);
+    const [customer, setCustomer] = useState(selectedRow ||
+        {
+            id: '',
+            name: '',
+            surname:'',
+            patronymic:'',
+            discount: 0,
+            phone_number: '',
+            city: '',
+            street: '',
+            zip_code: ''
+        });
 
     const addNewCustomer = (e) => {
         e.preventDefault()
+        console.log(customer)
         if (validateForm()) {
             const discount = parseFloat(customer.discount)
             customer.discount=discount
@@ -45,7 +40,7 @@ const CustomerFormPopup = ({setVisible, create, selectedRow, edit}) => {
     }
     const editCustomer = (e) => {
         e.preventDefault()
-        setCustomer({...customer, id: selectedRow})
+        setCustomer({...customer, id: selectedRow.id})
         console.log(customer)
         if (validateForm()) {
             const discount = parseFloat(customer.discount)
@@ -66,12 +61,17 @@ const CustomerFormPopup = ({setVisible, create, selectedRow, edit}) => {
         setVisible(false)
     }
     const validateForm = () => {
+        const idRegExp = /^\d{13}$/;
         const nameRegExp = /^[а-щА-ЩЬьЮюЯяЇїІіЄєҐґ']{1,50}$/;
         const phone_numberRegExp = /^\+380\d{9}$/;
-        const zipRegExp = /^\d{5}(\d{4})?$/;
+        const zipRegExp = /^\d{5}$/;
         const discountRegExp = /^[1-9]\d*$/;
         const addressRegExp = /^[а-щА-ЩЬьЮюЯяЇїІіЄєҐґ0-9'.,\s-]{1,50}$/;
         const errors = {};
+
+        if (!idRegExp.test(customer.id)) {
+            errors.id="id має містити 13 цифр";
+        }
 
         if (!nameRegExp.test(customer.name)) {
             errors.name="Ім'я має містити від 1 до 50 букв українського алфавіту";
@@ -100,7 +100,7 @@ const CustomerFormPopup = ({setVisible, create, selectedRow, edit}) => {
         }
 
         if (!zipRegExp.test(customer.zip_code)) {
-            errors.zip_code="Індекс має містити 5 цифр (або 9, якщо використовується формат XXXXXXXXX)";
+            errors.zip_code="Індекс має містити 5 цифр (або 9, якщо використовується формат XXXXX-XXXX)";
         }
 
         if (Object.keys(errors).length > 0) {
@@ -143,9 +143,14 @@ const CustomerFormPopup = ({setVisible, create, selectedRow, edit}) => {
                 </div>
                 <div className="form-content">
                     <InputTextForm
+                        name={"id"}
+                        placeholder={"Номер карти"}
+                        value={ selectedRow===undefined ? customer.id : selectedRow.id}
+                        onChange={e => setCustomer({...customer, id: e.target.value})}>Номер карти</InputTextForm>
+                    <InputTextForm
                         name={"percent"}
                         placeholder={"Відсоток"}
-                        value={`${customer.discount}`}
+                        value={customer.discount}
                         onChange={e => setCustomer({...customer, discount: e.target.value})}>Відсоток</InputTextForm>
                     <InputTextForm
                         name={"phone_number"}
