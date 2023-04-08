@@ -4,6 +4,7 @@ import phone from '../../assets/images/phone.png'
 import location from '../../assets/images/address.png'
 
 const ProfilePopup = ({setVisible}) => {
+    const employee = localStorage.getItem('employee');
     const st = {
         color: 'white',
         fontSize: '16px'
@@ -19,7 +20,7 @@ const ProfilePopup = ({setVisible}) => {
     return (
         <div>
             <div className="profile-top">
-            <div className="profile-name">Прізвище Ім'я По-батькові</div>
+            <div className="profile-name">{employee.surname} {employee.name} {employee.patronymic}</div>
             <RoundButton onClick={() => setVisible(false)}>&times;</RoundButton>
             </div>
             <div className="profile-left">
@@ -29,7 +30,7 @@ const ProfilePopup = ({setVisible}) => {
                 </h3>
                 <hr width="116px"/>
                 <p>
-                    123123 гривень
+                    {employee.salary} гривень
                 </p>
             </div>
             <div className="profile-p">
@@ -38,7 +39,7 @@ const ProfilePopup = ({setVisible}) => {
                 </h3>
                 <hr width="116px"/>
                 <p>
-                    12.03.1999
+                    {employee.date_of_birth}
                 </p>
             </div>
             <div className="profile-p">
@@ -47,7 +48,7 @@ const ProfilePopup = ({setVisible}) => {
                 </h3>
                 <hr width="116px"/>
                 <p>
-                    13.05.2019
+                    {employee.date_of_start}
                 </p>
             </div>
             </div>
