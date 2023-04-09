@@ -1,15 +1,16 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import BigButton from "../buttons/BigButton";
 import classes from './LoginForm.module.css'
 import BigInput from "../inputs/text-password/BigInput";
 import {useNavigate} from "react-router-dom";
 import axios from "axios";
+import {ManagerContext} from "../../../context";
 
 const LoginForm = () => {
     const [id, setId] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
-    const [isManager, setIsManager] = useState(true);
+    const {isManager, setIsManager} = useContext(ManagerContext);
     const [employee, setEmployee] = useState(null);
     const [authToken, setAuthToken] = useState(null);
 
@@ -25,6 +26,8 @@ const LoginForm = () => {
                     setAuthToken(authToken);
                     if(employee.role==='Касир'){
                         setIsManager(false);
+                    }else {
+                        setIsManager(true);
                     }
                     navigate('/products');
                     localStorage.setItem('authToken', authToken);
