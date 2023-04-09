@@ -2,9 +2,11 @@ package storage
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/apsdehal/go-logger"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/entity"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/service"
+	"strings"
 )
 
 type productStorage struct {
@@ -41,8 +43,53 @@ func (s *productStorage) GetProduct(id int) (*entity.Product, error) {
 	return &product, nil
 }
 
-func (s *productStorage) ListProducts(opts service.ListProductsOptions) ([]*entity.Product, error) {
-	return nil, nil
+func (s *productStorage) ListProducts(opts *service.ListProductsOptions) ([]*entity.Product, error) {
+	var products []*entity.Product
+	var query strings.Builder
+	var args []interface{}
+
+	query.WriteString("SELECT * FROM product WHERE 1=1")
+
+	if opts.Search != nil {
+		query.WriteString(" AND product_name ILIKE $1")
+		args = append(args, "%"+*opts.Search+"%")
+	}
+
+	nextArgIndex := len(args) + 1
+
+	if opts.CategoryID != nil {
+		query.WriteString(fmt.Sprintf(" AND fk_category_number = $%d", nextArgIndex))
+		args = append(args, *opts.CategoryID)
+		nextArgIndex++
+	}
+
+	if opts.SortName != nil {
+		query.WriteString(" ORDER BY product_name")
+		if opts.SortAscending != nil && *opts.SortAscending {
+			query.WriteString(" ASC")
+		} else {
+			query.WriteString(" DESC")
+		}
+	}
+
+	rows, err := s.db.Query(query.String(), args...)
+	if err != nil {
+		s.logger.Errorf("error while listing customer cards: %s", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		product := entity.Product{}
+		err := rows.Scan(&product.ID, &product.CategoryID, &product.Name, &product.Characteristics)
+		if err != nil {
+			s.logger.Errorf("error while scanning customer card row: %s", err)
+			return nil, err
+		}
+		products = append(products, &product)
+	}
+
+	return products, nil
 }
 
 func (s *productStorage) UpdateProduct(id int, product *entity.Product) (*entity.Product, error) {
@@ -76,8 +123,45 @@ func (s *productStorage) CreateProductCategory(category *entity.ProductCategory)
 	return category, err
 }
 
-func (s *productStorage) ListProductCategories() (*entity.Product, error) {
-	return nil, nil
+func (s *productStorage) ListProductCategories(opts *service.ListProductCategoriesOptions) ([]*entity.ProductCategory, error) {
+	var categories []*entity.ProductCategory
+	var query strings.Builder
+	var args []interface{}
+
+	query.WriteString("SELECT * FROM category WHERE 1=1")
+
+	if opts.Search != nil {
+		query.WriteString(" AND category_name ILIKE $1")
+		args = append(args, "%"+*opts.Search+"%")
+	}
+
+	if opts.SortName != nil {
+		query.WriteString(" ORDER BY category_name")
+		if opts.SortAscending != nil && *opts.SortAscending {
+			query.WriteString(" ASC")
+		} else {
+			query.WriteString(" DESC")
+		}
+	}
+
+	rows, err := s.db.Query(query.String(), args...)
+	if err != nil {
+		s.logger.Errorf("error while listing products' categories: %s", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		category := entity.ProductCategory{}
+		err := rows.Scan(&category.ID, &category.Name)
+		if err != nil {
+			s.logger.Errorf("error while scanning products' categories row: %s", err)
+			return nil, err
+		}
+		categories = append(categories, &category)
+	}
+
+	return categories, nil
 }
 
 func (s *productStorage) UpdateProductCategory(id int, product *entity.ProductCategory) (*entity.ProductCategory, error) {
@@ -120,9 +204,81 @@ func (s *productStorage) GetStoreProduct(id string) (*entity.StoreProduct, error
 	}
 	return &storeProduct, nil
 }
+func (s *productStorage) ListStoreProducts(opts *service.ListStoreProductsOptions) ([]*entity.StoreProduct, error) {
+	var storeProducts []*entity.StoreProduct
+	var query strings.Builder
+	var args []interface{}
 
-func (s *productStorage) ListStoreProducts(opts service.ListStoreProductsOptions) ([]*entity.StoreProduct, error) {
-	return nil, nil
+	query.WriteString(`
+	SELECT
+		sp.upc AS id,
+		sp.fk_upc_prom AS promotional_id,
+		sp.fk_id_product AS product_id,
+		sp.selling_price AS price,
+		sp.product_number AS count,
+		sp.promotional_product AS promotional
+	FROM store_product sp
+	INNER JOIN product p ON sp.fk_id_product = p.id_product
+	INNER JOIN category c ON p.fk_category_number = c.category_number
+	WHERE 1=1
+	`)
+
+	argIdx := 1
+	if opts.Search != nil {
+		query.WriteString(fmt.Sprintf(" AND (p.product_name ILIKE $%d)", argIdx))
+		searchString := fmt.Sprintf("%%%s%%", *opts.Search)
+		args = append(args, searchString)
+		argIdx++
+	}
+
+	if opts.CategoryID != nil {
+		query.WriteString(fmt.Sprintf(" AND c.category_number = $%d", argIdx))
+		args = append(args, *opts.CategoryID)
+		argIdx++
+	}
+
+	if opts.Promotion != nil {
+		query.WriteString(fmt.Sprintf(" AND sp.promotional_product = $%d", argIdx))
+		args = append(args, *opts.Promotion)
+		argIdx++
+	}
+
+	if opts.SortName != nil || opts.SortCount != nil || opts.SortPrice != nil {
+		query.WriteString(" ORDER BY ")
+		if opts.SortName != nil {
+			query.WriteString("p.product_name")
+		} else if opts.SortCount != nil {
+			query.WriteString("sp.product_number")
+		} else if opts.SortPrice != nil {
+			query.WriteString("sp.selling_price")
+		}
+
+		if opts.SortAscending != nil && *opts.SortAscending {
+			query.WriteString(" ASC")
+		} else {
+			query.WriteString(" DESC")
+		}
+	}
+
+	rows, err := s.db.Query(query.String(), args...)
+	if err != nil {
+		s.logger.Errorf("error while listing store products: %s", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		storeProduct := entity.StoreProduct{}
+		err := rows.Scan(&storeProduct.ID, &storeProduct.PromotionalID, &storeProduct.ProductID,
+			&storeProduct.Price, &storeProduct.Count, &storeProduct.Promotional)
+		if err != nil {
+			s.logger.Errorf("error while scanning store product row: %s", err)
+			return nil, err
+		}
+		storeProducts = append(storeProducts, &storeProduct)
+	}
+
+	return storeProducts, nil
 }
 
 func (s *productStorage) UpdateStoreProduct(id string, storeProduct *entity.StoreProduct) (*entity.StoreProduct, error) {

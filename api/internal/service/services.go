@@ -64,54 +64,49 @@ type ListCardOptions struct {
 type ProductService interface {
 	CreateProduct(product *entity.Product) (*entity.Product, error)
 	GetProduct(id int) (*entity.Product, error)
-	ListProducts(opts ListProductsOptions) ([]*entity.Product, error)
+	ListProducts(opts *ListProductsOptions) ([]*entity.Product, error)
 	UpdateProduct(id int, product *entity.Product) (*entity.Product, error)
 	DeleteProducts(ids []int) error
 
 	CreateProductCategory(category *entity.ProductCategory) (*entity.ProductCategory, error)
-	ListProductCategories() (*entity.Product, error)
+	ListProductCategories(opts *ListProductCategoriesOptions) ([]*entity.ProductCategory, error)
 	UpdateProductCategory(id int, product *entity.ProductCategory) (*entity.ProductCategory, error)
 	DeleteProductCategories(ids []int) error
 
 	CreateStoreProduct(storeProduct *entity.StoreProduct) (*entity.StoreProduct, error)
 	GetStoreProduct(id string) (*entity.StoreProduct, error)
-	ListStoreProducts(opts ListStoreProductsOptions) ([]*entity.StoreProduct, error)
+	ListStoreProducts(opts *ListStoreProductsOptions) ([]*entity.StoreProduct, error)
 	UpdateStoreProduct(id string, storeProduct *entity.StoreProduct) (*entity.StoreProduct, error)
 	DeleteStoreProducts(ids []string) error
 }
 
 type ListProductsOptions struct {
-	Search     *string
-	CategoryID *int
-	Sort       SortProductsOptions
+	Search        *string `form:"search"`
+	CategoryID    *int    `form:"categoryID"`
+	SortName      *bool   `form:"sortName"`
+	SortAscending *bool   `form:"sortAscending"`
 }
 
 type SortProductsOptions struct {
-	Name      *bool
-	Category  *bool
-	Ascending *bool
+	Name      *bool `form:"name"`
+	Category  *bool `form:"category"`
+	Ascending *bool `form:"ascending"`
 }
 
 type ListProductCategoriesOptions struct {
-	Search *string
-	Sort   SortProductCategoriesOptions
-}
-
-type SortProductCategoriesOptions struct {
-	Name      *bool
-	Ascending *bool
+	Search        *string `form:"search"`
+	SortName      *bool   `form:"sortName"`
+	SortAscending *bool   `form:"sortAscending"`
 }
 
 type ListStoreProductsOptions struct {
-	Search    *string
-	Promotion *bool
-	Sort      SortStoreProductsOptions
-}
-
-type SortStoreProductsOptions struct {
-	Name      *bool
-	Price     *bool
-	Ascending *bool
+	Search        *string `form:"search"`
+	CategoryID    *int    `form:"categoryID"`
+	Promotion     *bool   `form:"promotion"`
+	SortName      *bool   `form:"sortName"`
+	SortCount     *bool   `form:"sortCount"`
+	SortPrice     *bool   `form:"sortPrice"`
+	SortAscending *bool   `form:"sortAscending"`
 }
 
 type CheckService interface {

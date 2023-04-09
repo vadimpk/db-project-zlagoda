@@ -30,18 +30,18 @@ type CustomerCardStorage interface {
 type ProductStorage interface {
 	CreateProduct(product *entity.Product) (*entity.Product, error)
 	GetProduct(id int) (*entity.Product, error)
-	ListProducts(opts ListProductsOptions) ([]*entity.Product, error)
+	ListProducts(opts *ListProductsOptions) ([]*entity.Product, error)
 	UpdateProduct(id int, product *entity.Product) (*entity.Product, error)
 	DeleteProducts(ids []int) error
 
 	CreateProductCategory(category *entity.ProductCategory) (*entity.ProductCategory, error)
-	ListProductCategories() (*entity.Product, error)
+	ListProductCategories(opts *ListProductCategoriesOptions) ([]*entity.ProductCategory, error)
 	UpdateProductCategory(id int, product *entity.ProductCategory) (*entity.ProductCategory, error)
 	DeleteProductCategories(ids []int) error
 
 	CreateStoreProduct(storeProduct *entity.StoreProduct) (*entity.StoreProduct, error)
 	GetStoreProduct(id string) (*entity.StoreProduct, error)
-	ListStoreProducts(opts ListStoreProductsOptions) ([]*entity.StoreProduct, error)
+	ListStoreProducts(opts *ListStoreProductsOptions) ([]*entity.StoreProduct, error)
 	UpdateStoreProduct(id string, storeProduct *entity.StoreProduct) (*entity.StoreProduct, error)
 	DeleteStoreProducts(ids []string) error
 }

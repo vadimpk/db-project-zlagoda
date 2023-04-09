@@ -32,7 +32,7 @@ func (s *productService) GetProduct(id int) (*entity.Product, error) {
 	return s.storages.Product.GetProduct(id)
 }
 
-func (s *productService) ListProducts(opts ListProductsOptions) ([]*entity.Product, error) {
+func (s *productService) ListProducts(opts *ListProductsOptions) ([]*entity.Product, error) {
 	s.logger.Infof("listing products: %#v", opts)
 	return s.storages.Product.ListProducts(opts)
 }
@@ -52,9 +52,9 @@ func (s *productService) CreateProductCategory(category *entity.ProductCategory)
 	return s.storages.Product.CreateProductCategory(category)
 }
 
-func (s *productService) ListProductCategories() (*entity.Product, error) {
+func (s *productService) ListProductCategories(opts *ListProductCategoriesOptions) ([]*entity.ProductCategory, error) {
 	s.logger.Infof("listing product categories")
-	return s.storages.Product.ListProductCategories()
+	return s.storages.Product.ListProductCategories(opts)
 }
 
 func (s *productService) UpdateProductCategory(id int, product *entity.ProductCategory) (*entity.ProductCategory, error) {
@@ -77,7 +77,7 @@ func (s *productService) GetStoreProduct(id string) (*entity.StoreProduct, error
 	return s.storages.Product.GetStoreProduct(id)
 }
 
-func (s *productService) ListStoreProducts(opts ListStoreProductsOptions) ([]*entity.StoreProduct, error) {
+func (s *productService) ListStoreProducts(opts *ListStoreProductsOptions) ([]*entity.StoreProduct, error) {
 	s.logger.Infof("listing store products: %#v", opts)
 	return s.storages.Product.ListStoreProducts(opts)
 }

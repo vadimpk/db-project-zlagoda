@@ -6,7 +6,6 @@ import (
 	"github.com/apsdehal/go-logger"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/entity"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/service"
-	"log"
 	"strings"
 )
 
@@ -73,8 +72,6 @@ func (s *customerCardStorage) List(opts service.ListCardOptions) ([]*entity.Cust
 			query.WriteString(" DESC")
 		}
 	}
-
-	log.Println(query.String(), args)
 
 	rows, err := s.db.Query(query.String(), args...)
 	if err != nil {

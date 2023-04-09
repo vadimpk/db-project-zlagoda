@@ -100,11 +100,18 @@ func (r *productRoutes) getProduct(c *gin.Context) {
 // @Summary List products
 // @Tags product
 // @Description List products
+// @Param listOptions query service.ListProductsOptions false "List options"
 // @Success 200 {array} entity.Product
 // @Failure 400 {object} error
 // @Router /product [get]
 func (r *productRoutes) listProducts(c *gin.Context) {
-	products, err := r.opts.Services.Product.ListProducts(service.ListProductsOptions{})
+	var listOptions service.ListProductsOptions
+	if err := c.ShouldBindQuery(&listOptions); err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	products, err := r.opts.Services.Product.ListProducts(&listOptions)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
@@ -204,11 +211,18 @@ func (r *productRoutes) createCategory(c *gin.Context) {
 // @Summary List product categories
 // @Tags product category
 // @Description List product categories
+// @Param listOptions query service.ListProductCategoriesOptions false "List options"
 // @Success 200 {array} entity.ProductCategory
 // @Failure 400 {object} error
 // @Router /product/category [get]
 func (r *productRoutes) listCategories(c *gin.Context) {
-	categories, err := r.opts.Services.Product.ListProductCategories()
+	var listOptions service.ListProductCategoriesOptions
+	if err := c.ShouldBindQuery(&listOptions); err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	categories, err := r.opts.Services.Product.ListProductCategories(&listOptions)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
@@ -327,11 +341,18 @@ func (r *productRoutes) getStoreProduct(c *gin.Context) {
 // @Summary List store products
 // @Tags product in store
 // @Description List store products
+// @Param listOptions query service.ListStoreProductsOptions true "List options"
 // @Success 200 {array} entity.StoreProduct
 // @Failure 400 {object} error
 // @Router /product/store [get]
 func (r *productRoutes) listStoreProducts(c *gin.Context) {
-	storeProducts, err := r.opts.Services.Product.ListStoreProducts(service.ListStoreProductsOptions{})
+	var listOptions service.ListStoreProductsOptions
+	if err := c.ShouldBindQuery(&listOptions); err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	storeProducts, err := r.opts.Services.Product.ListStoreProducts(&listOptions)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
