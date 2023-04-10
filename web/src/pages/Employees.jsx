@@ -18,7 +18,6 @@ const Employees = () => {
     const [employees, setEmployees] = useState([]);
     const [isOpenSearch, setOpenSearch] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
-    //const filteredEmployees = isChecked ? employees.filter(employee => employee.role.toLowerCase()==='касир') : employees
     let filteredEmployees = employees;
     useEffect(() => {
         axios.get('http://localhost:8082/employee', {
