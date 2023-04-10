@@ -55,7 +55,6 @@ const Category = () => {
     const tableDataCategory = ["Номер", 'Назва'];
     const [select, setSelect] = useState("")
     const [products, setProducts] = useState( []);
-    const filteredProducts = select!=="Категорія" ? products.filter(product => product.category_id===select) : products
     const [selectedRowProduct, setSelectedRowProduct] = useState({
         category_id:0,
         characteristics:'',
