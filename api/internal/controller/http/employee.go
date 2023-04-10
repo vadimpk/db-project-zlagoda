@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/entity"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/service"
+	"github.com/vadimpk/db-project-zlagoda/api/pkg/errs"
 	"net/http"
 )
 
@@ -47,8 +48,14 @@ func (r *employeeRoutes) createEmployee(c *gin.Context) {
 
 	createdEmployee, err := r.opts.Services.Employee.Create(&employee)
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
+		return
 	}
+
 	c.JSON(http.StatusOK, createdEmployee)
 }
 
@@ -66,6 +73,10 @@ func (r *employeeRoutes) getEmployee(c *gin.Context) {
 
 	employee, err := r.opts.Services.Employee.Get(id)
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
@@ -94,6 +105,10 @@ func (r *employeeRoutes) listEmployee(c *gin.Context) {
 
 	employees, err := r.opts.Services.Employee.List(listOptions)
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
@@ -121,9 +136,14 @@ func (r *employeeRoutes) updateEmployee(c *gin.Context) {
 
 	updatedEmployee, err := r.opts.Services.Employee.Update(id, &employee)
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
+
 	c.JSON(http.StatusOK, updatedEmployee)
 }
 
@@ -139,9 +159,14 @@ func (r *employeeRoutes) updateEmployee(c *gin.Context) {
 func (r *employeeRoutes) deleteEmployee(c *gin.Context) {
 	err := r.opts.Services.Employee.Delete(c.Param("id"))
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
+
 	c.JSON(http.StatusOK, nil)
 }
 
@@ -172,6 +197,10 @@ func (r *employeeRoutes) login(c *gin.Context) {
 
 	employee, token, err := r.opts.Services.Employee.Login(body.EmployeeID, body.Password)
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}

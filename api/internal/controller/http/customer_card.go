@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/entity"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/service"
+	"github.com/vadimpk/db-project-zlagoda/api/pkg/errs"
 	"net/http"
 )
 
@@ -44,6 +45,10 @@ func (r *customerCardRoutes) createCard(c *gin.Context) {
 	}
 	createdCard, err := r.opts.Services.CustomerCard.Create(&card)
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
@@ -64,6 +69,10 @@ func (r *customerCardRoutes) getCard(c *gin.Context) {
 
 	card, err := r.opts.Services.CustomerCard.Get(id)
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
@@ -90,6 +99,10 @@ func (r *customerCardRoutes) listCards(c *gin.Context) {
 	}
 	cards, err := r.opts.Services.CustomerCard.List(listOptions)
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
@@ -117,6 +130,10 @@ func (r *customerCardRoutes) updateCard(c *gin.Context) {
 
 	updatedCard, err := r.opts.Services.CustomerCard.Update(id, &card)
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
@@ -135,6 +152,10 @@ func (r *customerCardRoutes) updateCard(c *gin.Context) {
 func (r *customerCardRoutes) deleteCard(c *gin.Context) {
 	err := r.opts.Services.CustomerCard.Delete(c.Param("id"))
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}

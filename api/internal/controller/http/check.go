@@ -3,6 +3,7 @@ package http
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/entity"
+	"github.com/vadimpk/db-project-zlagoda/api/pkg/errs"
 	"net/http"
 )
 
@@ -52,6 +53,10 @@ func (r *checkRoutes) createCheck(c *gin.Context) {
 
 	createdCheck, err := r.opts.Services.Check.CreateCheck(&check)
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
@@ -73,6 +78,10 @@ func (r *checkRoutes) getCheck(c *gin.Context) {
 
 	check, err := r.opts.Services.Check.GetCheck(id)
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
@@ -109,6 +118,10 @@ func (r *checkRoutes) updateCheck(c *gin.Context) {
 
 	updatedCheck, err := r.opts.Services.Check.UpdateCheck(id, &check)
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
@@ -128,6 +141,10 @@ func (r *checkRoutes) updateCheck(c *gin.Context) {
 func (r *checkRoutes) deleteCheck(c *gin.Context) {
 	err := r.opts.Services.Check.DeleteCheck(c.Param("id"))
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
@@ -152,6 +169,10 @@ func (r *checkRoutes) createCheckItem(c *gin.Context) {
 
 	createdCheckItem, err := r.opts.Services.Check.CreateCheckItem(&checkItem)
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
@@ -185,6 +206,10 @@ func (r *checkRoutes) getCheckItem(c *gin.Context) {
 		CheckID:        query.CheckId,
 	})
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
@@ -233,6 +258,10 @@ func (r *checkRoutes) updateCheckItem(c *gin.Context) {
 		CheckID:        query.CheckId,
 	}, &checkItem)
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
@@ -262,6 +291,10 @@ func (r *checkRoutes) deleteCheckItem(c *gin.Context) {
 
 	err := r.opts.Services.Check.DeleteCheckItem(requestBody.Id)
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}

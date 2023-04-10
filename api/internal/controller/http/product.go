@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/entity"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/service"
+	"github.com/vadimpk/db-project-zlagoda/api/pkg/errs"
 	"net/http"
 	"strconv"
 )
@@ -63,6 +64,10 @@ func (r *productRoutes) createProduct(c *gin.Context) {
 
 	createdProduct, err := r.opts.Services.Product.CreateProduct(&product)
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
@@ -89,6 +94,10 @@ func (r *productRoutes) getProduct(c *gin.Context) {
 
 	product, err := r.opts.Services.Product.GetProduct(productID)
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
@@ -118,6 +127,10 @@ func (r *productRoutes) listProducts(c *gin.Context) {
 
 	products, err := r.opts.Services.Product.ListProducts(&listOptions)
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
@@ -150,6 +163,10 @@ func (r *productRoutes) updateProduct(c *gin.Context) {
 
 	updatedProduct, err := r.opts.Services.Product.UpdateProduct(productID, &product)
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
@@ -176,6 +193,10 @@ func (r *productRoutes) deleteProduct(c *gin.Context) {
 
 	err = r.opts.Services.Product.DeleteProduct(productID)
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
@@ -201,6 +222,10 @@ func (r *productRoutes) createCategory(c *gin.Context) {
 
 	createdCategory, err := r.opts.Services.Product.CreateProductCategory(&category)
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
@@ -226,6 +251,10 @@ func (r *productRoutes) listCategories(c *gin.Context) {
 
 	categories, err := r.opts.Services.Product.ListProductCategories(&listOptions)
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
@@ -258,6 +287,10 @@ func (r *productRoutes) updateCategory(c *gin.Context) {
 
 	updatedCategory, err := r.opts.Services.Product.UpdateProductCategory(categoryID, &category)
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
@@ -284,6 +317,10 @@ func (r *productRoutes) deleteCategory(c *gin.Context) {
 
 	err = r.opts.Services.Product.DeleteProductCategory(productID)
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
@@ -309,6 +346,10 @@ func (r *productRoutes) createStoreProduct(c *gin.Context) {
 
 	createdStoreProduct, err := r.opts.Services.Product.CreateStoreProduct(&storeProduct)
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
@@ -329,6 +370,10 @@ func (r *productRoutes) getStoreProduct(c *gin.Context) {
 
 	storeProduct, err := r.opts.Services.Product.GetStoreProduct(id)
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
@@ -358,9 +403,14 @@ func (r *productRoutes) listStoreProducts(c *gin.Context) {
 
 	storeProducts, err := r.opts.Services.Product.ListStoreProducts(&listOptions)
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
+
 	c.JSON(http.StatusOK, storeProducts)
 }
 
@@ -385,6 +435,10 @@ func (r *productRoutes) updateStoreProduct(c *gin.Context) {
 
 	updatedStoreProduct, err := r.opts.Services.Product.UpdateStoreProduct(id, &storeProduct)
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
@@ -404,6 +458,10 @@ func (r *productRoutes) updateStoreProduct(c *gin.Context) {
 func (r *productRoutes) deleteStoreProduct(c *gin.Context) {
 	err := r.opts.Services.Product.DeleteStoreProduct(c.Param("id"))
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
