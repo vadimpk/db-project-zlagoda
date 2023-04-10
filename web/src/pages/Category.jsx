@@ -14,10 +14,18 @@ import ProductFormPopup from "../components/popups/ProductFormPopup";
 import axios from "axios";
 
 const Category = () => {
-
+    const authToken = localStorage.getItem('authToken');
     const [categories, setCategories] = useState( []);
     useEffect(() => {
-        axios.get('http://localhost:8082/product/category')
+        axios.get('http://localhost:8082/product/category', {
+            headers: {
+                Authorization: `Bearer ${authToken}`
+            },
+            params: {
+                sortAscending: true,
+                sortSurname: true
+            }
+        })
             .then(response => {
                 setCategories(response.data);
             })
@@ -26,6 +34,25 @@ const Category = () => {
             });
 
     }, []);
+    /*
+        useEffect(() => {
+        axios.get('http://localhost:8082/customer-card', {
+            headers: {
+                Authorization: `Bearer ${authToken}`
+            },
+            params: {
+                sortAscending: true,
+                sortSurname: true
+            }
+        })
+            .then(response => {
+                setCustomers(response.data);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }, []);
+     */
     const [selectedRowCategory, setSelectedRowCategory] = useState({
         id:0,
         name:''

@@ -1,10 +1,10 @@
-import React from 'react';
+import React, {useContext, useState} from 'react';
 import RoundButton from "../UI/buttons/RoundButton";
 import phone from '../../assets/images/phone.png'
 import location from '../../assets/images/address.png'
 
 const ProfilePopup = ({setVisible}) => {
-    const employee = localStorage.getItem('employee');
+    const employee = JSON.parse(localStorage.getItem('employee'));
     const st = {
         color: 'white',
         fontSize: '16px'
