@@ -69,6 +69,10 @@ func (r *employeeRoutes) getEmployee(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
+	if employee == nil {
+		c.JSON(http.StatusNotFound, nil)
+		return
+	}
 	c.JSON(http.StatusOK, employee)
 }
 

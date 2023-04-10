@@ -92,6 +92,11 @@ func (r *productRoutes) getProduct(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
+	if product == nil {
+		c.JSON(http.StatusNotFound, nil)
+		return
+	}
+
 	c.JSON(http.StatusOK, product)
 }
 
@@ -327,6 +332,11 @@ func (r *productRoutes) getStoreProduct(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
+	if storeProduct == nil {
+		c.JSON(http.StatusNotFound, nil)
+		return
+	}
+
 	c.JSON(http.StatusOK, storeProduct)
 }
 

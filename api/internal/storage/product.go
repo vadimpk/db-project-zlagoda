@@ -38,6 +38,9 @@ func (s *productStorage) GetProduct(id int) (*entity.Product, error) {
 	err := s.db.QueryRow("SELECT * FROM product WHERE id_product = $1", id).
 		Scan(&product.ID, &product.CategoryID, &product.Name, &product.Characteristics)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 		s.logger.Errorf("error while getting product: %s", err)
 	}
 	return &product, nil
@@ -126,6 +129,9 @@ func (s *productStorage) GetProductCategory(id int) (*entity.ProductCategory, er
 	err := s.db.QueryRow("SELECT * FROM category WHERE category_number = $1", id).
 		Scan(&category.ID, &category.Name)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 		s.logger.Errorf("error while getting product category: %s", err)
 	}
 	return &category, nil
@@ -206,6 +212,9 @@ func (s *productStorage) GetStoreProduct(id string) (*entity.StoreProduct, error
 	err := s.db.QueryRow("SELECT * FROM store_product WHERE upc = $1", id).
 		Scan(&storeProduct.ID, &storeProduct.PromotionalID, &storeProduct.ProductID, &storeProduct.Price, &storeProduct.Count, &storeProduct.Promotional)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 		s.logger.Errorf("error while getting store product: %s", err)
 	}
 	return &storeProduct, nil

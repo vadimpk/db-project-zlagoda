@@ -67,6 +67,10 @@ func (r *customerCardRoutes) getCard(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
+	if card == nil {
+		c.JSON(http.StatusNotFound, nil)
+		return
+	}
 	c.JSON(http.StatusOK, card)
 }
 

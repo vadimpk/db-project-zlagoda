@@ -76,6 +76,10 @@ func (r *checkRoutes) getCheck(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
+	if check == nil {
+		c.JSON(http.StatusNotFound, nil)
+		return
+	}
 
 	c.JSON(http.StatusOK, check)
 }
@@ -182,6 +186,10 @@ func (r *checkRoutes) getCheckItem(c *gin.Context) {
 	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	if checkItem == nil {
+		c.JSON(http.StatusNotFound, nil)
 		return
 	}
 

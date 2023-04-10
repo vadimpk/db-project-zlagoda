@@ -36,6 +36,9 @@ func (s *checkStorage) GetCheck(id string) (*entity.Check, error) {
 	err := s.db.QueryRow("SELECT * FROM checks WHERE check_number = $1", id).
 		Scan(&check.ID, &check.EmployeeID, &check.CustomerCardID, &check.Date, &check.TotalPrice, &check.VAT)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 		s.logger.Errorf("error while getting check: %s", err)
 	}
 	return &check, nil
@@ -80,6 +83,9 @@ func (s *checkStorage) GetCheckItem(id entity.CheckItemID) (*entity.CheckItem, e
 		id.CheckID, id.StoreProductID).
 		Scan(&checkItem.ID.StoreProductID, &checkItem.ID.CheckID, &checkItem.ProductCount, &checkItem.ProductPrice)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 		s.logger.Errorf("error while getting check item: %s", err)
 	}
 	return &checkItem, nil

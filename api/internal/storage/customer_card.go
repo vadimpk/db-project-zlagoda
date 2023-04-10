@@ -39,6 +39,9 @@ func (s *customerCardStorage) Get(id string) (*entity.CustomerCard, error) {
 		Scan(&card.ID, &card.Surname, &card.Name, &card.Patronymic,
 			&card.PhoneNumber, &card.City, &card.Street, &card.Zip, card.Discount)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 		s.logger.Errorf("error while getting customer card: %s", err)
 	}
 	return &card, nil
