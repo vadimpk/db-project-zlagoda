@@ -7,11 +7,11 @@ import AppRouter from "./components/AppRouter";
 function App() {
     const [isManager, setIsManager] = useState(false);
 
-    useEffect(() => {
+    /*useEffect(() => {
         if (localStorage.getItem('manager')) {
             setIsManager(true)
         }
-    }, [])
+    }, [])*/
 
     return (
     <ManagerContext.Provider value={{

@@ -11,8 +11,7 @@ const LoginForm = () => {
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
     const {isManager, setIsManager} = useContext(ManagerContext);
-    const [employee, setEmployee] = useState(null);
-    const [authToken, setAuthToken] = useState(null);
+
 
     const handleLogin = async () => {
             const requestBody = {
@@ -22,8 +21,6 @@ const LoginForm = () => {
             axios.post('http://localhost:8082/employee/login', requestBody)
                 .then(response => {
                     const { employee, authToken } = response.data;
-                    setEmployee(employee);
-                    setAuthToken(authToken);
                     if(employee.role==='Касир'){
                         setIsManager(false);
                     }else {
@@ -31,9 +28,7 @@ const LoginForm = () => {
                     }
                     navigate('/products');
                     localStorage.setItem('authToken', authToken);
-                    localStorage.setItem('employee', employee);
-                    console.log(employee)
-                    console.log(authToken)
+                    localStorage.setItem('employee', JSON.stringify(employee));
                 })
                 .catch(error => {
                     console.error(error);
