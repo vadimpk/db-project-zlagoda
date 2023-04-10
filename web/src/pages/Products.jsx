@@ -19,21 +19,10 @@ const Products = () => {
     const authToken = localStorage.getItem('authToken');
 
     const {isManager, setIsManager} = useContext(ManagerContext);
+    const [productsInStore, setProductsInStore] = useState( []);
     const [products, setProducts] = useState( []);
-    useEffect(() => {
-        axios.get('http://localhost:8082/product/store', {
-            headers: {
-                Authorization: `Bearer ${authToken}`
-            },
-        })
-            .then(response => {
-                console.log(response.data);
-            })
-            .catch(error => {
-                console.log(error);
-            });
-
-    }, []);
+    const [selectPromotion, setSelectPromotion] = useState('');
+    const [selectSort, setSelectSort] = useState('');
 
     const [product, setProduct] = useState({
         id:0,
@@ -56,36 +45,47 @@ const Products = () => {
     const tableData = ["UPC", "ID", 'Назва', "Кількість", "Ціна", "Акційний товар"];
     const [modal, setModal] = useState(false);
     const [isOpenSearch, setOpenSearch] = useState(false);
-    const [onSale, setOnSale] = useState(false);
-    const [notOnSale, setNotOnSale] = useState(false);
-    const [filteredP, setFilteredP] = useState(products);
 
     function handleSearch(upc) {
-            const product = products.find(e => e.id === upc)
+            const product = productsInStore.find(e => e.id === upc)
             setProduct(product)
             setOpenSearch(true)
     }
 
-    function handleSale(){
-        setOnSale(!onSale)
-    }
-    function handleNotSale(){
-        setNotOnSale(!notOnSale)
-    }
-
     useEffect(() => {
-        const filtered = products.filter(item => {
-            if (onSale && item.promotional) {
-                return true;
+            const params = {
+                sortAscending: true,
+            };
+        if (isManager) {
+            params.sortCount = true;
+        } else {
+            params.sortName = true;
+        }
+            if (selectPromotion==='promotional') {
+                params.promotion = true;
             }
-            if (notOnSale && !item.promotional) {
-                return true;
+            if (selectPromotion==='not-promotional') {
+                params.promotion = false;
             }
-            return  !onSale && !notOnSale;
-        });
-
-        setFilteredP(filtered);
-    }, [products, onSale, notOnSale]);
+        if (selectSort==='name-sort') {
+            params.sortName = true;
+        }
+        if (selectSort==='count-sort') {
+            params.sortCount = true;
+        }
+            axios.get('http://localhost:8082/product/store', {
+                headers: {
+                    Authorization: `Bearer ${authToken}`
+                },
+                params
+            })
+                .then(response => {
+                    setProductsInStore(response.data);
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+    }, [ selectPromotion, selectSort]);
 
     function handleAdd() {
         setSelectedRow(undefined);
@@ -102,16 +102,16 @@ const Products = () => {
         if (selectedRow.id===''){
             alert('Виберіть товар для видалення')
         } else {
-            setProducts(prevProducts => prevProducts.filter(product => product.id !== selectedRow.id));
+            setProductsInStore(prevProducts => prevProducts.filter(product => product.id !== selectedRow.id));
         }
     }
     const createProduct = (newProduct) => {
-        setProducts(prevProduct => [...prevProduct, newProduct]);
+        setProductsInStore(prevProduct => [...prevProduct, newProduct]);
         setModal(false)
     }
     const editProduct = (newProduct, upc) => {
         newProduct.id=upc
-        setProducts(products.map(e => {
+        setProductsInStore(productsInStore.map(e => {
             if (e.id===upc){
                 return newProduct;
             }
@@ -126,7 +126,7 @@ const Products = () => {
             name,
             count,
             price,
-            promotional
+            promotional1 : promotional? 'Так' : 'Ні'
         }));
     }
     return (
@@ -138,14 +138,22 @@ const Products = () => {
                     <Modal visible={isOpenSearch} setVisible={setOpenSearch}>
                         <ProductPopup product={product} setVisible={setOpenSearch}/>
                     </Modal>
-                    <Checkbox
-                        name={"sale"}
-                        checked={onSale}
-                        onChange={handleSale}>Акційні товари</Checkbox>
-                    <Checkbox
-                        name={"nosale"}
-                        checked={notOnSale}
-                        onChange={handleNotSale}>Не акційні товари</Checkbox>
+                    <Select style={{ marginLeft: '15px' }} onChange={(e) => setSelectPromotion(e.target.value)}>
+                        <option key={1} value={'promotional'}>
+                            Акційний
+                        </option>
+                        <option key={2} value={'not-promotional'}>
+                            Не акційний
+                        </option>
+                    </Select>
+                    <Select style={{ marginLeft: '15px' }} onChange={(e) => setSelectSort(e.target.value)}>
+                        <option key={1} value={'name-sort'}>
+                            За алфавітом
+                        </option>
+                        <option key={2} value={'count-sort'}>
+                            За кількістю
+                        </option>
+                    </Select>
                 </div>
                     {
                      isManager
@@ -163,7 +171,7 @@ const Products = () => {
                     <ProductFormPopup setVisible={setModal} create={createProduct} edit={editProduct} selectedRow={selectedRow===undefined ? undefined : products.find(product => product.id === selectedRow.id)}/>
                 </ModalForm>
             </div>
-            <Table tableData={tableData} rowData={changeFieldsOrder(filteredP)} setSelectedRow={setSelectedRow}/>
+            <Table tableData={tableData} rowData={changeFieldsOrder(productsInStore)} setSelectedRow={setSelectedRow}/>
         </div>
     );
 };
