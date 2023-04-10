@@ -106,13 +106,11 @@ func (s *employeeStorage) Update(id string, employee *entity.Employee) (*entity.
 	return employee, err
 }
 
-func (s *employeeStorage) Delete(ids []string) error {
-	for _, id := range ids {
-		_, err := s.db.Exec("DELETE FROM employee WHERE id_employee = $1", id)
-		if err != nil {
-			s.logger.Errorf("error while deleting employee: %s", err)
-			return err
-		}
+func (s *employeeStorage) Delete(id string) error {
+	_, err := s.db.Exec("DELETE FROM employee WHERE id_employee = $1", id)
+	if err != nil {
+		s.logger.Errorf("error while deleting employee: %s", err)
+		return err
 	}
 	return nil
 }

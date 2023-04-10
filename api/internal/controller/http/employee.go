@@ -23,7 +23,7 @@ func setupEmployeeRoutes(options *Options, handler *gin.Engine) {
 		group.GET("/:id", newAuthMiddleware(options), routes.getEmployee)
 		group.GET("/", newAuthMiddleware(options), routes.listEmployee)
 		group.PUT("/:id", newAuthMiddleware(options), routes.updateEmployee)
-		group.DELETE("/", newAuthMiddleware(options), routes.deleteEmployee)
+		group.DELETE("/:id", newAuthMiddleware(options), routes.deleteEmployee)
 
 		group.POST("/login", routes.login)
 	}
@@ -123,27 +123,17 @@ func (r *employeeRoutes) updateEmployee(c *gin.Context) {
 	c.JSON(http.StatusOK, updatedEmployee)
 }
 
-type deleteEmployeeRequestBody struct {
-	Ids []string `json:"ids"`
-}
-
 // @Id delete-employee
 // @Security BearerAuth
 // @Summary Delete employee
 // @Tags employee
 // @Description Delete employee
-// @Param ids body deleteEmployeeRequestBody true "Employee IDs"
+// @Param id path string true "Employee ID"
 // @Success 200
 // @Failure 400 {object} error
-// @Router /employee [delete]
+// @Router /employee/{id} [delete]
 func (r *employeeRoutes) deleteEmployee(c *gin.Context) {
-	var body deleteEmployeeRequestBody
-	if err := c.ShouldBindJSON(&body); err != nil {
-		c.JSON(http.StatusBadRequest, err)
-		return
-	}
-
-	err := r.opts.Services.Employee.Delete(body.Ids)
+	err := r.opts.Services.Employee.Delete(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return

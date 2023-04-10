@@ -55,13 +55,11 @@ func (s *checkStorage) UpdateCheck(id string, check *entity.Check) (*entity.Chec
 	return check, nil
 }
 
-func (s *checkStorage) DeleteChecks(ids []string) error {
-	for _, id := range ids {
-		_, err := s.db.Exec("DELETE FROM checks WHERE check_number = $1", id)
-		if err != nil {
-			s.logger.Errorf("error while deleting check: %s", err)
-			return err
-		}
+func (s *checkStorage) DeleteCheck(id string) error {
+	_, err := s.db.Exec("DELETE FROM checks WHERE check_number = $1", id)
+	if err != nil {
+		s.logger.Errorf("error while deleting check: %s", err)
+		return err
 	}
 	return nil
 }
@@ -101,13 +99,11 @@ func (s *checkStorage) UpdateCheckItem(id entity.CheckItemID, checkItem *entity.
 	return checkItem, nil
 }
 
-func (s *checkStorage) DeleteCheckItems(ids []entity.CheckItemID) error {
-	for _, id := range ids {
-		_, err := s.db.Exec("DELETE FROM sale WHERE fk_check_number = $1 AND fk_UPC = $2", id.CheckID, id.StoreProductID)
-		if err != nil {
-			s.logger.Errorf("error while deleting check item: %s", err)
-			return err
-		}
+func (s *checkStorage) DeleteCheckItem(id entity.CheckItemID) error {
+	_, err := s.db.Exec("DELETE FROM sale WHERE fk_check_number = $1 AND fk_UPC = $2", id.CheckID, id.StoreProductID)
+	if err != nil {
+		s.logger.Errorf("error while deleting check item: %s", err)
+		return err
 	}
 	return nil
 }

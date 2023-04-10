@@ -22,7 +22,7 @@ func setupCheckRoutes(options *Options, handler *gin.Engine) {
 		checkGroup.GET("/:id", routes.getCheck)
 		checkGroup.GET("/", routes.listChecks)
 		checkGroup.PUT("/:id", routes.updateCheck)
-		checkGroup.DELETE("/", routes.deleteChecks)
+		checkGroup.DELETE("/:id", routes.deleteCheck)
 	}
 
 	checkItemGroup := checkGroup.Group("/check-item")
@@ -31,7 +31,7 @@ func setupCheckRoutes(options *Options, handler *gin.Engine) {
 		checkItemGroup.GET("/", routes.getCheckItem)
 		checkItemGroup.GET("/list", routes.listCheckItems)
 		checkItemGroup.PUT("/", routes.updateCheckItem)
-		checkItemGroup.DELETE("/", routes.deleteCheckItems)
+		checkItemGroup.DELETE("/", routes.deleteCheckItem)
 	}
 }
 
@@ -112,40 +112,23 @@ func (r *checkRoutes) updateCheck(c *gin.Context) {
 	c.JSON(http.StatusOK, updatedCheck)
 }
 
-type deleteChecksRequestBody struct {
-	Ids []string `json:"ids"`
-}
-
-type deleteChecksResponseBody struct {
-	Deleted []string `json:"deleted"`
-}
-
 // @Id delete-checks
 // @Security BearerAuth
 // @Summary Delete checks
 // @Tags check
 // @Description Delete checks
-// @Param ids body deleteChecksRequestBody true "Check IDs"
-// @Success 200 {object} deleteChecksResponseBody
+// @Param id path string true "Check ID"
+// @Success 200
 // @Failure 400 {object} error
-// @Router /check [delete]
-func (r *checkRoutes) deleteChecks(c *gin.Context) {
-	var requestBody deleteChecksRequestBody
-	if err := c.ShouldBindJSON(&requestBody); err != nil {
-		c.JSON(http.StatusBadRequest, err)
-		return
-	}
-
-	// deleted, err := r.opts.Services.Check.DeleteChecks(requestBody.Ids)
-	err := r.opts.Services.Check.DeleteChecks(requestBody.Ids)
+// @Router /check/{id} [delete]
+func (r *checkRoutes) deleteCheck(c *gin.Context) {
+	err := r.opts.Services.Check.DeleteCheck(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, deleteChecksResponseBody{
-		Deleted: nil,
-	})
+	c.JSON(http.StatusOK, nil)
 }
 
 // @Id Create check item
@@ -250,11 +233,7 @@ func (r *checkRoutes) updateCheckItem(c *gin.Context) {
 }
 
 type deleteCheckItemsRequestBody struct {
-	Ids []entity.CheckItemID `json:"ids"`
-}
-
-type deleteCheckItemsResponseBody struct {
-	Deleted []entity.CheckItemID `json:"deleted"`
+	Id entity.CheckItemID `json:"id"`
 }
 
 // @Id delete-check-items
@@ -262,25 +241,22 @@ type deleteCheckItemsResponseBody struct {
 // @Summary Delete check items
 // @Tags check-item
 // @Description Delete check items
-// @Param ids body deleteCheckItemsRequestBody true "Check item IDs"
-// @Success 200 {object} deleteCheckItemsResponseBody
+// @Param id body deleteCheckItemsRequestBody true "Check item ID"
+// @Success 200
 // @Failure 400 {object} error
 // @Router /check/check-item [delete]
-func (r *checkRoutes) deleteCheckItems(c *gin.Context) {
+func (r *checkRoutes) deleteCheckItem(c *gin.Context) {
 	var requestBody deleteCheckItemsRequestBody
 	if err := c.ShouldBindJSON(&requestBody); err != nil {
 		c.JSON(http.StatusBadRequest, err)
 		return
 	}
 
-	// deleted, err := r.opts.Services.Check.DeleteCheckItems(requestBody.Ids)
-	err := r.opts.Services.Check.DeleteCheckItems(requestBody.Ids)
+	err := r.opts.Services.Check.DeleteCheckItem(requestBody.Id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, deleteChecksResponseBody{
-		Deleted: nil,
-	})
+	c.JSON(http.StatusOK, nil)
 }

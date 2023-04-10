@@ -23,6 +23,15 @@ func NewCustomerCardService(opts Options) CustomerCardService {
 var _ CustomerCardService = (*customerCardService)(nil)
 
 func (s *customerCardService) Create(card *entity.CustomerCard) (*entity.CustomerCard, error) {
+	existingCard, err := s.storages.CustomerCard.Get(card.ID)
+	if err != nil {
+		s.logger.Errorf("failed to get card: %v", err)
+		return nil, err
+	}
+	if existingCard != nil {
+		s.logger.Errorf("card already exists")
+		return nil, ErrCreateCardAlreadyExists
+	}
 	s.logger.Infof("creating card: %#v", card)
 	return s.storages.CustomerCard.Create(card)
 }
@@ -42,7 +51,7 @@ func (s *customerCardService) Update(id string, card *entity.CustomerCard) (*ent
 	return s.storages.CustomerCard.Update(id, card)
 }
 
-func (s *customerCardService) Delete(ids []string) error {
-	s.logger.Infof("deleting cards: %#v", ids)
-	return s.storages.CustomerCard.Delete(ids)
+func (s *customerCardService) Delete(id string) error {
+	s.logger.Infof("deleting card: %#v", id)
+	return s.storages.CustomerCard.Delete(id)
 }

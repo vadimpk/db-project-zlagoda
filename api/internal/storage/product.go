@@ -21,7 +21,7 @@ func NewProductStorage(logger *logger.Logger, db *sql.DB) service.ProductStorage
 	}
 }
 
-var _ service.EmployeeStorage = (*employeeStorage)(nil)
+var _ service.ProductStorage = (*productStorage)(nil)
 
 func (s *productStorage) CreateProduct(product *entity.Product) (*entity.Product, error) {
 	_, err := s.db.Exec("INSERT INTO product (id_product, fk_category_number, product_name, product_characteristics) VALUES ($1, $2, $3, $4)",
@@ -102,13 +102,11 @@ func (s *productStorage) UpdateProduct(id int, product *entity.Product) (*entity
 	return product, err
 }
 
-func (s *productStorage) DeleteProducts(ids []int) error {
-	for _, id := range ids {
-		_, err := s.db.Exec("DELETE FROM product WHERE id_product = $1", id)
-		if err != nil {
-			s.logger.Errorf("error while deleting product: %s", err)
-			return err
-		}
+func (s *productStorage) DeleteProduct(id int) error {
+	_, err := s.db.Exec("DELETE FROM product WHERE id_product = $1", id)
+	if err != nil {
+		s.logger.Errorf("error while deleting product: %s", err)
+		return err
 	}
 	return nil
 }
@@ -121,6 +119,16 @@ func (s *productStorage) CreateProductCategory(category *entity.ProductCategory)
 		return nil, err
 	}
 	return category, err
+}
+
+func (s *productStorage) GetProductCategory(id int) (*entity.ProductCategory, error) {
+	category := entity.ProductCategory{}
+	err := s.db.QueryRow("SELECT * FROM category WHERE category_number = $1", id).
+		Scan(&category.ID, &category.Name)
+	if err != nil {
+		s.logger.Errorf("error while getting product category: %s", err)
+	}
+	return &category, nil
 }
 
 func (s *productStorage) ListProductCategories(opts *service.ListProductCategoriesOptions) ([]*entity.ProductCategory, error) {
@@ -174,13 +182,11 @@ func (s *productStorage) UpdateProductCategory(id int, product *entity.ProductCa
 	return product, err
 }
 
-func (s *productStorage) DeleteProductCategories(ids []int) error {
-	for _, id := range ids {
-		_, err := s.db.Exec("DELETE FROM category WHERE category_number = $1", id)
-		if err != nil {
-			s.logger.Errorf("error while deleting product: %s", err)
-			return err
-		}
+func (s *productStorage) DeleteProductCategory(id int) error {
+	_, err := s.db.Exec("DELETE FROM category WHERE category_number = $1", id)
+	if err != nil {
+		s.logger.Errorf("error while deleting product: %s", err)
+		return err
 	}
 	return nil
 }
@@ -291,13 +297,11 @@ func (s *productStorage) UpdateStoreProduct(id string, storeProduct *entity.Stor
 	return storeProduct, err
 }
 
-func (s *productStorage) DeleteStoreProducts(ids []string) error {
-	for _, id := range ids {
-		_, err := s.db.Exec("DELETE FROM store_product WHERE upc = $1", id)
-		if err != nil {
-			s.logger.Errorf("error while deleting store product: %s", err)
-			return err
-		}
+func (s *productStorage) DeleteStoreProduct(id string) error {
+	_, err := s.db.Exec("DELETE FROM store_product WHERE upc = $1", id)
+	if err != nil {
+		s.logger.Errorf("error while deleting store product: %s", err)
+		return err
 	}
 	return nil
 }

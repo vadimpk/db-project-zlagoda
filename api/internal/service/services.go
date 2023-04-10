@@ -25,11 +25,21 @@ type EmployeeService interface {
 	Get(id string) (*entity.Employee, error)
 	List(opts ListEmployeeOptions) ([]*entity.Employee, error)
 	Update(id string, employee *entity.Employee) (*entity.Employee, error)
-	Delete(ids []string) error
+	Delete(id string) error
 
 	Login(id string, password string) (*entity.Employee, string, error)
 	VerifyAccessToken(authToken string) (*entity.Employee, error)
 }
+
+var (
+	ErrCreateEmployeeAlreadyExists = errs.New("employee already exists")
+
+	ErrLoginEmployeeNotFound        = errs.New("employee not found")
+	ErrLoginEmployeeInvalidPassword = errs.New("invalid password")
+
+	ErrVerifyAccessTokenInvalidAccessToken = errs.New("invalid access token")
+	ErrVerifyAccessTokenEmployeeNotFound   = errs.New("employee not found")
+)
 
 type ListEmployeeOptions struct {
 	Search        *string `form:"search"`
@@ -38,21 +48,17 @@ type ListEmployeeOptions struct {
 	SortAscending *bool   `form:"sortAscending"`
 }
 
-var (
-	ErrLoginEmployeeNotFound        = errs.New("employee not found")
-	ErrLoginEmployeeInvalidPassword = errs.New("invalid password")
-
-	ErrVerifyAccessTokenInvalidAccessToken = errs.New("invalid access token")
-	ErrVerifyAccessTokenEmployeeNotFound   = errs.New("employee not found")
-)
-
 type CustomerCardService interface {
 	Create(card *entity.CustomerCard) (*entity.CustomerCard, error)
 	Get(id string) (*entity.CustomerCard, error)
 	List(opts ListCardOptions) ([]*entity.CustomerCard, error)
 	Update(id string, card *entity.CustomerCard) (*entity.CustomerCard, error)
-	Delete(ids []string) error
+	Delete(id string) error
 }
+
+var (
+	ErrCreateCardAlreadyExists = errs.New("card already exists")
+)
 
 type ListCardOptions struct {
 	Search        *string `form:"search"`
@@ -66,19 +72,27 @@ type ProductService interface {
 	GetProduct(id int) (*entity.Product, error)
 	ListProducts(opts *ListProductsOptions) ([]*entity.Product, error)
 	UpdateProduct(id int, product *entity.Product) (*entity.Product, error)
-	DeleteProducts(ids []int) error
+	DeleteProduct(id int) error
 
 	CreateProductCategory(category *entity.ProductCategory) (*entity.ProductCategory, error)
 	ListProductCategories(opts *ListProductCategoriesOptions) ([]*entity.ProductCategory, error)
 	UpdateProductCategory(id int, product *entity.ProductCategory) (*entity.ProductCategory, error)
-	DeleteProductCategories(ids []int) error
+	DeleteProductCategory(id int) error
 
 	CreateStoreProduct(storeProduct *entity.StoreProduct) (*entity.StoreProduct, error)
 	GetStoreProduct(id string) (*entity.StoreProduct, error)
 	ListStoreProducts(opts *ListStoreProductsOptions) ([]*entity.StoreProduct, error)
 	UpdateStoreProduct(id string, storeProduct *entity.StoreProduct) (*entity.StoreProduct, error)
-	DeleteStoreProducts(ids []string) error
+	DeleteStoreProduct(id string) error
 }
+
+var (
+	ErrCreateProductAlreadyExists = errs.New("product already exists")
+
+	ErrCreateProductCategoryAlreadyExists = errs.New("product category already exists")
+
+	ErrCreateStoreProductAlreadyExists = errs.New("store product already exists")
+)
 
 type ListProductsOptions struct {
 	Search        *string `form:"search"`
@@ -114,13 +128,13 @@ type CheckService interface {
 	GetCheck(id string) (*entity.Check, error)
 	ListChecks(opts ListChecksOptions) ([]*entity.Check, error)
 	UpdateCheck(id string, check *entity.Check) (*entity.Check, error)
-	DeleteChecks(ids []string) error
+	DeleteCheck(id string) error
 
 	CreateCheckItem(checkItem *entity.CheckItem) (*entity.CheckItem, error)
 	GetCheckItem(id entity.CheckItemID) (*entity.CheckItem, error)
 	ListCheckItems(opts ListCheckItemsOptions) ([]*entity.CheckItem, error)
 	UpdateCheckItem(id entity.CheckItemID, checkItem *entity.CheckItem) (*entity.CheckItem, error)
-	DeleteCheckItems(ids []entity.CheckItemID) error
+	DeleteCheckItem(id entity.CheckItemID) error
 }
 
 type ListChecksOptions struct {

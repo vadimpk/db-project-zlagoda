@@ -23,7 +23,7 @@ func setupCustomerCardRoutes(options *Options, handler *gin.Engine) {
 		customerCardGroup.GET("/:id", routes.getCard)
 		customerCardGroup.GET("/", routes.listCards)
 		customerCardGroup.PUT("/:id", routes.updateCard)
-		customerCardGroup.DELETE("/", routes.deleteCards)
+		customerCardGroup.DELETE("/:id", routes.deleteCard)
 
 	}
 }
@@ -119,26 +119,17 @@ func (r *customerCardRoutes) updateCard(c *gin.Context) {
 	c.JSON(http.StatusOK, updatedCard)
 }
 
-type deleteCardsRequestBody struct {
-	Ids []string `json:"ids"`
-}
-
 // @Id delete-cards
 // @Security BearerAuth
 // @Summary Delete customer cards
 // @Tags customer-card
 // @Description Delete customer cards
-// @Param ids body deleteCardsRequestBody true "Card IDs"
+// @Param id path string true "Card ID"
 // @Success 200
 // @Failure 400 {object} error
-// @Router /customer-card [delete]
-func (r *customerCardRoutes) deleteCards(c *gin.Context) {
-	var body deleteCardsRequestBody
-	if err := c.ShouldBindJSON(&body); err != nil {
-		c.JSON(http.StatusBadRequest, err)
-		return
-	}
-	err := r.opts.Services.CustomerCard.Delete(body.Ids)
+// @Router /customer-card/{id} [delete]
+func (r *customerCardRoutes) deleteCard(c *gin.Context) {
+	err := r.opts.Services.CustomerCard.Delete(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return

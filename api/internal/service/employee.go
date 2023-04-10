@@ -27,6 +27,15 @@ func NewEmployeeService(opts Options) EmployeeService {
 var _ EmployeeService = (*employeeService)(nil)
 
 func (s *employeeService) Create(employee *entity.Employee) (*entity.Employee, error) {
+	existingEmployee, err := s.storages.Employee.Get(employee.ID)
+	if err != nil {
+		s.logger.Errorf("failed to get employee: %v", err)
+		return nil, fmt.Errorf("failed to get employee: %w", err)
+	}
+	if existingEmployee != nil {
+		s.logger.Errorf("employee already exists")
+		return nil, ErrCreateEmployeeAlreadyExists
+	}
 	s.logger.Infof("creating employee: %#v", employee)
 	return s.storages.Employee.Create(employee)
 }
@@ -46,9 +55,9 @@ func (s *employeeService) Update(id string, employee *entity.Employee) (*entity.
 	return s.storages.Employee.Update(id, employee)
 }
 
-func (s *employeeService) Delete(ids []string) error {
-	s.logger.Infof("deleting employees: %#v", ids)
-	return s.storages.Employee.Delete(ids)
+func (s *employeeService) Delete(id string) error {
+	s.logger.Infof("deleting employee: %#v", id)
+	return s.storages.Employee.Delete(id)
 }
 
 func (s *employeeService) Login(id string, password string) (*entity.Employee, string, error) {

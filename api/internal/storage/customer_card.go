@@ -104,13 +104,11 @@ func (s *customerCardStorage) Update(id string, card *entity.CustomerCard) (*ent
 	return card, nil
 }
 
-func (s *customerCardStorage) Delete(ids []string) error {
-	for _, id := range ids {
-		_, err := s.db.Exec("DELETE FROM customer_card WHERE card_number = $1", id)
-		if err != nil {
-			s.logger.Errorf("error while deleting card: %s", err)
-			return err
-		}
+func (s *customerCardStorage) Delete(id string) error {
+	_, err := s.db.Exec("DELETE FROM customer_card WHERE card_number = $1", id)
+	if err != nil {
+		s.logger.Errorf("error while deleting card: %s", err)
+		return err
 	}
 	return nil
 }

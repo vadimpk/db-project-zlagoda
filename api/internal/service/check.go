@@ -41,9 +41,9 @@ func (s *checkService) UpdateCheck(id string, check *entity.Check) (*entity.Chec
 	return s.storages.Check.UpdateCheck(id, check)
 }
 
-func (s *checkService) DeleteChecks(ids []string) error {
-	s.logger.Infof("deleting checks: %#v", ids)
-	return s.storages.Check.DeleteChecks(ids)
+func (s *checkService) DeleteCheck(id string) error {
+	s.logger.Infof("deleting check: %#v", id)
+	return s.storages.Check.DeleteCheck(id)
 }
 
 func (s *checkService) CreateCheckItem(checkItem *entity.CheckItem) (*entity.CheckItem, error) {
@@ -65,7 +65,7 @@ func (s *checkService) UpdateCheckItem(id entity.CheckItemID, checkItem *entity.
 	return s.storages.Check.UpdateCheckItem(id, checkItem)
 }
 
-func (s *checkService) DeleteCheckItems(ids []entity.CheckItemID) error {
-	s.logger.Infof("deleting check items: %#v", ids)
-	return s.storages.Check.DeleteCheckItems(ids)
+func (s *checkService) DeleteCheckItem(id entity.CheckItemID) error {
+	s.logger.Infof("deleting check item: %#v", id)
+	return s.storages.Check.DeleteCheckItem(id)
 }
