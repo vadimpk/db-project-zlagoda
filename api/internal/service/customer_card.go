@@ -53,5 +53,16 @@ func (s *customerCardService) Update(id string, card *entity.CustomerCard) (*ent
 
 func (s *customerCardService) Delete(id string) error {
 	s.logger.Infof("deleting card: %#v", id)
+	checks, err := s.storages.Check.ListChecks(&ListChecksOptions{
+		EmployeeID: &id,
+	})
+	if err != nil {
+		s.logger.Errorf("failed to get checks: %v", err)
+		return err
+	}
+	if len(checks) > 0 {
+		s.logger.Errorf("card has checks")
+		return ErrDeleteEmployeeChecksExist
+	}
 	return s.storages.CustomerCard.Delete(id)
 }

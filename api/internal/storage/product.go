@@ -249,6 +249,12 @@ func (s *productStorage) ListStoreProducts(opts *service.ListStoreProductsOption
 		argIdx++
 	}
 
+	if opts.Promotion != nil {
+		query.WriteString(fmt.Sprintf(" AND sp.promotional_product = $%d", argIdx))
+		args = append(args, *opts.Promotion)
+		argIdx++
+	}
+
 	if opts.SortName != nil || opts.SortCount != nil || opts.SortPrice != nil {
 		query.WriteString(" ORDER BY ")
 		if opts.SortName != nil {

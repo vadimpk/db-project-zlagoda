@@ -54,6 +54,18 @@ func (s *productService) UpdateProduct(id int, product *entity.Product) (*entity
 
 func (s *productService) DeleteProduct(id int) error {
 	s.logger.Infof("deleting product: %#v", id)
+	storeProducts, err := s.storages.Product.ListStoreProducts(&ListStoreProductsOptions{
+		ProductID: &id,
+	})
+	if err != nil {
+		s.logger.Errorf("failed to list store products: %v", err)
+		return err
+	}
+	if len(storeProducts) > 0 {
+		s.logger.Errorf("product is used in store")
+		return ErrDeleteProductStoreProductsExist
+	}
+
 	return s.storages.Product.DeleteProduct(id)
 }
 
@@ -83,6 +95,17 @@ func (s *productService) UpdateProductCategory(id int, product *entity.ProductCa
 
 func (s *productService) DeleteProductCategory(id int) error {
 	s.logger.Infof("deleting product category: %#v", id)
+	products, err := s.storages.Product.ListProducts(&ListProductsOptions{
+		CategoryID: &id,
+	})
+	if err != nil {
+		s.logger.Errorf("failed to list products: %v", err)
+		return err
+	}
+	if len(products) > 0 {
+		s.logger.Errorf("product category has products")
+		return ErrDeleteProductCategoryProductsExist
+	}
 	return s.storages.Product.DeleteProductCategory(id)
 }
 
@@ -117,5 +140,16 @@ func (s *productService) UpdateStoreProduct(id string, storeProduct *entity.Stor
 
 func (s *productService) DeleteStoreProduct(id string) error {
 	s.logger.Infof("deleting store product: %#v", id)
+	checks, err := s.storages.Check.ListCheckItems(&ListCheckItemsOptions{
+		StoreProductID: &id,
+	})
+	if err != nil {
+		s.logger.Errorf("failed to get checks: %v", err)
+		return err
+	}
+	if len(checks) > 0 {
+		s.logger.Errorf("card has checks")
+		return ErrDeleteStoreProductCheckItemsExist
+	}
 	return s.storages.Product.DeleteStoreProduct(id)
 }

@@ -50,13 +50,13 @@ type ProductStorage interface {
 type CheckStorage interface {
 	CreateCheck(check *entity.Check) (*entity.Check, error)
 	GetCheck(id string) (*entity.Check, error)
-	ListChecks(opts ListChecksOptions) ([]*entity.Check, error)
+	ListChecks(opts *ListChecksOptions) ([]*entity.Check, error)
 	UpdateCheck(id string, check *entity.Check) (*entity.Check, error)
 	DeleteCheck(id string) error
 
 	CreateCheckItem(checkItem *entity.CheckItem) (*entity.CheckItem, error)
 	GetCheckItem(id entity.CheckItemID) (*entity.CheckItem, error)
-	ListCheckItems(opts ListCheckItemsOptions) ([]*entity.CheckItem, error)
+	ListCheckItems(opts *ListCheckItemsOptions) ([]*entity.CheckItem, error)
 	UpdateCheckItem(id entity.CheckItemID, checkItem *entity.CheckItem) (*entity.CheckItem, error)
 	DeleteCheckItem(id entity.CheckItemID) error
 }

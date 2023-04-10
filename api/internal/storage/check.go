@@ -41,7 +41,7 @@ func (s *checkStorage) GetCheck(id string) (*entity.Check, error) {
 	return &check, nil
 }
 
-func (s *checkStorage) ListChecks(opts service.ListChecksOptions) ([]*entity.Check, error) {
+func (s *checkStorage) ListChecks(opts *service.ListChecksOptions) ([]*entity.Check, error) {
 	return nil, nil
 }
 
@@ -85,7 +85,7 @@ func (s *checkStorage) GetCheckItem(id entity.CheckItemID) (*entity.CheckItem, e
 	return &checkItem, nil
 }
 
-func (s *checkStorage) ListCheckItems(opts service.ListCheckItemsOptions) ([]*entity.CheckItem, error) {
+func (s *checkStorage) ListCheckItems(opts *service.ListCheckItemsOptions) ([]*entity.CheckItem, error) {
 	return nil, nil
 }
 

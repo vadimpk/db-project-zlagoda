@@ -32,7 +32,7 @@ func (s *checkService) GetCheck(id string) (*entity.Check, error) {
 	return s.storages.Check.GetCheck(id)
 }
 
-func (s *checkService) ListChecks(opts ListChecksOptions) ([]*entity.Check, error) {
+func (s *checkService) ListChecks(opts *ListChecksOptions) ([]*entity.Check, error) {
 	return nil, nil
 }
 
@@ -56,7 +56,7 @@ func (s *checkService) GetCheckItem(id entity.CheckItemID) (*entity.CheckItem, e
 	return s.storages.Check.GetCheckItem(id)
 }
 
-func (s *checkService) ListCheckItems(opts ListCheckItemsOptions) ([]*entity.CheckItem, error) {
+func (s *checkService) ListCheckItems(opts *ListCheckItemsOptions) ([]*entity.CheckItem, error) {
 	return nil, nil
 }
 

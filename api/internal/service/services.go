@@ -33,6 +33,7 @@ type EmployeeService interface {
 
 var (
 	ErrCreateEmployeeAlreadyExists = errs.New("employee already exists")
+	ErrDeleteEmployeeChecksExist   = errs.New("employee has checks")
 
 	ErrLoginEmployeeNotFound        = errs.New("employee not found")
 	ErrLoginEmployeeInvalidPassword = errs.New("invalid password")
@@ -58,6 +59,7 @@ type CustomerCardService interface {
 
 var (
 	ErrCreateCardAlreadyExists = errs.New("card already exists")
+	ErrDeleteCardChecksExist   = errs.New("card has checks")
 )
 
 type ListCardOptions struct {
@@ -87,11 +89,14 @@ type ProductService interface {
 }
 
 var (
-	ErrCreateProductAlreadyExists = errs.New("product already exists")
+	ErrCreateProductAlreadyExists      = errs.New("product already exists")
+	ErrDeleteProductStoreProductsExist = errs.New("store products exist")
 
 	ErrCreateProductCategoryAlreadyExists = errs.New("product category already exists")
+	ErrDeleteProductCategoryProductsExist = errs.New("products exist")
 
-	ErrCreateStoreProductAlreadyExists = errs.New("store product already exists")
+	ErrCreateStoreProductAlreadyExists   = errs.New("store product already exists")
+	ErrDeleteStoreProductCheckItemsExist = errs.New("check items exist")
 )
 
 type ListProductsOptions struct {
@@ -116,6 +121,7 @@ type ListProductCategoriesOptions struct {
 type ListStoreProductsOptions struct {
 	Search        *string `form:"search"`
 	CategoryID    *int    `form:"categoryID"`
+	ProductID     *int    `form:"productID"`
 	Promotion     *bool   `form:"promotion"`
 	SortName      *bool   `form:"sortName"`
 	SortCount     *bool   `form:"sortCount"`
@@ -126,21 +132,23 @@ type ListStoreProductsOptions struct {
 type CheckService interface {
 	CreateCheck(check *entity.Check) (*entity.Check, error)
 	GetCheck(id string) (*entity.Check, error)
-	ListChecks(opts ListChecksOptions) ([]*entity.Check, error)
+	ListChecks(opts *ListChecksOptions) ([]*entity.Check, error)
 	UpdateCheck(id string, check *entity.Check) (*entity.Check, error)
 	DeleteCheck(id string) error
 
 	CreateCheckItem(checkItem *entity.CheckItem) (*entity.CheckItem, error)
 	GetCheckItem(id entity.CheckItemID) (*entity.CheckItem, error)
-	ListCheckItems(opts ListCheckItemsOptions) ([]*entity.CheckItem, error)
+	ListCheckItems(opts *ListCheckItemsOptions) ([]*entity.CheckItem, error)
 	UpdateCheckItem(id entity.CheckItemID, checkItem *entity.CheckItem) (*entity.CheckItem, error)
 	DeleteCheckItem(id entity.CheckItemID) error
 }
 
 type ListChecksOptions struct {
-	Search *string
+	CardID     *string
+	EmployeeID *string
 }
 
 type ListCheckItemsOptions struct {
-	Search *string
+	CheckID        *string
+	StoreProductID *string
 }
