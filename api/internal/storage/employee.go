@@ -41,6 +41,7 @@ func (s *employeeStorage) Get(id string) (*entity.Employee, error) {
 			&employee.Phone, &employee.City, &employee.Street, &employee.Zip, &employee.Password)
 	if err != nil {
 		if err == sql.ErrNoRows {
+			s.logger.Infof("employee with id %s not found", id)
 			return nil, nil
 		}
 		s.logger.Errorf("error while getting employee: %s", err)

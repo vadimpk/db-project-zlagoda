@@ -39,6 +39,7 @@ func (s *productStorage) GetProduct(id int) (*entity.Product, error) {
 		Scan(&product.ID, &product.CategoryID, &product.Name, &product.Characteristics)
 	if err != nil {
 		if err == sql.ErrNoRows {
+			s.logger.Infof("product with id %d not found", id)
 			return nil, nil
 		}
 		s.logger.Errorf("error while getting product: %s", err)
@@ -75,6 +76,7 @@ func (s *productStorage) ListProducts(opts *service.ListProductsOptions) ([]*ent
 		}
 	}
 
+	s.logger.Infof("query: %s", query.String())
 	rows, err := s.db.Query(query.String(), args...)
 	if err != nil {
 		s.logger.Errorf("error while listing customer cards: %s", err)
@@ -130,6 +132,7 @@ func (s *productStorage) GetProductCategory(id int) (*entity.ProductCategory, er
 		Scan(&category.ID, &category.Name)
 	if err != nil {
 		if err == sql.ErrNoRows {
+			s.logger.Infof("product category with id %d not found", id)
 			return nil, nil
 		}
 		s.logger.Errorf("error while getting product category: %s", err)
@@ -158,6 +161,7 @@ func (s *productStorage) ListProductCategories(opts *service.ListProductCategori
 		}
 	}
 
+	s.logger.Infof("query: %s", query.String())
 	rows, err := s.db.Query(query.String(), args...)
 	if err != nil {
 		s.logger.Errorf("error while listing products' categories: %s", err)
@@ -213,6 +217,7 @@ func (s *productStorage) GetStoreProduct(id string) (*entity.StoreProduct, error
 		Scan(&storeProduct.ID, &storeProduct.PromotionalID, &storeProduct.ProductID, &storeProduct.Price, &storeProduct.Count, &storeProduct.Promotional)
 	if err != nil {
 		if err == sql.ErrNoRows {
+			s.logger.Infof("store product with id %s not found", id)
 			return nil, nil
 		}
 		s.logger.Errorf("error while getting store product: %s", err)
@@ -281,6 +286,7 @@ func (s *productStorage) ListStoreProducts(opts *service.ListStoreProductsOption
 		}
 	}
 
+	s.logger.Infof("query: %s", query.String())
 	rows, err := s.db.Query(query.String(), args...)
 	if err != nil {
 		s.logger.Errorf("error while listing store products: %s", err)

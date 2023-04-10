@@ -40,6 +40,7 @@ func (s *customerCardStorage) Get(id string) (*entity.CustomerCard, error) {
 			&card.PhoneNumber, &card.City, &card.Street, &card.Zip, card.Discount)
 	if err != nil {
 		if err == sql.ErrNoRows {
+			s.logger.Infof("card with id %s not found", id)
 			return nil, nil
 		}
 		s.logger.Errorf("error while getting customer card: %s", err)

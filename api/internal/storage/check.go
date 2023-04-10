@@ -37,6 +37,7 @@ func (s *checkStorage) GetCheck(id string) (*entity.Check, error) {
 		Scan(&check.ID, &check.EmployeeID, &check.CustomerCardID, &check.Date, &check.TotalPrice, &check.VAT)
 	if err != nil {
 		if err == sql.ErrNoRows {
+			s.logger.Infof("check with id %s not found", id)
 			return nil, nil
 		}
 		s.logger.Errorf("error while getting check: %s", err)
@@ -84,6 +85,7 @@ func (s *checkStorage) GetCheckItem(id entity.CheckItemID) (*entity.CheckItem, e
 		Scan(&checkItem.ID.StoreProductID, &checkItem.ID.CheckID, &checkItem.ProductCount, &checkItem.ProductPrice)
 	if err != nil {
 		if err == sql.ErrNoRows {
+			s.logger.Infof("check item with id %s not found", id)
 			return nil, nil
 		}
 		s.logger.Errorf("error while getting check item: %s", err)
