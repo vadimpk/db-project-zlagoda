@@ -157,22 +157,22 @@ const Category = () => {
     }
     useEffect(() => {
         const id = categories.find(cat => cat.name === select)?.id;
-            axios.get('http://localhost:8082/product', {
-                headers: {
-                    Authorization: `Bearer ${authToken}`
-                },
-                params: {
-                    sortAscending: true,
-                    sortName: true,
-                    categoryID: id
-                }
+        axios.get('http://localhost:8082/product', {
+            headers: {
+                Authorization: `Bearer ${authToken}`
+            },
+            params: {
+                sortAscending: true,
+                sortName: true,
+                categoryID: id
+            }
+        })
+            .then(response => {
+                setProducts(response.data);
             })
-                .then(response => {
-                    setProducts(response.data);
-                })
-                .catch(error => {
-                    console.log(error);
-                });
+            .catch(error => {
+                console.log(error);
+            });
     }, [select]);
     return (
         <div>
