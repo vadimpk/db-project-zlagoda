@@ -1,25 +1,30 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import RoundButton from "../UI/buttons/RoundButton";
 import BigButton from "../UI/buttons/BigButton";
 import InputTextForm from "../UI/inputs/text-password/InputTextForm";
+import axios from "axios";
 
 const CustomerFormPopup = ({setVisible, create, selectedRow, edit}) => {
-    const [customer, setCustomer] = useState(selectedRow ||
-        {
-            id: '',
-            name: '',
-            surname:'',
-            patronymic:'',
-            discount: 0,
-            phone_number: '',
-            city: '',
-            street: '',
-            zip_code: ''
-        });
+    const [customer, setCustomer] = useState({
+        id: '',
+        name: '',
+        surname:'',
+        patronymic:'',
+        discount: 0,
+        phone_number: '',
+        city: '',
+        street: '',
+        zip_code: ''
+    });
+
+    useEffect(() => {
+        if (selectedRow!==undefined) {
+            setCustomer(selectedRow)
+        }
+    },[selectedRow]);
 
     const addNewCustomer = (e) => {
         e.preventDefault()
-        console.log(customer)
         if (validateForm()) {
             const discount = parseFloat(customer.discount)
             customer.discount=discount
@@ -40,7 +45,7 @@ const CustomerFormPopup = ({setVisible, create, selectedRow, edit}) => {
     }
     const editCustomer = (e) => {
         e.preventDefault()
-        setCustomer({...customer, id: selectedRow.id})
+        setCustomer({...customer, id: selectedRow})
         console.log(customer)
         if (validateForm()) {
             const discount = parseFloat(customer.discount)
@@ -145,12 +150,12 @@ const CustomerFormPopup = ({setVisible, create, selectedRow, edit}) => {
                     <InputTextForm
                         name={"id"}
                         placeholder={"Номер карти"}
-                        value={ selectedRow===undefined ? customer.id : selectedRow.id}
+                        value={ customer.id }
                         onChange={e => setCustomer({...customer, id: e.target.value})}>Номер карти</InputTextForm>
                     <InputTextForm
                         name={"percent"}
                         placeholder={"Відсоток"}
-                        value={customer.discount}
+                        value={`${customer.discount}`}
                         onChange={e => setCustomer({...customer, discount: e.target.value})}>Відсоток</InputTextForm>
                     <InputTextForm
                         name={"phone_number"}

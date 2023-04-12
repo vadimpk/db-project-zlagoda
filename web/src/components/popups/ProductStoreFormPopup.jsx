@@ -1,27 +1,48 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import RoundButton from "../UI/buttons/RoundButton";
 import BigButton from "../UI/buttons/BigButton";
 import InputTextForm from "../UI/inputs/text-password/InputTextForm";
-import Radio from "../UI/inputs/radio/Radio";
 import Checkbox from "../UI/inputs/checkbox/Checkbox";
 
 const ProductStoreFormPopup = ({setVisible, create, selectedRow, edit}) => {
     const st = {
         marginLeft: '-30px',
     }
-    const [product, setProduct] = useState(selectedRow ||
+    const authToken = localStorage.getItem('authToken');
+    const [product, setProduct] = useState(
         {
             id:  '',
-            price: '',
-            product_id: '',
-            count: '',
-            sale: false
+            price: 0,
+            product_id: 0,
+            count: 0,
+            promotional: false,
+            promotional_id:''
         });
+    useEffect(() => {
+        if (selectedRow!==undefined) {
+            setProduct(prevState => ({
+                ...prevState,
+                id: selectedRow.id,
+                price: selectedRow.price,
+                product_id: selectedRow.product_id,
+                count: selectedRow.count,
+                promotional: selectedRow.promotional,
+                promotional_id: selectedRow.promotional_id
+            }));
+        }
+    },[selectedRow]);
 
     const addNewProduct = (e) => {
         e.preventDefault()
         console.log(product)
         if (validateForm()) {
+            const price = parseFloat(product.price)
+            product.price = price
+            const product_id = parseFloat(product.product_id)
+            product.product_id = product_id
+            const count = parseFloat(product.count)
+            product.count = count
+            console.log(product)
             create(product)
         }
         setProduct({
@@ -60,10 +81,6 @@ const ProductStoreFormPopup = ({setVisible, create, selectedRow, edit}) => {
             errors.id='Будь ласка, введіть коректні числові значення для id, product_id, count та price.';
             return false;
         }
-        if (!namePattern.test(product.name)) {
-            errors.name='Будь ласка, введіть коректні значення для поля name. Дозволено букви українського алфавіту, цифри, кома та пробіл.';
-            return false;
-        }
 
         if (Object.keys(errors).length > 0) {
             const errorMessages = Object.values(errors).join('\n');
@@ -72,7 +89,6 @@ const ProductStoreFormPopup = ({setVisible, create, selectedRow, edit}) => {
         }
         return true;
     }
-
     return (
         <form>
             <div className="form-top">
@@ -90,35 +106,42 @@ const ProductStoreFormPopup = ({setVisible, create, selectedRow, edit}) => {
                     <InputTextForm
                         name={"upc"}
                         placeholder={"UPC"}
-                        value={ selectedRow===undefined ? product.id : selectedRow.id}
-                        onChange={e => setProduct({...product, id: e.target.value})}>id</InputTextForm>
+                        value={ product.id }
+                        onChange={e => setProduct({...product, id: e.target.value})}>UPC</InputTextForm>
                     <InputTextForm
                         name={"price"}
                         placeholder={"Ціна"}
                         value={product.price}
+                        style={{marginBottom: '10px'}}
                         onChange={e => setProduct({
                             ...product,
                             price: e.target.value
                         })}>Ціна продажу</InputTextForm>
+                    <Checkbox
+                        name={"sale"}
+                        id={"sale"}
+                        checked = {product.promotional}
+                        onChange={() => setProduct({...product, sale: !product.promotional})}
+                        style={st}>Акційний товар</Checkbox>
                 </div>
                 <div className="form-content">
                     <InputTextForm
                         name={"ID"}
                         placeholder={"ID"}
-                        value={ selectedRow===undefined ? product.product_id : selectedRow.product_id}
-                        onChange={e => setProduct({...product, product_id: e.target.value})}>product_id</InputTextForm>
+                        value={ product.product_id}
+                        onChange={e => setProduct({...product, product_id: e.target.value})}>ID</InputTextForm>
                     <InputTextForm
                         name={"count"}
                         placeholder={"Кількість"}
                         value={product.count}
                         onChange={e => setProduct({...product, count: e.target.value})}>Кількість</InputTextForm>
+                    <InputTextForm
+                        name={"promotional_id"}
+                        placeholder={"ID"}
+                        value={product.promotional_id}
+                        onChange={e => setProduct({...product, promotional_id: e.target.value})}>ID акційного товару</InputTextForm>
                 </div>
             </div>
-            <Checkbox
-                name={"sale"}
-                id={"sale"}
-                onClick={() => setProduct({...product, sale: selectedRow===undefined ? !product.sale : !selectedRow.sale})}
-                style={st}>Акційний товар</Checkbox>
 
             {selectedRow===undefined
                 ?

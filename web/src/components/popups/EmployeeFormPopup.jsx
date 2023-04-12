@@ -1,13 +1,12 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import RoundButton from "../UI/buttons/RoundButton";
 import BigButton from "../UI/buttons/BigButton";
 import InputTextForm from "../UI/inputs/text-password/InputTextForm";
 import Radio from "../UI/inputs/radio/Radio";
 import DateForm from "../UI/inputs/date/DateForm";
-import employees from "../../pages/Employees";
 
 const EmployeeFormPopup = ({setVisible, create, selectedRow, edit}) => {
-    const [employee, setEmployee] = useState(selectedRow ||
+    const [employee, setEmployee] = useState(
         {
         id:  '',
         surname: '',
@@ -23,6 +22,13 @@ const EmployeeFormPopup = ({setVisible, create, selectedRow, edit}) => {
         zip: '',
         password: ''
     });
+
+    useEffect(() => {
+        if (selectedRow!==undefined) {
+            setEmployee(selectedRow)
+            console.log(selectedRow)
+        }
+    },[selectedRow]);
 
     const addNewEmployee = (e) => {
         e.preventDefault()
@@ -189,7 +195,7 @@ const EmployeeFormPopup = ({setVisible, create, selectedRow, edit}) => {
                                 <InputTextForm
                                     name={"id"}
                                     placeholder={"id"}
-                                    value={ selectedRow===undefined ? employee.id : selectedRow.id}
+                                    value={ employee.id}
                                     onChange={e => setEmployee({...employee, id: e.target.value})}>id</InputTextForm>
                                 <InputTextForm
                                     name={"salary"}
@@ -208,10 +214,12 @@ const EmployeeFormPopup = ({setVisible, create, selectedRow, edit}) => {
                             <Radio
                                 name={"position"}
                                 id={"cashier"}
+                                checked={employee.role === 'Касир'}
                                 onChange={() => setEmployee({...employee, role: 'Касир'})}>Касир</Radio>
                             <Radio
                                 name={"position"}
                                 id={"manager"}
+                                checked={employee.role === 'Менеджер'}
                                 onChange={() => setEmployee({ ...employee, role: 'Менеджер' })}>Менеджер</Radio>
                         </div>
                         <div className="form-main">
@@ -234,11 +242,11 @@ const EmployeeFormPopup = ({setVisible, create, selectedRow, edit}) => {
                             <div className="form-content">
                                 <DateForm
                                     name={"startWork"}
-                                    value={employee.date_of_start}
+                                    value={employee.date_of_start.substr(0, 10)}
                                     onChange={e => setEmployee({...employee, date_of_start: e.target.value})}>Дата початку роботи</DateForm>
                                 <DateForm
                                     name={"birth"}
-                                    value={employee.date_of_birth}
+                                    value={employee.date_of_birth.substr(0, 10)}
                                     onChange={e => setEmployee({...employee, date_of_birth: e.target.value})}>
                                     Дата народження
                                 </DateForm>

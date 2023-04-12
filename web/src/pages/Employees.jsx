@@ -88,8 +88,6 @@ const Employees = () => {
     });
 
     function handleSearch(surname) {
-        //const employee = employees.find( e => e.surname.toLowerCase().includes(surname.toLowerCase()))
-        //setEmployee(employee)
         axios.get('http://localhost:8082/employee', {
             headers: {
                 Authorization: `Bearer ${authToken}`
@@ -118,6 +116,7 @@ const Employees = () => {
                 console.log(response.data);
             })
             .catch(error => {
+                alert('Такий працівник уже існує')
                 console.log(error);
             });
 
@@ -134,6 +133,7 @@ const Employees = () => {
                 console.log(response.data);
             })
             .catch(error => {
+                alert('Такий працівник уже існує')
                 console.log(error);
             });
         setModal(false)
@@ -154,18 +154,16 @@ const Employees = () => {
         if (selectedRow.id===''){
             alert('Виберіть працівника для видалення')
         } else {
-            axios.delete('http://localhost:8082/employee',{
+            axios.delete(`http://localhost:8082/employee/${selectedRow.id}`,{
                 headers: {
                     Authorization: `Bearer ${authToken}`
-                },
-                data: {
-                    ids: [selectedRow.id]
                 }
             })
                 .then(response => {
                     console.log(response.data);
                 })
                 .catch(error => {
+                    alert('Сервер відхилив ваш запит на видалення')
                     console.log(error);
                 });
 

@@ -82,18 +82,16 @@ const Customers = () => {
         if (selectedRow.id===''){
             alert('Виберіть клієнта для видалення')
         } else {
-            axios.delete('http://localhost:8082/customer-card',{
+            axios.delete(`http://localhost:8082/customer-card/${selectedRow.id}`,{
                 headers: {
                     Authorization: `Bearer ${authToken}`
-                },
-                data: {
-                    ids: [selectedRow.id]
                 }
             })
                 .then(response => {
                     console.log(response.data);
                 })
                 .catch(error => {
+                    alert('Сервер відхилив ваш запит на видалення')
                     console.log(error);
                 });
         }
@@ -108,6 +106,7 @@ const Customers = () => {
                 console.log(response.data);
             })
             .catch(error => {
+                alert('Такий клієнт уже існує')
                 console.log(error);
             });
 
@@ -124,6 +123,7 @@ const Customers = () => {
                 console.log(response.data);
             })
             .catch(error => {
+                alert('Такий клієнт уже існує')
                 console.log(error);
             });
         setModal(false)
