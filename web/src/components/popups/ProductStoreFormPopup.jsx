@@ -42,6 +42,9 @@ const ProductStoreFormPopup = ({setVisible, create, selectedRow, edit}) => {
             product.product_id = product_id
             const count = parseFloat(product.count)
             product.count = count
+            if(product.promotional_id===''){
+                product.promotional_id=null
+            }
             console.log(product)
             create(product)
         }
@@ -59,6 +62,16 @@ const ProductStoreFormPopup = ({setVisible, create, selectedRow, edit}) => {
         setProduct({...product, id: selectedRow.id})
         console.log(product)
         if (validateForm()) {
+            const price = parseFloat(product.price)
+            product.price = price
+            const product_id = parseFloat(product.product_id)
+            product.product_id = product_id
+            const count = parseFloat(product.count)
+            product.count = count
+            if(product.promotional_id===''){
+                product.promotional_id=null
+            }
+            console.log(product)
             edit(product, selectedRow.id)
         }
         setProduct({
@@ -121,7 +134,7 @@ const ProductStoreFormPopup = ({setVisible, create, selectedRow, edit}) => {
                         name={"sale"}
                         id={"sale"}
                         checked = {product.promotional}
-                        onChange={() => setProduct({...product, sale: !product.promotional})}
+                        onChange={() => setProduct(prevState => ({...prevState, promotional: !prevState.promotional}))}
                         style={st}>Акційний товар</Checkbox>
                 </div>
                 <div className="form-content">

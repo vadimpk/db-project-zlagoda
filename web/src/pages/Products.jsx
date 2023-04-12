@@ -188,14 +188,20 @@ const Products = () => {
         setModal(false)
     }
     const editProduct = (newProduct, upc) => {
-        /*newProduct.id=upc
-        setProductsInStore(productsInStore.map(e => {
-            if (e.id===upc){
-                return newProduct;
+        newProduct.id=upc
+        axios.put(`http://localhost:8082/product/store/${upc}`, newProduct,{
+            headers: {
+                Authorization: `Bearer ${authToken}`
             }
-            return e
-        }));
-        setModal(false)*/
+        })
+            .then(response => {
+                console.log(response.data);
+            })
+            .catch(error => {
+                alert('Такий товар уже існує')
+                console.log(error);
+            });
+        setModal(false)
     }
     function changeFieldsOrder(arr) {
         return arr.map(({ id, count, product_id, name, category_id, price,promotional, promotional_id}) => ({
