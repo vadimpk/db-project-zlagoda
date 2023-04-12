@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import RoundButton from "../UI/buttons/RoundButton";
 import BigButton from "../UI/buttons/BigButton";
 import InputTextForm from "../UI/inputs/text-password/InputTextForm";
@@ -10,9 +10,17 @@ const CategoryFormPopup = ({setVisible, create, selectedRow, edit}) => {
             name: ''
         });
 
+    useEffect(() => {
+        if (selectedRow!==undefined) {
+            setCategory(selectedRow)
+        }
+    },[selectedRow]);
+
     const addNewCategory = (e) => {
         e.preventDefault()
         if (validateForm()) {
+            const id = parseFloat(category.id)
+            category.id=id
             create(category)
         }
         setCategory({
@@ -25,6 +33,8 @@ const CategoryFormPopup = ({setVisible, create, selectedRow, edit}) => {
         e.preventDefault()
         setCategory({...category, id: selectedRow.id})
         if (validateForm()) {
+            const id = parseFloat(category.id)
+            category.id=id
             edit(category, selectedRow.id)
         }
         setCategory({
@@ -41,7 +51,8 @@ const CategoryFormPopup = ({setVisible, create, selectedRow, edit}) => {
         if (!category.name || !nameRegex.test(category.name.trim())) {
             errors.name = 'Некоректна назва категорії';
         }
-        if ((!numberRegex.test(category.id.trim()))&&selectedRow===undefined) {
+        if(selectedRow===undefined)
+        if (!numberRegex.test(category.id.trim())) {
             errors.id = 'Некоректний номер категорії';
         }
 
@@ -70,7 +81,7 @@ const CategoryFormPopup = ({setVisible, create, selectedRow, edit}) => {
                     <InputTextForm
                         name={"id"}
                         placeholder={"Номер категорії"}
-                        value={ selectedRow===undefined ? category.id : selectedRow.id}
+                        value={category.id}
                         onChange={e => setCategory({...category, id: e.target.value})}>Номер категорії</InputTextForm>
                     <InputTextForm
                         name={"name"}

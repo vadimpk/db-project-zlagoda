@@ -31,6 +31,7 @@ const LoginForm = () => {
                     localStorage.setItem('employee', JSON.stringify(employee));
                 })
                 .catch(error => {
+                    alert('Некоректні дані')
                     console.error(error);
                 });
     };

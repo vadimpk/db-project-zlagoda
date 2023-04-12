@@ -19,38 +19,86 @@ const Products = () => {
     const authToken = localStorage.getItem('authToken');
 
     const {isManager, setIsManager} = useContext(ManagerContext);
-    const [productsInStore, setProductsInStore] = useState( []);
     const [products, setProducts] = useState( []);
     const [selectPromotion, setSelectPromotion] = useState('');
     const [selectSort, setSelectSort] = useState('');
 
     const [product, setProduct] = useState({
-        id:0,
-        product_id:0,
         name:'',
         count:0,
         price:0,
-        promotional: false,
-        promotional_id: 0
+        product_id:0,
+        characteristics: ''
     });
     const [selectedRow, setSelectedRow] = useState({
-        id:0,
+        id:'',
         product_id:0,
         name:'',
         count:0,
         price:0,
         promotional: false,
-        promotional_id: 0
+        promotional_id:''
     });
     const tableData = ["UPC", "ID", 'Назва', "Кількість", "Ціна", "Акційний товар"];
     const [modal, setModal] = useState(false);
     const [isOpenSearch, setOpenSearch] = useState(false);
 
     function handleSearch(upc) {
-            const product = productsInStore.find(e => e.id === upc)
-            setProduct(product)
-            setOpenSearch(true)
+        axios.get(`http://localhost:8082/product/store/${upc}`, {
+            headers: {
+                Authorization: `Bearer ${authToken}`
+            }
+        })
+            .then(response => {
+                const productId = response.data.product_id;
+                Promise.all([getProductName(productId), getCharacteristics(productId)])
+                    .then(responses => {
+                        const [name, characteristics] = responses;
+                        const updatedProduct = {
+                            ...product,
+                            product_id: productId,
+                            count: response.data.count,
+                            price: response.data.price,
+                            name,
+                            characteristics
+                        };
+                        setProduct(updatedProduct);
+                        setOpenSearch(true);
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
+            })
+            .catch(error => {
+                alert('Товар не знайдено')
+                console.log(error);
+            });
     }
+    const getCharacteristics = (id) => {
+        return axios.get(`http://localhost:8082/product/${id}`, {
+            headers: {
+                Authorization: `Bearer ${authToken}`
+            }
+        })
+            .then(response => {
+                return response.data.characteristics;
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+    const getProductName = async (id) => {
+        try {
+            const response = await axios.get(`http://localhost:8082/product/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${authToken}`
+                }
+            });
+            return response.data.name;
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
     useEffect(() => {
             const params = {
@@ -80,12 +128,19 @@ const Products = () => {
                 params
             })
                 .then(response => {
-                    setProductsInStore(response.data);
+                    const products = response.data;
+                    const promises = products.map(product => getProductName(product.product_id));
+                    Promise.all(promises).then(names => {
+                        const productsWithNames = products.map((product, index) => {
+                            return { ...product, name: names[index] };
+                        });
+                        setProducts(productsWithNames);
+                    });
                 })
                 .catch(error => {
                     console.log(error);
                 });
-    }, [ selectPromotion, selectSort]);
+    }, [selectPromotion, selectSort]);
 
     function handleAdd() {
         setSelectedRow(undefined);
@@ -102,22 +157,45 @@ const Products = () => {
         if (selectedRow.id===''){
             alert('Виберіть товар для видалення')
         } else {
-            setProductsInStore(prevProducts => prevProducts.filter(product => product.id !== selectedRow.id));
+            axios.delete(`http://localhost:8082/product/store/${selectedRow.id}`,{
+                headers: {
+                    Authorization: `Bearer ${authToken}`
+                }
+            })
+                .then(response => {
+                    console.log(response.data);
+                })
+                .catch(error => {
+                    alert('Сервер відхилив ваш запит на видалення')
+                    console.log(error);
+                });
         }
     }
+
     const createProduct = (newProduct) => {
-        setProductsInStore(prevProduct => [...prevProduct, newProduct]);
+         axios.post('http://localhost:8082/product/store', newProduct, {
+            headers: {
+                Authorization: `Bearer ${authToken}`
+            }
+        })
+            .then(response => {
+                console.log(response.data);
+            })
+            .catch(error => {
+                alert('Такий товар уже існує')
+                console.log(error);
+            });
         setModal(false)
     }
     const editProduct = (newProduct, upc) => {
-        newProduct.id=upc
+        /*newProduct.id=upc
         setProductsInStore(productsInStore.map(e => {
             if (e.id===upc){
                 return newProduct;
             }
             return e
         }));
-        setModal(false)
+        setModal(false)*/
     }
     function changeFieldsOrder(arr) {
         return arr.map(({ id, count, product_id, name, category_id, price,promotional, promotional_id}) => ({
@@ -171,7 +249,7 @@ const Products = () => {
                     <ProductFormPopup setVisible={setModal} create={createProduct} edit={editProduct} selectedRow={selectedRow===undefined ? undefined : products.find(product => product.id === selectedRow.id)}/>
                 </ModalForm>
             </div>
-            <Table tableData={tableData} rowData={changeFieldsOrder(productsInStore)} setSelectedRow={setSelectedRow}/>
+            <Table tableData={tableData} rowData={changeFieldsOrder(products)} setSelectedRow={setSelectedRow}/>
         </div>
     );
 };
