@@ -151,7 +151,7 @@ func (s *checkStorage) ListCheckItems(opts *service.ListCheckItemsOptions) ([]*e
 	var query strings.Builder
 	var args []interface{}
 
-	query.WriteString("SELECT * FROM sale WHERE 1=1")
+	query.WriteString("SELECT sale.* FROM sale JOIN checks ON sale.fk_check_number = checks.check_number WHERE 1=1")
 
 	nextArgIndex := 1
 
@@ -164,6 +164,18 @@ func (s *checkStorage) ListCheckItems(opts *service.ListCheckItemsOptions) ([]*e
 	if opts.StoreProductID != nil {
 		query.WriteString(fmt.Sprintf(" AND fk_UPC = $%d", nextArgIndex))
 		args = append(args, *opts.StoreProductID)
+		nextArgIndex++
+	}
+
+	if opts.StartDate != nil {
+		query.WriteString(fmt.Sprintf(" AND print_date >= $%d", nextArgIndex))
+		args = append(args, *opts.StartDate)
+		nextArgIndex++
+	}
+
+	if opts.EndDate != nil {
+		query.WriteString(fmt.Sprintf(" AND print_date <= $%d", nextArgIndex))
+		args = append(args, *opts.EndDate)
 		nextArgIndex++
 	}
 

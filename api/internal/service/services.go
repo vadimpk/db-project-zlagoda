@@ -180,4 +180,6 @@ type ListChecksOptions struct {
 type ListCheckItemsOptions struct {
 	CheckID        *string `form:"checkID"`
 	StoreProductID *string `form:"storeProductID"`
+	StartDate      *string `form:"startDate"`
+	EndDate        *string `form:"endDate"`
 }
