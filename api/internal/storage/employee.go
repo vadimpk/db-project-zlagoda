@@ -78,6 +78,8 @@ func (s *employeeStorage) List(opts service.ListEmployeeOptions) ([]*entity.Empl
 			query.WriteString(" DESC")
 		}
 	}
+
+	s.logger.Infof("query: %s", query.String())
 	rows, err := s.db.Query(query.String(), args...)
 	if err != nil {
 		s.logger.Errorf("error while listing employees: %s", err)

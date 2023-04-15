@@ -77,6 +77,7 @@ func (s *customerCardStorage) List(opts service.ListCardOptions) ([]*entity.Cust
 		}
 	}
 
+	s.logger.Infof("query: %s", query.String())
 	rows, err := s.db.Query(query.String(), args...)
 	if err != nil {
 		s.logger.Errorf("error while listing customer cards: %s", err)

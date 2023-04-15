@@ -17,7 +17,7 @@ type Services struct {
 	Employee     EmployeeService
 	CustomerCard CustomerCardService
 	Product      ProductService
-	Check        CheckStorage
+	Check        CheckService
 }
 
 type EmployeeService interface {
@@ -33,7 +33,10 @@ type EmployeeService interface {
 
 var (
 	ErrCreateEmployeeAlreadyExists = errs.New("employee already exists")
-	ErrDeleteEmployeeChecksExist   = errs.New("employee has checks")
+
+	ErrEmployeeNotFound = errs.New("employee not found")
+
+	ErrDeleteEmployeeChecksExist = errs.New("employee has checks")
 
 	ErrLoginEmployeeNotFound        = errs.New("employee not found")
 	ErrLoginEmployeeInvalidPassword = errs.New("invalid password")
@@ -58,8 +61,10 @@ type CustomerCardService interface {
 }
 
 var (
-	ErrCreateCardAlreadyExists = errs.New("card already exists")
-	ErrDeleteCardChecksExist   = errs.New("card has checks")
+	ErrUpdateCardNotFound = errs.New("card not found")
+
+	ErrDeleteCardNotFound    = errs.New("card not found")
+	ErrDeleteCardChecksExist = errs.New("card has checks")
 )
 
 type ListCardOptions struct {
@@ -89,14 +94,20 @@ type ProductService interface {
 }
 
 var (
-	ErrCreateProductAlreadyExists      = errs.New("product already exists")
+	ErrCreateProductAlreadyExists      = errs.New("product with such id already exists")
+	ErrUpdateProductAlreadyExists      = errs.New("product with such id already exists")
 	ErrDeleteProductStoreProductsExist = errs.New("store products exist")
+	ErrDeleteProductNotFound           = errs.New("product not found")
+	ErrDeleteProductCategoryNotFound   = errs.New("product category not found")
 
-	ErrCreateProductCategoryAlreadyExists = errs.New("product category already exists")
+	ErrCreateProductCategoryAlreadyExists = errs.New("product category with such id already exists")
+	ErrUpdateProductCategoryAlreadyExists = errs.New("product category with such id already exists")
 	ErrDeleteProductCategoryProductsExist = errs.New("products exist")
 
 	ErrCreateStoreProductAlreadyExists   = errs.New("store product already exists")
+	ErrUpdateStoreProductAlreadyExists   = errs.New("store product already exists")
 	ErrDeleteStoreProductCheckItemsExist = errs.New("check items exist")
+	ErrDeleteStoreProductNotFound        = errs.New("store product not found")
 )
 
 type ListProductsOptions struct {
@@ -133,22 +144,40 @@ type CheckService interface {
 	CreateCheck(check *entity.Check) (*entity.Check, error)
 	GetCheck(id string) (*entity.Check, error)
 	ListChecks(opts *ListChecksOptions) ([]*entity.Check, error)
-	UpdateCheck(id string, check *entity.Check) (*entity.Check, error)
+	//UpdateCheck(id string, check *entity.Check) (*entity.Check, error)
 	DeleteCheck(id string) error
 
-	CreateCheckItem(checkItem *entity.CheckItem) (*entity.CheckItem, error)
+	CreateCheckItem(checkItem *entity.CheckItem) (CreateOrUpdateCheckItemOutput, error)
 	GetCheckItem(id entity.CheckItemID) (*entity.CheckItem, error)
 	ListCheckItems(opts *ListCheckItemsOptions) ([]*entity.CheckItem, error)
-	UpdateCheckItem(id entity.CheckItemID, checkItem *entity.CheckItem) (*entity.CheckItem, error)
-	DeleteCheckItem(id entity.CheckItemID) error
+	UpdateCheckItem(id entity.CheckItemID, checkItem *entity.CheckItem) (CreateOrUpdateCheckItemOutput, error)
+	DeleteCheckItem(id entity.CheckItemID) (CreateOrUpdateCheckItemOutput, error)
+}
+
+var (
+	ErrDeleteCheckNotFound              = errs.New("check not found")
+	ErrCreateCheckItemProductNotFound   = errs.New("product not found")
+	ErrCreateCheckItemNotEnoughProducts = errs.New("not enough products")
+
+	ErrUpdateCheckItemNotEnoughProducts = errs.New("not enough products")
+
+	ErrDeleteCheckItemNotFound = errs.New("check item not found")
+)
+
+type CreateOrUpdateCheckItemOutput struct {
+	CheckItem *entity.CheckItem
+	Check     *entity.Check
+	Product   *entity.StoreProduct
 }
 
 type ListChecksOptions struct {
-	CardID     *string
-	EmployeeID *string
+	CardID     *string `form:"cardID"`
+	EmployeeID *string `form:"employeeID"`
+	StartDate  *string `form:"startDate"`
+	EndDate    *string `form:"endDate"`
 }
 
 type ListCheckItemsOptions struct {
-	CheckID        *string
-	StoreProductID *string
+	CheckID        *string `form:"checkID"`
+	StoreProductID *string `form:"storeProductID"`
 }

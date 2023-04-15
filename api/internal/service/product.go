@@ -29,7 +29,7 @@ func (s *productService) CreateProduct(product *entity.Product) (*entity.Product
 		return nil, err
 	}
 	if existingProduct != nil {
-		s.logger.Errorf("product already exists")
+		s.logger.Infof("product already exists")
 		return nil, ErrCreateProductAlreadyExists
 	}
 
@@ -49,11 +49,30 @@ func (s *productService) ListProducts(opts *ListProductsOptions) ([]*entity.Prod
 
 func (s *productService) UpdateProduct(id int, product *entity.Product) (*entity.Product, error) {
 	s.logger.Infof("updating product: %#v", product)
+	existingProduct, err := s.storages.Product.GetProduct(product.ID)
+	if err != nil {
+		s.logger.Errorf("error getting product: %#v", err)
+		return nil, err
+	}
+	if existingProduct != nil {
+		s.logger.Infof("product already exists")
+		return nil, ErrUpdateProductAlreadyExists
+	}
 	return s.storages.Product.UpdateProduct(id, product)
 }
 
 func (s *productService) DeleteProduct(id int) error {
 	s.logger.Infof("deleting product: %#v", id)
+	product, err := s.storages.Product.GetProduct(id)
+	if err != nil {
+		s.logger.Errorf("failed to get product: %v", err)
+		return err
+	}
+	if product == nil {
+		s.logger.Infof("product not found")
+		return ErrDeleteProductNotFound
+	}
+
 	storeProducts, err := s.storages.Product.ListStoreProducts(&ListStoreProductsOptions{
 		ProductID: &id,
 	})
@@ -62,7 +81,7 @@ func (s *productService) DeleteProduct(id int) error {
 		return err
 	}
 	if len(storeProducts) > 0 {
-		s.logger.Errorf("product is used in store")
+		s.logger.Infof("product is used in store")
 		return ErrDeleteProductStoreProductsExist
 	}
 
@@ -76,7 +95,7 @@ func (s *productService) CreateProductCategory(category *entity.ProductCategory)
 		return nil, err
 	}
 	if existingCategory != nil {
-		s.logger.Errorf("product category already exists")
+		s.logger.Infof("product category already exists")
 		return nil, ErrCreateProductCategoryAlreadyExists
 	}
 	s.logger.Infof("creating product category: %#v", category)
@@ -88,13 +107,33 @@ func (s *productService) ListProductCategories(opts *ListProductCategoriesOption
 	return s.storages.Product.ListProductCategories(opts)
 }
 
-func (s *productService) UpdateProductCategory(id int, product *entity.ProductCategory) (*entity.ProductCategory, error) {
-	s.logger.Infof("updating product category: %#v", product)
-	return s.storages.Product.UpdateProductCategory(id, product)
+func (s *productService) UpdateProductCategory(id int, productCategory *entity.ProductCategory) (*entity.ProductCategory, error) {
+	s.logger.Infof("updating productCategory category: %#v", productCategory)
+	existingProductCategory, err := s.storages.Product.GetProductCategory(productCategory.ID)
+	if err != nil {
+		s.logger.Errorf("error getting product category: %#v", err)
+		return nil, err
+	}
+	if existingProductCategory != nil {
+		s.logger.Infof("product category already exists")
+		return nil, ErrUpdateProductCategoryAlreadyExists
+	}
+
+	return s.storages.Product.UpdateProductCategory(id, productCategory)
 }
 
 func (s *productService) DeleteProductCategory(id int) error {
 	s.logger.Infof("deleting product category: %#v", id)
+	productCategory, err := s.storages.Product.GetProductCategory(id)
+	if err != nil {
+		s.logger.Errorf("failed to get product category: %v", err)
+		return err
+	}
+	if productCategory == nil {
+		s.logger.Infof("product category not found")
+		return ErrDeleteProductCategoryNotFound
+	}
+
 	products, err := s.storages.Product.ListProducts(&ListProductsOptions{
 		CategoryID: &id,
 	})
@@ -103,7 +142,7 @@ func (s *productService) DeleteProductCategory(id int) error {
 		return err
 	}
 	if len(products) > 0 {
-		s.logger.Errorf("product category has products")
+		s.logger.Infof("product category has products")
 		return ErrDeleteProductCategoryProductsExist
 	}
 	return s.storages.Product.DeleteProductCategory(id)
@@ -116,7 +155,7 @@ func (s *productService) CreateStoreProduct(storeProduct *entity.StoreProduct) (
 		return nil, err
 	}
 	if existingStoreProduct != nil {
-		s.logger.Errorf("store product already exists")
+		s.logger.Infof("store product already exists")
 		return nil, ErrCreateStoreProductAlreadyExists
 	}
 	s.logger.Infof("creating store product: %#v", storeProduct)
@@ -135,11 +174,30 @@ func (s *productService) ListStoreProducts(opts *ListStoreProductsOptions) ([]*e
 
 func (s *productService) UpdateStoreProduct(id string, storeProduct *entity.StoreProduct) (*entity.StoreProduct, error) {
 	s.logger.Infof("updating store product: %#v", storeProduct)
+	existingStoreProduct, err := s.storages.Product.GetStoreProduct(storeProduct.ID)
+	if err != nil {
+		s.logger.Errorf("error getting store product: %#v", err)
+		return nil, err
+	}
+	if existingStoreProduct != nil {
+		s.logger.Infof("store product already exists")
+		return nil, ErrUpdateStoreProductAlreadyExists
+	}
 	return s.storages.Product.UpdateStoreProduct(id, storeProduct)
 }
 
 func (s *productService) DeleteStoreProduct(id string) error {
 	s.logger.Infof("deleting store product: %#v", id)
+	storeProduct, err := s.storages.Product.GetStoreProduct(id)
+	if err != nil {
+		s.logger.Errorf("failed to get store product: %v", err)
+		return err
+	}
+	if storeProduct == nil {
+		s.logger.Infof("store product not found")
+		return ErrDeleteStoreProductNotFound
+	}
+
 	checks, err := s.storages.Check.ListCheckItems(&ListCheckItemsOptions{
 		StoreProductID: &id,
 	})
@@ -148,7 +206,7 @@ func (s *productService) DeleteStoreProduct(id string) error {
 		return err
 	}
 	if len(checks) > 0 {
-		s.logger.Errorf("card has checks")
+		s.logger.Infof("card has checks")
 		return ErrDeleteStoreProductCheckItemsExist
 	}
 	return s.storages.Product.DeleteStoreProduct(id)

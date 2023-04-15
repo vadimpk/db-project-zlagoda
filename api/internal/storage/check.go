@@ -2,9 +2,11 @@ package storage
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/apsdehal/go-logger"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/entity"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/service"
+	"strings"
 )
 
 type checkStorage struct {
@@ -46,7 +48,58 @@ func (s *checkStorage) GetCheck(id string) (*entity.Check, error) {
 }
 
 func (s *checkStorage) ListChecks(opts *service.ListChecksOptions) ([]*entity.Check, error) {
-	return nil, nil
+	var checks []*entity.Check
+	var query strings.Builder
+	var args []interface{}
+
+	query.WriteString("SELECT * FROM checks WHERE 1=1")
+
+	nextArgIndex := 1
+
+	if opts.CardID != nil {
+		query.WriteString(fmt.Sprintf(" AND fk_card_number = $%d", nextArgIndex))
+		args = append(args, *opts.CardID)
+		nextArgIndex++
+	}
+
+	if opts.EmployeeID != nil {
+		query.WriteString(fmt.Sprintf(" AND fk_id_employee = $%d", nextArgIndex))
+		args = append(args, *opts.EmployeeID)
+		nextArgIndex++
+	}
+
+	if opts.StartDate != nil {
+		query.WriteString(fmt.Sprintf(" AND print_date >= $%d", nextArgIndex))
+		args = append(args, *opts.StartDate)
+		nextArgIndex++
+	}
+
+	if opts.EndDate != nil {
+		query.WriteString(fmt.Sprintf(" AND print_date <= $%d", nextArgIndex))
+		args = append(args, *opts.EndDate)
+		nextArgIndex++
+	}
+
+	s.logger.Infof("query: %s", query.String())
+	rows, err := s.db.Query(query.String(), args...)
+	if err != nil {
+		s.logger.Errorf("error while listing checks: %s", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		check := entity.Check{}
+		err := rows.Scan(&check.ID, &check.EmployeeID, &check.CustomerCardID,
+			&check.Date, &check.TotalPrice, &check.VAT)
+		if err != nil {
+			s.logger.Errorf("error while scanning check row: %s", err)
+			return nil, err
+		}
+		checks = append(checks, &check)
+	}
+
+	return checks, nil
 }
 
 func (s *checkStorage) UpdateCheck(id string, check *entity.Check) (*entity.Check, error) {
@@ -94,7 +147,48 @@ func (s *checkStorage) GetCheckItem(id entity.CheckItemID) (*entity.CheckItem, e
 }
 
 func (s *checkStorage) ListCheckItems(opts *service.ListCheckItemsOptions) ([]*entity.CheckItem, error) {
-	return nil, nil
+	var checkItems []*entity.CheckItem
+	var query strings.Builder
+	var args []interface{}
+
+	query.WriteString("SELECT * FROM sale WHERE 1=1")
+
+	nextArgIndex := 1
+
+	if opts.CheckID != nil {
+		query.WriteString(fmt.Sprintf(" AND fk_check_number = $%d", nextArgIndex))
+		args = append(args, *opts.CheckID)
+		nextArgIndex++
+	}
+
+	if opts.StoreProductID != nil {
+		query.WriteString(fmt.Sprintf(" AND fk_UPC = $%d", nextArgIndex))
+		args = append(args, *opts.StoreProductID)
+		nextArgIndex++
+	}
+
+	s.logger.Infof("query: %s", query.String())
+	rows, err := s.db.Query(query.String(), args...)
+	if err != nil {
+		s.logger.Errorf("error while listing check items: %s", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		checkItem := entity.CheckItem{}
+		checkItemID := entity.CheckItemID{}
+		err := rows.Scan(&checkItemID.StoreProductID, &checkItemID.CheckID,
+			&checkItem.ProductCount, &checkItem.ProductPrice)
+		if err != nil {
+			s.logger.Errorf("error while scanning check item row: %s", err)
+			return nil, err
+		}
+		checkItem.ID = checkItemID
+		checkItems = append(checkItems, &checkItem)
+	}
+
+	return checkItems, nil
 }
 
 func (s *checkStorage) UpdateCheckItem(id entity.CheckItemID, checkItem *entity.CheckItem) (*entity.CheckItem, error) {

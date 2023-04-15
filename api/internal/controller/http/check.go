@@ -3,6 +3,7 @@ package http
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/entity"
+	"github.com/vadimpk/db-project-zlagoda/api/internal/service"
 	"github.com/vadimpk/db-project-zlagoda/api/pkg/errs"
 	"net/http"
 )
@@ -22,7 +23,7 @@ func setupCheckRoutes(options *Options, handler *gin.Engine) {
 		checkGroup.POST("/", routes.createCheck)
 		checkGroup.GET("/:id", routes.getCheck)
 		checkGroup.GET("/", routes.listChecks)
-		checkGroup.PUT("/:id", routes.updateCheck)
+		//checkGroup.PUT("/:id", routes.updateCheck)
 		checkGroup.DELETE("/:id", routes.deleteCheck)
 	}
 
@@ -93,30 +94,23 @@ func (r *checkRoutes) getCheck(c *gin.Context) {
 	c.JSON(http.StatusOK, check)
 }
 
-func (r *checkRoutes) listChecks(c *gin.Context) {
-	return
-}
-
-// @Id update-check
+// @Id list-checks
 // @Security BearerAuth
-// @Summary Update check
+// @Summary List checks
 // @Tags check
-// @Description Update check
-// @Param id path string true "Check ID"
-// @Param check body entity.Check true "Check"
-// @Success 200 {object} entity.Check
+// @Description List checks
+// @Param listOptions query service.ListChecksOptions true "List options"
+// @Success 200 {array} entity.Check
 // @Failure 400 {object} error
-// @Router /check/{id} [put]
-func (r *checkRoutes) updateCheck(c *gin.Context) {
-	id := c.Param("id")
-
-	var check entity.Check
-	if err := c.ShouldBindJSON(&check); err != nil {
+// @Router /check [get]
+func (r *checkRoutes) listChecks(c *gin.Context) {
+	var listOptions service.ListChecksOptions
+	if err := c.ShouldBindQuery(&listOptions); err != nil {
 		c.JSON(http.StatusBadRequest, err)
 		return
 	}
 
-	updatedCheck, err := r.opts.Services.Check.UpdateCheck(id, &check)
+	checks, err := r.opts.Services.Check.ListChecks(&listOptions)
 	if err != nil {
 		if errs.IsExpected(err) {
 			c.JSON(http.StatusBadRequest, err)
@@ -126,8 +120,40 @@ func (r *checkRoutes) updateCheck(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, updatedCheck)
+	c.JSON(http.StatusOK, checks)
 }
+
+//// @Id update-check
+//// @Security BearerAuth
+//// @Summary Update check
+//// @Tags check
+//// @Description Update check
+//// @Param id path string true "Check ID"
+//// @Param check body entity.Check true "Check"
+//// @Success 200 {object} entity.Check
+//// @Failure 400 {object} error
+//// @Router /check/{id} [put]
+//func (r *checkRoutes) updateCheck(c *gin.Context) {
+//	id := c.Param("id")
+//
+//	var check entity.Check
+//	if err := c.ShouldBindJSON(&check); err != nil {
+//		c.JSON(http.StatusBadRequest, err)
+//		return
+//	}
+//
+//	updatedCheck, err := r.opts.Services.Check.UpdateCheck(id, &check)
+//	if err != nil {
+//		if errs.IsExpected(err) {
+//			c.JSON(http.StatusBadRequest, err)
+//			return
+//		}
+//		c.JSON(http.StatusInternalServerError, err)
+//		return
+//	}
+//
+//	c.JSON(http.StatusOK, updatedCheck)
+//}
 
 // @Id delete-checks
 // @Security BearerAuth
@@ -152,12 +178,18 @@ func (r *checkRoutes) deleteCheck(c *gin.Context) {
 	c.JSON(http.StatusOK, nil)
 }
 
+type createCheckItemResponseBody struct {
+	CheckItem *entity.CheckItem    `json:"checkItem"`
+	Check     *entity.Check        `json:"check"`
+	Product   *entity.StoreProduct `json:"product"`
+}
+
 // @Id Create check item
 // @Security BearerAuth
 // @Tags check-item
 // @Summary Create check item
 // @Param check-item body entity.CheckItem true "Check item"
-// @Success 200 {object} entity.CheckItem
+// @Success 200 {object} createCheckItemResponseBody
 // @Failure 400 {object} error
 // @Router /check/check-item [post]
 func (r *checkRoutes) createCheckItem(c *gin.Context) {
@@ -167,7 +199,7 @@ func (r *checkRoutes) createCheckItem(c *gin.Context) {
 		return
 	}
 
-	createdCheckItem, err := r.opts.Services.Check.CreateCheckItem(&checkItem)
+	output, err := r.opts.Services.Check.CreateCheckItem(&checkItem)
 	if err != nil {
 		if errs.IsExpected(err) {
 			c.JSON(http.StatusBadRequest, err)
@@ -177,7 +209,11 @@ func (r *checkRoutes) createCheckItem(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, createdCheckItem)
+	c.JSON(http.StatusOK, createCheckItemResponseBody{
+		CheckItem: output.CheckItem,
+		Check:     output.Check,
+		Product:   output.Product,
+	})
 }
 
 type getCheckItemRequestQuery struct {
@@ -221,13 +257,44 @@ func (r *checkRoutes) getCheckItem(c *gin.Context) {
 	c.JSON(http.StatusOK, checkItem)
 }
 
+// @Id list-check-items
+// @Security BearerAuth
+// @Summary List check items
+// @Tags check-item
+// @Description List check items
+// @Param listOptions query service.ListCheckItemsOptions true "List options"
+// @Success 200 {array} entity.CheckItem
+// @Failure 400 {object} error
+// @Router /check/check-item/list [get]
 func (r *checkRoutes) listCheckItems(c *gin.Context) {
-	return
+	var listOptions service.ListCheckItemsOptions
+	if err := c.ShouldBindQuery(&listOptions); err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	checkItems, err := r.opts.Services.Check.ListCheckItems(&listOptions)
+	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, checkItems)
 }
 
 type updateCheckItemRequestQuery struct {
 	CheckId        string `form:"checkId"`
 	StoreProductId string `form:"storeProductId"`
+}
+
+type updateCheckItemResponseBody struct {
+	CheckItem *entity.CheckItem    `json:"checkItem"`
+	Check     *entity.Check        `json:"check"`
+	Product   *entity.StoreProduct `json:"product"`
 }
 
 // @Id update-check-item
@@ -237,7 +304,7 @@ type updateCheckItemRequestQuery struct {
 // @Description Update check item
 // @Param id query updateCheckItemRequestQuery true "Check item ID"
 // @Param check-item body entity.CheckItem true "Check item"
-// @Success 200 {object} entity.CheckItem
+// @Success 200 {object} updateCheckItemResponseBody
 // @Failure 400 {object} error
 // @Router /check/check-item [put]
 func (r *checkRoutes) updateCheckItem(c *gin.Context) {
@@ -253,7 +320,7 @@ func (r *checkRoutes) updateCheckItem(c *gin.Context) {
 		return
 	}
 
-	updatedCheckItem, err := r.opts.Services.Check.UpdateCheckItem(entity.CheckItemID{
+	output, err := r.opts.Services.Check.UpdateCheckItem(entity.CheckItemID{
 		StoreProductID: query.StoreProductId,
 		CheckID:        query.CheckId,
 	}, &checkItem)
@@ -266,11 +333,20 @@ func (r *checkRoutes) updateCheckItem(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, updatedCheckItem)
+	c.JSON(http.StatusOK, updateCheckItemResponseBody{
+		CheckItem: output.CheckItem,
+		Check:     output.Check,
+		Product:   output.Product,
+	})
 }
 
 type deleteCheckItemsRequestBody struct {
 	Id entity.CheckItemID `json:"id"`
+}
+
+type deleteCheckItemsResponseBody struct {
+	Check   *entity.Check        `json:"check"`
+	Product *entity.StoreProduct `json:"product"`
 }
 
 // @Id delete-check-items
@@ -279,7 +355,7 @@ type deleteCheckItemsRequestBody struct {
 // @Tags check-item
 // @Description Delete check items
 // @Param id body deleteCheckItemsRequestBody true "Check item ID"
-// @Success 200
+// @Success 200 {object} deleteCheckItemsResponseBody
 // @Failure 400 {object} error
 // @Router /check/check-item [delete]
 func (r *checkRoutes) deleteCheckItem(c *gin.Context) {
@@ -289,7 +365,7 @@ func (r *checkRoutes) deleteCheckItem(c *gin.Context) {
 		return
 	}
 
-	err := r.opts.Services.Check.DeleteCheckItem(requestBody.Id)
+	output, err := r.opts.Services.Check.DeleteCheckItem(requestBody.Id)
 	if err != nil {
 		if errs.IsExpected(err) {
 			c.JSON(http.StatusBadRequest, err)
@@ -299,5 +375,8 @@ func (r *checkRoutes) deleteCheckItem(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, nil)
+	c.JSON(http.StatusOK, deleteCheckItemsResponseBody{
+		Check:   output.Check,
+		Product: output.Product,
+	})
 }
