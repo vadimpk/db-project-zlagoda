@@ -49,6 +49,16 @@ func (s *productService) ListProducts(opts *ListProductsOptions) ([]*entity.Prod
 
 func (s *productService) UpdateProduct(id int, product *entity.Product) (*entity.Product, error) {
 	s.logger.Infof("updating product: %#v", product)
+	previousProduct, err := s.storages.Product.GetProduct(id)
+	if err != nil {
+		s.logger.Errorf("error getting product: %#v", err)
+		return nil, err
+	}
+	if previousProduct == nil {
+		s.logger.Infof("product not found")
+		return nil, ErrUpdateProductNotFound
+	}
+
 	existingProduct, err := s.storages.Product.GetProduct(product.ID)
 	if err != nil {
 		s.logger.Errorf("error getting product: %#v", err)
@@ -109,6 +119,16 @@ func (s *productService) ListProductCategories(opts *ListProductCategoriesOption
 
 func (s *productService) UpdateProductCategory(id int, productCategory *entity.ProductCategory) (*entity.ProductCategory, error) {
 	s.logger.Infof("updating productCategory category: %#v", productCategory)
+	previousProductCategory, err := s.storages.Product.GetProductCategory(id)
+	if err != nil {
+		s.logger.Errorf("failed to get product category: %v", err)
+		return nil, err
+	}
+	if previousProductCategory == nil {
+		s.logger.Infof("product category not found")
+		return nil, ErrUpdateProductCategoryNotFound
+	}
+
 	existingProductCategory, err := s.storages.Product.GetProductCategory(productCategory.ID)
 	if err != nil {
 		s.logger.Errorf("error getting product category: %#v", err)
@@ -174,6 +194,16 @@ func (s *productService) ListStoreProducts(opts *ListStoreProductsOptions) ([]*e
 
 func (s *productService) UpdateStoreProduct(id string, storeProduct *entity.StoreProduct) (*entity.StoreProduct, error) {
 	s.logger.Infof("updating store product: %#v", storeProduct)
+	previousStoreProduct, err := s.storages.Product.GetStoreProduct(id)
+	if err != nil {
+		s.logger.Errorf("error getting store product: %#v", err)
+		return nil, err
+	}
+	if previousStoreProduct == nil {
+		s.logger.Infof("store product not found")
+		return nil, ErrUpdateStoreProductNotFound
+	}
+
 	existingStoreProduct, err := s.storages.Product.GetStoreProduct(storeProduct.ID)
 	if err != nil {
 		s.logger.Errorf("error getting store product: %#v", err)
@@ -183,6 +213,7 @@ func (s *productService) UpdateStoreProduct(id string, storeProduct *entity.Stor
 		s.logger.Infof("store product already exists")
 		return nil, ErrUpdateStoreProductAlreadyExists
 	}
+
 	return s.storages.Product.UpdateStoreProduct(id, storeProduct)
 }
 

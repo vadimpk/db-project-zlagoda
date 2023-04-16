@@ -41,16 +41,26 @@ func (s *customerCardService) List(opts ListCardOptions) ([]*entity.CustomerCard
 
 func (s *customerCardService) Update(id string, card *entity.CustomerCard) (*entity.CustomerCard, error) {
 	s.logger.Infof("updating card: %#v", card)
-	card, err := s.storages.CustomerCard.Get(id)
+	previousCard, err := s.storages.CustomerCard.Get(id)
 	if err != nil {
 		s.logger.Errorf("error getting card: %#v", err)
 		return nil, err
 	}
-	if card == nil {
+	if previousCard == nil {
 		s.logger.Infof("card with id %s not found", id)
 		return nil, ErrUpdateCardNotFound
 	}
-	card.ID = id
+
+	existingCard, err := s.storages.CustomerCard.Get(card.ID)
+	if err != nil {
+		s.logger.Errorf("error getting card: %#v", err)
+		return nil, err
+	}
+	if existingCard != nil && existingCard.ID != id {
+		s.logger.Infof("card already exists")
+		return nil, ErrUpdateCardAlreadyExists
+	}
+
 	return s.storages.CustomerCard.Update(id, card)
 }
 

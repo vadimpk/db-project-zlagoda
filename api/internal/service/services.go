@@ -34,7 +34,8 @@ type EmployeeService interface {
 var (
 	ErrCreateEmployeeAlreadyExists = errs.New("employee already exists")
 
-	ErrEmployeeNotFound = errs.New("employee not found")
+	ErrEmployeeNotFound            = errs.New("employee not found")
+	ErrEmployeeWithIDAlreadyExists = errs.New("employee with id already exists")
 
 	ErrDeleteEmployeeChecksExist = errs.New("employee has checks")
 
@@ -61,7 +62,8 @@ type CustomerCardService interface {
 }
 
 var (
-	ErrUpdateCardNotFound = errs.New("card not found")
+	ErrUpdateCardNotFound      = errs.New("card not found")
+	ErrUpdateCardAlreadyExists = errs.New("card already exists")
 
 	ErrDeleteCardNotFound    = errs.New("card not found")
 	ErrDeleteCardChecksExist = errs.New("card has checks")
@@ -96,16 +98,19 @@ type ProductService interface {
 var (
 	ErrCreateProductAlreadyExists      = errs.New("product with such id already exists")
 	ErrUpdateProductAlreadyExists      = errs.New("product with such id already exists")
+	ErrUpdateProductNotFound           = errs.New("product not found")
 	ErrDeleteProductStoreProductsExist = errs.New("store products exist")
 	ErrDeleteProductNotFound           = errs.New("product not found")
 	ErrDeleteProductCategoryNotFound   = errs.New("product category not found")
 
 	ErrCreateProductCategoryAlreadyExists = errs.New("product category with such id already exists")
 	ErrUpdateProductCategoryAlreadyExists = errs.New("product category with such id already exists")
+	ErrUpdateProductCategoryNotFound      = errs.New("product category not found")
 	ErrDeleteProductCategoryProductsExist = errs.New("products exist")
 
 	ErrCreateStoreProductAlreadyExists   = errs.New("store product already exists")
 	ErrUpdateStoreProductAlreadyExists   = errs.New("store product already exists")
+	ErrUpdateStoreProductNotFound        = errs.New("store product not found")
 	ErrDeleteStoreProductCheckItemsExist = errs.New("check items exist")
 	ErrDeleteStoreProductNotFound        = errs.New("store product not found")
 )

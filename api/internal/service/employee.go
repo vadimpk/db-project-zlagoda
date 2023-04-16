@@ -52,14 +52,24 @@ func (s *employeeService) List(opts ListEmployeeOptions) ([]*entity.Employee, er
 
 func (s *employeeService) Update(id string, employee *entity.Employee) (*entity.Employee, error) {
 	s.logger.Infof("updating employee: %#v", employee)
-	employee, err := s.storages.Employee.Get(id)
+	previousEmployee, err := s.storages.Employee.Get(id)
 	if err != nil {
 		s.logger.Errorf("error getting employee: %#v", err)
 		return nil, err
 	}
-	if employee == nil {
+	if previousEmployee == nil {
 		s.logger.Errorf("employee not found")
 		return nil, ErrEmployeeNotFound
+	}
+
+	employeeWithID, err := s.storages.Employee.Get(employee.ID)
+	if err != nil {
+		s.logger.Errorf("error getting employee: %#v", err)
+		return nil, err
+	}
+	if employeeWithID != nil && employeeWithID.ID != id {
+		s.logger.Errorf("employee with this id already exists")
+		return nil, ErrEmployeeWithIDAlreadyExists
 	}
 
 	return s.storages.Employee.Update(id, employee)
