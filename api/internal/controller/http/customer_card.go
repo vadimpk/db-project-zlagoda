@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/entity"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/service"
-	"github.com/vadimpk/db-project-zlagoda/api/pkg/errs"
 	"net/http"
 )
 
@@ -24,7 +23,7 @@ func setupCustomerCardRoutes(options *Options, handler *gin.Engine) {
 		customerCardGroup.GET("/:id", routes.getCard)
 		customerCardGroup.GET("/", routes.listCards)
 		customerCardGroup.PUT("/:id", routes.updateCard)
-		customerCardGroup.DELETE("/:id", routes.deleteCard)
+		customerCardGroup.DELETE("/", routes.deleteCards)
 
 	}
 }
@@ -45,10 +44,6 @@ func (r *customerCardRoutes) createCard(c *gin.Context) {
 	}
 	createdCard, err := r.opts.Services.CustomerCard.Create(&card)
 	if err != nil {
-		if errs.IsExpected(err) {
-			c.JSON(http.StatusBadRequest, err)
-			return
-		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
@@ -69,15 +64,7 @@ func (r *customerCardRoutes) getCard(c *gin.Context) {
 
 	card, err := r.opts.Services.CustomerCard.Get(id)
 	if err != nil {
-		if errs.IsExpected(err) {
-			c.JSON(http.StatusBadRequest, err)
-			return
-		}
 		c.JSON(http.StatusInternalServerError, err)
-		return
-	}
-	if card == nil {
-		c.JSON(http.StatusNotFound, nil)
 		return
 	}
 	c.JSON(http.StatusOK, card)
@@ -99,10 +86,6 @@ func (r *customerCardRoutes) listCards(c *gin.Context) {
 	}
 	cards, err := r.opts.Services.CustomerCard.List(listOptions)
 	if err != nil {
-		if errs.IsExpected(err) {
-			c.JSON(http.StatusBadRequest, err)
-			return
-		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
@@ -130,14 +113,14 @@ func (r *customerCardRoutes) updateCard(c *gin.Context) {
 
 	updatedCard, err := r.opts.Services.CustomerCard.Update(id, &card)
 	if err != nil {
-		if errs.IsExpected(err) {
-			c.JSON(http.StatusBadRequest, err)
-			return
-		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
 	c.JSON(http.StatusOK, updatedCard)
+}
+
+type deleteCardsRequestBody struct {
+	Ids []string `json:"ids"`
 }
 
 // @Id delete-cards
@@ -145,17 +128,18 @@ func (r *customerCardRoutes) updateCard(c *gin.Context) {
 // @Summary Delete customer cards
 // @Tags customer-card
 // @Description Delete customer cards
-// @Param id path string true "Card ID"
+// @Param ids body deleteCardsRequestBody true "Card IDs"
 // @Success 200
 // @Failure 400 {object} error
-// @Router /customer-card/{id} [delete]
-func (r *customerCardRoutes) deleteCard(c *gin.Context) {
-	err := r.opts.Services.CustomerCard.Delete(c.Param("id"))
+// @Router /customer-card [delete]
+func (r *customerCardRoutes) deleteCards(c *gin.Context) {
+	var body deleteCardsRequestBody
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	err := r.opts.Services.CustomerCard.Delete(body.Ids)
 	if err != nil {
-		if errs.IsExpected(err) {
-			c.JSON(http.StatusBadRequest, err)
-			return
-		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}

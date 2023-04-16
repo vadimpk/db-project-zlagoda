@@ -39,10 +39,6 @@ func (s *customerCardStorage) Get(id string) (*entity.CustomerCard, error) {
 		Scan(&card.ID, &card.Surname, &card.Name, &card.Patronymic,
 			&card.PhoneNumber, &card.City, &card.Street, &card.Zip, card.Discount)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			s.logger.Infof("card with id %s not found", id)
-			return nil, nil
-		}
 		s.logger.Errorf("error while getting customer card: %s", err)
 	}
 	return &card, nil
@@ -77,7 +73,6 @@ func (s *customerCardStorage) List(opts service.ListCardOptions) ([]*entity.Cust
 		}
 	}
 
-	s.logger.Infof("query: %s", query.String())
 	rows, err := s.db.Query(query.String(), args...)
 	if err != nil {
 		s.logger.Errorf("error while listing customer cards: %s", err)
@@ -109,11 +104,13 @@ func (s *customerCardStorage) Update(id string, card *entity.CustomerCard) (*ent
 	return card, nil
 }
 
-func (s *customerCardStorage) Delete(id string) error {
-	_, err := s.db.Exec("DELETE FROM customer_card WHERE card_number = $1", id)
-	if err != nil {
-		s.logger.Errorf("error while deleting card: %s", err)
-		return err
+func (s *customerCardStorage) Delete(ids []string) error {
+	for _, id := range ids {
+		_, err := s.db.Exec("DELETE FROM customer_card WHERE card_number = $1", id)
+		if err != nil {
+			s.logger.Errorf("error while deleting card: %s", err)
+			return err
+		}
 	}
 	return nil
 }

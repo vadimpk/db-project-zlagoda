@@ -27,15 +27,6 @@ func NewEmployeeService(opts Options) EmployeeService {
 var _ EmployeeService = (*employeeService)(nil)
 
 func (s *employeeService) Create(employee *entity.Employee) (*entity.Employee, error) {
-	existingEmployee, err := s.storages.Employee.Get(employee.ID)
-	if err != nil {
-		s.logger.Errorf("failed to get employee: %v", err)
-		return nil, fmt.Errorf("failed to get employee: %w", err)
-	}
-	if existingEmployee != nil {
-		s.logger.Infof("employee already exists")
-		return nil, ErrCreateEmployeeAlreadyExists
-	}
 	s.logger.Infof("creating employee: %#v", employee)
 	return s.storages.Employee.Create(employee)
 }
@@ -52,53 +43,12 @@ func (s *employeeService) List(opts ListEmployeeOptions) ([]*entity.Employee, er
 
 func (s *employeeService) Update(id string, employee *entity.Employee) (*entity.Employee, error) {
 	s.logger.Infof("updating employee: %#v", employee)
-	previousEmployee, err := s.storages.Employee.Get(id)
-	if err != nil {
-		s.logger.Errorf("error getting employee: %#v", err)
-		return nil, err
-	}
-	if previousEmployee == nil {
-		s.logger.Errorf("employee not found")
-		return nil, ErrEmployeeNotFound
-	}
-
-	employeeWithID, err := s.storages.Employee.Get(employee.ID)
-	if err != nil {
-		s.logger.Errorf("error getting employee: %#v", err)
-		return nil, err
-	}
-	if employeeWithID != nil && employeeWithID.ID != id {
-		s.logger.Errorf("employee with this id already exists")
-		return nil, ErrEmployeeWithIDAlreadyExists
-	}
-
 	return s.storages.Employee.Update(id, employee)
 }
 
-func (s *employeeService) Delete(id string) error {
-	s.logger.Infof("deleting employee: %#v", id)
-	employee, err := s.storages.Employee.Get(id)
-	if err != nil {
-		s.logger.Errorf("failed to get employee: %v", err)
-		return fmt.Errorf("failed to get employee: %w", err)
-	}
-	if employee == nil {
-		s.logger.Infof("employee not found")
-		return ErrEmployeeNotFound
-	}
-
-	checks, err := s.storages.Check.ListChecks(&ListChecksOptions{
-		CardID: &id,
-	})
-	if err != nil {
-		s.logger.Errorf("failed to get checks: %v", err)
-		return err
-	}
-	if len(checks) > 0 {
-		s.logger.Infof("card has checks")
-		return ErrDeleteCardChecksExist
-	}
-	return s.storages.Employee.Delete(id)
+func (s *employeeService) Delete(ids []string) error {
+	s.logger.Infof("deleting employees: %#v", ids)
+	return s.storages.Employee.Delete(ids)
 }
 
 func (s *employeeService) Login(id string, password string) (*entity.Employee, string, error) {
@@ -110,13 +60,13 @@ func (s *employeeService) Login(id string, password string) (*entity.Employee, s
 		return nil, "", fmt.Errorf("failed to get employee: %w", err)
 	}
 	if employee == nil {
-		s.logger.Infof("employee not found")
+		s.logger.Errorf("employee not found")
 		return nil, "", ErrLoginEmployeeNotFound
 	}
 
 	isValidPassword := password == employee.Password
 	if !isValidPassword {
-		s.logger.Infof("invalid password")
+		s.logger.Info("invalid password")
 		return nil, "", ErrLoginEmployeeInvalidPassword
 	}
 
@@ -150,7 +100,7 @@ func (s *employeeService) VerifyAccessToken(authToken string) (*entity.Employee,
 		return nil, fmt.Errorf("failed to get user: %w", err)
 	}
 	if user == nil {
-		s.logger.Infof("user not found")
+		s.logger.Errorf("user not found")
 		return nil, ErrVerifyAccessTokenEmployeeNotFound
 	}
 
