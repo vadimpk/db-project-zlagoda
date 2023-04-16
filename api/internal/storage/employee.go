@@ -40,6 +40,10 @@ func (s *employeeStorage) Get(id string) (*entity.Employee, error) {
 			&employee.Role, &employee.Salary, &employee.DateOfBirth, &employee.DateOfStart,
 			&employee.Phone, &employee.City, &employee.Street, &employee.Zip, &employee.Password)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			s.logger.Infof("employee with id %s not found", id)
+			return nil, nil
+		}
 		s.logger.Errorf("error while getting employee: %s", err)
 	}
 	s.logger.Infof("got employee: %v", employee)
@@ -74,6 +78,8 @@ func (s *employeeStorage) List(opts service.ListEmployeeOptions) ([]*entity.Empl
 			query.WriteString(" DESC")
 		}
 	}
+
+	s.logger.Infof("query: %s", query.String())
 	rows, err := s.db.Query(query.String(), args...)
 	if err != nil {
 		s.logger.Errorf("error while listing employees: %s", err)
@@ -106,13 +112,11 @@ func (s *employeeStorage) Update(id string, employee *entity.Employee) (*entity.
 	return employee, err
 }
 
-func (s *employeeStorage) Delete(ids []string) error {
-	for _, id := range ids {
-		_, err := s.db.Exec("DELETE FROM employee WHERE id_employee = $1", id)
-		if err != nil {
-			s.logger.Errorf("error while deleting employee: %s", err)
-			return err
-		}
+func (s *employeeStorage) Delete(id string) error {
+	_, err := s.db.Exec("DELETE FROM employee WHERE id_employee = $1", id)
+	if err != nil {
+		s.logger.Errorf("error while deleting employee: %s", err)
+		return err
 	}
 	return nil
 }

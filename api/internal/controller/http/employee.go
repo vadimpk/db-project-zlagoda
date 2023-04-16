@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/entity"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/service"
+	"github.com/vadimpk/db-project-zlagoda/api/pkg/errs"
 	"net/http"
 )
 
@@ -23,7 +24,7 @@ func setupEmployeeRoutes(options *Options, handler *gin.Engine) {
 		group.GET("/:id", newAuthMiddleware(options), routes.getEmployee)
 		group.GET("/", newAuthMiddleware(options), routes.listEmployee)
 		group.PUT("/:id", newAuthMiddleware(options), routes.updateEmployee)
-		group.DELETE("/", newAuthMiddleware(options), routes.deleteEmployee)
+		group.DELETE("/:id", newAuthMiddleware(options), routes.deleteEmployee)
 
 		group.POST("/login", routes.login)
 	}
@@ -47,8 +48,14 @@ func (r *employeeRoutes) createEmployee(c *gin.Context) {
 
 	createdEmployee, err := r.opts.Services.Employee.Create(&employee)
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
+		return
 	}
+
 	c.JSON(http.StatusOK, createdEmployee)
 }
 
@@ -66,7 +73,15 @@ func (r *employeeRoutes) getEmployee(c *gin.Context) {
 
 	employee, err := r.opts.Services.Employee.Get(id)
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	if employee == nil {
+		c.JSON(http.StatusNotFound, nil)
 		return
 	}
 	c.JSON(http.StatusOK, employee)
@@ -90,6 +105,10 @@ func (r *employeeRoutes) listEmployee(c *gin.Context) {
 
 	employees, err := r.opts.Services.Employee.List(listOptions)
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
@@ -117,14 +136,15 @@ func (r *employeeRoutes) updateEmployee(c *gin.Context) {
 
 	updatedEmployee, err := r.opts.Services.Employee.Update(id, &employee)
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
-	c.JSON(http.StatusOK, updatedEmployee)
-}
 
-type deleteEmployeeRequestBody struct {
-	Ids []string `json:"ids"`
+	c.JSON(http.StatusOK, updatedEmployee)
 }
 
 // @Id delete-employee
@@ -132,22 +152,21 @@ type deleteEmployeeRequestBody struct {
 // @Summary Delete employee
 // @Tags employee
 // @Description Delete employee
-// @Param ids body deleteEmployeeRequestBody true "Employee IDs"
+// @Param id path string true "Employee ID"
 // @Success 200
 // @Failure 400 {object} error
-// @Router /employee [delete]
+// @Router /employee/{id} [delete]
 func (r *employeeRoutes) deleteEmployee(c *gin.Context) {
-	var body deleteEmployeeRequestBody
-	if err := c.ShouldBindJSON(&body); err != nil {
-		c.JSON(http.StatusBadRequest, err)
-		return
-	}
-
-	err := r.opts.Services.Employee.Delete(body.Ids)
+	err := r.opts.Services.Employee.Delete(c.Param("id"))
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
+
 	c.JSON(http.StatusOK, nil)
 }
 
@@ -178,6 +197,10 @@ func (r *employeeRoutes) login(c *gin.Context) {
 
 	employee, token, err := r.opts.Services.Employee.Login(body.EmployeeID, body.Password)
 	if err != nil {
+		if errs.IsExpected(err) {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
