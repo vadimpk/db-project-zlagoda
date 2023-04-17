@@ -11,11 +11,11 @@ const ProductFormPopup = ({setVisible, create}) => {
         });
 
     const addNewProduct = (e) => {
-        e.preventDefault();
+        e.preventDefault()
         if(validateForm()) {
-            const product_count = parseFloat(product.product_count);
-            product.product_count=product_count;
-            create(product);
+            const product_count = parseFloat(product.product_count)
+            product.product_count=product_count
+            create(product)
         }
         setProduct({
             store_product_id:'',
@@ -25,11 +25,17 @@ const ProductFormPopup = ({setVisible, create}) => {
     }
 
     const validateForm = () => {
-        const errors ={};
+        const errors ={}
         const pricePattern = /^\d+(\.\d+)?$/; // дозволено тільки цифри та десяткові точки
+        const idPattern = /^\d{12}$/;
+
 
         if (!pricePattern.test(product.product_count)) {
             errors.product_count="Кількість має бути додатнім числом";
+        }
+
+        if (!idPattern.test(product.store_product_id)) {
+            errors.surname="UPC повинно складатись з 12цифр";
         }
 
         if (Object.keys(errors).length > 0) {
