@@ -124,6 +124,7 @@ const Employees = () => {
     }
     const editEmployee = (newEmployee, id) => {
         newEmployee.id=id
+        console.log(newEmployee)
         axios.put(`http://localhost:8082/employee/${id}`, newEmployee,{
             headers: {
                 Authorization: `Bearer ${authToken}`

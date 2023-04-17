@@ -6,18 +6,44 @@ import InputTextForm from "../UI/inputs/text-password/InputTextForm";
 const ProductFormPopup = ({setVisible, create}) => {
     const [product, setProduct] = useState(
         {
-            name:'',
-            amount: 0
+            store_product_id:'',
+            product_count: 0
         });
 
     const addNewProduct = (e) => {
         e.preventDefault()
-        create(product)
+        if(validateForm()) {
+            const product_count = parseFloat(product.product_count)
+            product.product_count=product_count
+            create(product)
+        }
         setProduct({
-            name:'',
-            amount: 0
+            store_product_id:'',
+            product_count: 0
         });
         setVisible(false)
+    }
+
+    const validateForm = () => {
+        const errors ={}
+        const pricePattern = /^\d+(\.\d+)?$/; // дозволено тільки цифри та десяткові точки
+        const idPattern = /^\d{12}$/;
+
+
+        if (!pricePattern.test(product.product_count)) {
+            errors.product_count="Кількість має бути додатнім числом";
+        }
+
+        if (!idPattern.test(product.store_product_id)) {
+            errors.surname="UPC повинно складатись з 12цифр";
+        }
+
+        if (Object.keys(errors).length > 0) {
+            const errorMessages = Object.values(errors).join('\n');
+            alert(errorMessages);
+            return false;
+        }
+        return true;
     }
 
     return (
@@ -29,18 +55,18 @@ const ProductFormPopup = ({setVisible, create}) => {
             <div className="form-main">
                 <div className="form-content">
                     <InputTextForm
-                        name={"name"}
-                        placeholder={"Назва"}
-                        value={product.name}
+                        name={"store_product_id"}
+                        placeholder={"UPC товару"}
+                        value={product.store_product_id}
                         onChange={e => setProduct({
                             ...product,
-                            name: e.target.value
+                            store_product_id: e.target.value
                         })}>Назва</InputTextForm>
                     <InputTextForm
-                        name={"amount"}
+                        name={"product_count"}
                         placeholder={"Кількість"}
-                        value={ product.amount}
-                        onChange={e => setProduct({...product, amount: e.target.value})}>Кількість
+                        value={ product.product_count}
+                        onChange={e => setProduct({...product, product_count: e.target.value})}>Кількість
                     </InputTextForm>
                 </div>
             </div>

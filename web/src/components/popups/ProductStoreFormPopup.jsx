@@ -8,7 +8,6 @@ const ProductStoreFormPopup = ({setVisible, create, selectedRow, edit}) => {
     const st = {
         marginLeft: '-30px',
     }
-    const authToken = localStorage.getItem('authToken');
     const [product, setProduct] = useState(
         {
             id:  '',
@@ -86,7 +85,6 @@ const ProductStoreFormPopup = ({setVisible, create, selectedRow, edit}) => {
     const validateForm = () => {
         const idPattern = /^\d+$/; // дозволено тільки цифри
         const pricePattern = /^\d+(\.\d+)?$/; // дозволено тільки цифри та десяткові точки
-        const namePattern = /^[\p{L}0-9\s,.]+$/u; // дозволено букви українського алфавіту, цифри, кома та пробіл
         const countPattern = /^-?\d+(\.\d+)?$/; // дозволено тільки цифри та десяткові точки, включаючи від'ємні числа
         const errors = {};
 
