@@ -13,32 +13,41 @@ import CheckPopup from "../components/popups/CheckPopup";
 import ModalForm from "../components/UI/Modal/ModalForm";
 import CheckProductFormPopup from "../components/popups/CheckProductFormPopup";
 import axios from "axios";
+import SearchInput from "../components/UI/inputs/text-password/SearchInput";
 
 const Checks = () => {
     const authToken = localStorage.getItem('authToken');
     const employee = JSON.parse(localStorage.getItem('employee'));
+    const products = JSON.parse(localStorage.getItem('products'));
     const [modal, setModal] = useState(false);
-    const {isManager, setIsManager} = useContext(ManagerContext);
+    const isManager = employee.role!=='Касир';
     const [startDate, setStartDate] = useState(undefined);
     const [endDate, setEndDate] = useState(undefined);
-    const checksHeaders = ['Номер чеку','Дата','Загальна сума','ПДВ'];
+    const checksHeaders = ['Номер чеку','Дата','Загальна сума','ПДВ','Карта клієнта'];
+    const checksHeadersM = ['Номер чеку','Дата','Загальна сума','ПДВ','Карта клієнта','Касир'];
     const checkHeaders = ['Назва товару','Кількість','Ціна'];
     const [isOpenSearch, setOpenSearch] = useState(false);
+    const [createdCheck, setCreatedCheck] = useState(false);
     const [checks, setChecks] = useState([])
     const [cashiers, setCashiers] = useState([]);
-    const [selectedRow, setSelectedRow] = useState({
-        id: '',
-        date: null,
-        sum: 0,
-        pdv: 0
-    });
-    const [checksFiltered, setChecksFiltered] = useState(checks);
-    const checksTable = checksFiltered.map(({ id, date, sum, pdv }) => ({
-        id,
-        date: date.toLocaleDateString(),
-        sum,
-        pdv,
-    }))
+    const [selectedRow, setSelectedRow] = useState();
+    const [selectedCheck, setSelectedCheck] = useState();
+    const [selectedCashier, setSelectedCashier] = useState("");
+    const [customerId, setCustomerId] = useState('');
+
+    const transformedData = checks ? checks.map(({ id, date, total_price, vat, customer_card_id, employee_id }) => {
+        const cashier = cashiers.find(cashier => cashier.employee_id === employee_id);
+        const employeeName = isManager ? (cashier ? cashier.fullName : null) : null;
+        return {
+            id,
+            date,
+            total_price,
+            vat,
+            customer_card_id: customer_card_id ? customer_card_id : 'Відсутня',
+            employee_id: employeeName,
+        };
+    }) : [];
+
     const [newCheck, setNewCheck] = useState({
         id: '',
         date: new Date(),
@@ -48,60 +57,175 @@ const Checks = () => {
         customer_card_id: undefined,
         items: []
     })
+    const sum = checks ? checks.reduce((total, obj) => total + obj.total_price, 0) : 0;
 
-    const [selectedOption, setSelectedOption] = useState("");
-    const sum = checksFiltered.reduce((total, obj) => total + obj.sum, 0);
+    async function fetchData() {
+        try {
+            const params = {}
+            const currentDate = new Date().toISOString().slice(0, 10);
+            if (!isManager) {
+                params.employeeID=employee.id;
+                params.startDate= currentDate;
+            }
+            const checksResponse = await axios.get("http://localhost:8082/check", {
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                }, params
+            });
+            setChecks(checksResponse.data);
+
+            const cashiersResponse = await axios.get(
+                "http://localhost:8082/employee",
+                {
+                    headers: {
+                        Authorization: `Bearer ${authToken}`,
+                    },
+                    params: {
+                        role: "Касир",
+                    },
+                }
+            );
+            const cashiers1 = cashiersResponse.data.map(
+                (cashier) => ({
+                    employee_id: cashier.id,
+                    fullName: `${cashier.surname} ${cashier.name} ${cashier.patronymic}`
+                })
+            );
+            setCashiers(cashiers1);
+            await updateProducts();
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
     useEffect(() => {
-        axios.get('http://localhost:8082/check', {
-            headers: {
-                Authorization: `Bearer ${authToken}`
-            }
-        })
-            .then(response => {
+        fetchData();
+    }, []);
+    useEffect(() => {
+        const params = {};
+        if (startDate!==undefined&&endDate!==undefined) {
+            params.startDate = new Date(startDate);
+            params.endDate = new Date(endDate);
+        }
+        if(selectedCashier!==""){
+            params.employeeID = selectedCashier;
+        }
+            axios.get("http://localhost:8082/check", {
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                },
+                params
+            }).then(response => {
+                if(response.data===null){
+                    setChecks([]);
+                }
                 setChecks(response.data);
             })
-            .catch(error => {
-                console.log(error);
-            });
-        axios.get('http://localhost:8082/employee', {
-            headers: {
-                Authorization: `Bearer ${authToken}`
-            },
-            params: {
-                role: 'Касир'
-            }
-        })
-            .then(response => {
-                const cashiersSurnames = response.data.map(cashier => cashier.surname);
-                setCashiers(cashiersSurnames);
-            })
-            .catch(error => {
-                console.log(error);
-            });
-        setIsManager(false)
-        console.log(isManager)
-    }, []);
+    }, [startDate, endDate, selectedCashier])
+    useEffect(() => {
+        let data;
+        if (selectedRow !== undefined) {
+            axios
+                .get('http://localhost:8082/check/check-item/list', {
+                    headers: {
+                        Authorization: `Bearer ${authToken}`,
+                    },
+                    params: {
+                        checkID: selectedRow.id
+                    }
+                })
+                .then(response => {
+                    data = response.data
+                    if(data!==null) {
+                        const transformedData = data.map(({id, product_count, product_price}) => {
+                            const {
+                                upc,
+                                name,
+                                product_price: storeProductPrice
+                            } = products.find(p => p.upc === id.store_product_id);
+                            return {
+                                name,
+                                product_count,
+                                product_price: storeProductPrice || product_price,
+                            };
+                        });
+                        setSelectedCheck(transformedData)
+                    }else {
+                        alert('Чеків з таким номером немає');
+                        setSelectedCheck();
+                    }
+                })
+        }
+    }, [selectedRow])
 
+    async function updateProducts() {
+        const productsResponse = await axios.get("http://localhost:8082/product", {
+            headers: {
+                Authorization: `Bearer ${authToken}`,
+            },
+        });
+        const arr1 = productsResponse.data.map(({ id, name }) => ({ id, name }));
+
+        const storeResponse = await axios.get(
+            "http://localhost:8082/product/store",
+            {
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                },
+            }
+        );
+        const arr2 = storeResponse.data.map(({ id, product_id, price }) => ({
+            upc: id,
+            id: product_id,
+            product_price: price
+        }));
+
+        const result = [];
+        arr1.forEach(item1 => {
+            const matches = arr2.filter(item2 => item2.id === item1.id);
+            if (matches.length === 0) {
+                result.push({
+                    name: item1.name,
+                    upc: null,
+                    product_price: null
+                });
+            } else {
+                matches.forEach(match => {
+                    result.push({
+                        name: item1.name,
+                        upc: match.upc,
+                        product_price: match.product_price
+                    });
+                });
+            }
+        });
+
+        localStorage.setItem("products", JSON.stringify(result));
+    }
 
     function handleSearch(id) {
-        /*const check = checks.find(e => e.id === id)
-        if (check===undefined){
-            alert("Чеків не знайдено");
-        }else {
-            const check = checks.find(e => e.id === id)
-            setChecksFiltered([check]);
-        }*/
-    }
-    function handleSelect (category) {
-        setSelectedOption(category);
+        setSelectedRow(prevState => {
+            return {
+                ...prevState,
+                id: id
+            };
+        });
     }
     function handleDelete() {
-        /*if (selectedRow.id===''){
+        if (selectedRow===undefined){
             alert('Виберіть чек для видалення')
         } else {
-            setChecks(prevChecks => prevChecks.filter(check => check.id !== selectedRow.id));
-        }*/
+            axios.delete(`http://localhost:8082/check/${selectedRow.id}`, {
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                }
+            }).then(response => {
+                console.log(response.data);
+            }).catch(e => {
+                alert('Видалення відхилене сервером')
+                console.log(e);
+            })
+        }
     }
     function handleSum() {
         if (startDate===undefined||endDate===undefined){
@@ -110,53 +234,46 @@ const Checks = () => {
             setOpenSearch(true)
         }
     }
-
     function handleAddCheck() {
-        setNewCheck({...newCheck, date: new Date(), employee_id: employee.id})
-        const check = {
-            date: newCheck.date,
-            total_price:0,
-            vat: 0,
-            employee_id: employee.id
-        }
-        axios.post('http://localhost:8082/check', check, {
-            headers: {
-                Authorization: `Bearer ${authToken}`
+        if (newCheck.id==='') {
+            setNewCheck({...newCheck, date: new Date(), employee_id: employee.id})
+            const check = {
+                date: newCheck.date,
+                total_price: 0,
+                vat: 0,
+                employee_id: employee.id,
+                ...(customerId && { customer_card_id: customerId })
             }
-        })
-            .then(response => {
-                console.log(response.data)
+            axios.post('http://localhost:8082/check', check, {
+                headers: {
+                    Authorization: `Bearer ${authToken}`
+                }
             })
-            .catch( error => {
-                console.log(error)
-                alert('Не вдалось створити чек')
-            })
+                .then(response => {
+                    setNewCheck({...newCheck, id: response.data.id})
+                    console.log(response.data)
+                })
+                .catch(error => {
+                    console.log(error)
+                    alert('Такої карти клієнта не існує')
+                    setModal(false);
+                    return;
+                })
+        }
         setModal(true);
+        setCustomerId('');
     }
 
     const addProduct = (newProduct) => {
-        let upc, price;
-        axios.get(`http://localhost:8082/product/store/${newProduct.store_product_id}`, {
-            headers: {
-                Authorization: `Bearer ${authToken}`
-            }
-        })
-            .then(response => {
-                upc = response.data.id;
-                price = response.data.price;
-
-            })
-            .catch(error => {
-                alert('Товар не знайдено')
-                console.log(error);
-            });
+        try {
+            const match = products.find((product) => product.upc === newProduct.store_product_id);
         const c = {
             id: {
                 check_id: newCheck.id,
                 store_product_id: newProduct.store_product_id
             },
             product_count: newProduct.product_count,
-            product_price: price
+            product_price: match.product_price
         }
         axios.post('http://localhost:8082/check/check-item',c,{
             headers: {
@@ -165,25 +282,25 @@ const Checks = () => {
         }).then(response => {
             console.log(response.data)
         }).catch( error => {
-            alert('Не вдалось додати товар')
+            alert('Неправильний UPC товару')
             console.log(error)
         })
         setNewCheck({
             ...newCheck,
-            items: [...newCheck.items, c]
+            items: [...newCheck.items, {
+                name: match.name,
+                product_count: newProduct.product_count,
+                product_price: match.product_price
+            }]
         });
         setModal(false)
+        } catch (e) {
+            alert('Товар не знайдено')
+            console.log(e)
+        }
     }
-
     function handleSaveCheck() {
-        const total = newCheck.items.reduce((accumulator, currentValue) => {
-            return accumulator + currentValue.price;
-        }, 0);
-        console.log(total)
-        newCheck.sum=total;
-        newCheck.pdv=total*1.2;
-        console.log(newCheck)
-        setChecks([...checks, newCheck]);
+        console.log(newCheck);
         setNewCheck({
             id: '',
             date: new Date(),
@@ -191,7 +308,7 @@ const Checks = () => {
             pdv: 0,
             cashier: '',
             items: []
-        })
+        });
     }
 
     return (
@@ -202,11 +319,11 @@ const Checks = () => {
                         {
                     isManager
                     ?
-                        <Select value={selectedOption} onChange={(e) => handleSelect(e.target.value)}>
+                        <Select value={selectedCashier} onChange={(e) => setSelectedCashier(e.target.value)}>
                             {
                                 cashiers.map((item, index) => (
-                                    <option key={index} value={item}>
-                                        {item}
+                                    <option key={index} value={item.employee_id}>
+                                        {item.fullName}
                                     </option>
                                 ))
                             }
@@ -235,11 +352,17 @@ const Checks = () => {
                             <PrintButton/>
                         </div>
                             <Modal visible={isOpenSearch} setVisible={setOpenSearch}>
-                                <CheckPopup setVisible={setOpenSearch} startDate={startDate} endDate={endDate} sum={sum} cashier={selectedOption}/>
+                                <CheckPopup setVisible={setOpenSearch} startDate={startDate} endDate={endDate} sum={sum} cashier={selectedCashier}/>
                             </Modal>
                     </>
                         :
                         <div className="filter-left">
+                            <SearchInput
+                                placeholder={"Введіть номер карти клієнта"}
+                                value={customerId}
+                                onChange={event => setCustomerId(event.target.value)}
+                                showMagnifier={true}
+                            />
                             <RoundButton onClick={handleAddCheck}>+</RoundButton>
                         </div>
                 }
@@ -249,20 +372,20 @@ const Checks = () => {
             </div>
             <div className="two-tables-div">
                 <Table
-                    tableData={checksHeaders}
-                    rowData={checksTable}
+                    tableData={ isManager ? checksHeadersM : checksHeaders}
+                    rowData={transformedData}
                     setSelectedRow={setSelectedRow}/>
                 {
-                    selectedRow.id!==''&&checks.find(check => check.id===selectedRow.id)!==undefined
+                    selectedCheck!==undefined
                     ?
-                    <Table tableData={checkHeaders} rowData={checks.find(check => check.id===selectedRow.id).items}/>
+                    <Table tableData={checkHeaders} rowData={selectedCheck}/>
                     :
                     null
                 }
                 {
                     newCheck.id!==''
                     ?
-                        <div style={{ display: 'flex' , flexDirection: "column", alignItems: "center"}}>
+                        <div style={{ display: 'flex', flexDirection: "column", alignItems: "center"}}>
                             <Table tableData={checkHeaders} rowData={newCheck.items}/>
                             <PrintButton label="Зберегти" onClick={handleSaveCheck}/>
                         </div>

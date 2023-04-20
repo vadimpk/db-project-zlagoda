@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import SearchInput from "../inputs/text-password/SearchInput";
 import SearchButton from "../buttons/SearchButton";
 
-function Searchbar(props) {
+function Searchbar({label, ...props}) {
     const [searchTerm, setSearchTerm] = useState('');
 
     function handleSearch(event) {
@@ -22,7 +22,13 @@ function Searchbar(props) {
                 value={searchTerm}
                 onChange={handleInputChange}
             />
-            <SearchButton type="submit">Знайти</SearchButton>
+            <SearchButton type="submit">{
+                label!==undefined
+                    ?
+                    label
+                    :
+                    "Знайти"
+            }</SearchButton>
         </form>
     );
 }

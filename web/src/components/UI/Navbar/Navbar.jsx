@@ -6,7 +6,8 @@ import ProfilePopup from "../../popups/ProfilePopup";
 import Modal from "../Modal/Modal";
 
 const Navbar = () => {
-    const {isManager, setIsManager} = useContext(ManagerContext);
+    const employee = JSON.parse(localStorage.getItem('employee'));
+    const isManager = employee.role!=='Касир';
     const [modal, setModal] = useState(false);
 
     return (
