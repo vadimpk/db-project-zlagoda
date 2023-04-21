@@ -15,6 +15,8 @@ import axios from "axios";
 
 const Category = () => {
     const authToken = localStorage.getItem('authToken');
+    const employee = JSON.parse(localStorage.getItem('employee'));
+    const isManager = employee.role!=='Касир';
     const [categories, setCategories] = useState( []);
     const [selectedRowCategory, setSelectedRowCategory] = useState({
         id:0,
@@ -164,7 +166,6 @@ const Category = () => {
 
         return changeFieldsOrder(transformedProducts);
     }
-
     function changeFieldsOrder(arr) {
         return arr.map(({ category_name, characteristics, id, name, category_id }) => ({
             id,
@@ -224,15 +225,50 @@ const Category = () => {
                     console.log(error);
                 });
     }, [select]);
+    useEffect(() => {
+        if (selectedRowProduct !== undefined) {
+            axios
+                .get('http://localhost:8082/product', {
+                    headers: {
+                        Authorization: `Bearer ${authToken}`,
+                    },
+                    params: {
+                        search: selectedRowProduct.name
+                    }
+                })
+                .then(response => {
+                    setProducts(response.data);
+                }).catch(error => {
+                    console.log(error);
+                    alert("Товарів з такою назвою немає");
+            })
+        }
+    }, [selectedRowProduct])
+    function handleSearch(name) {
+        setSelectedRowProduct(prevState => {
+            return {
+                ...prevState,
+                name: name
+            };
+        });
+    }
     return (
         <div>
             <Navbar/>
             <div className="filter">
                 <div className="filter-right">
+                    {
+                    isManager
+                    ?
+                    <>
                     <PrintButton/>
                     <RoundButton onClick={handleEditCategory}><img src={edit} width="14px" height="12px"/></RoundButton>
                     <RoundButton onClick={handleDeleteCategory}>&minus;</RoundButton>
                     <RoundButton onClick={handleAddCategory}>+</RoundButton>
+                    </>
+                    :
+                        <Searchbar onSearch={handleSearch} placeholder={"Введіть назву товару"}/>
+                    }
                 </div>
                 <ModalForm visible={modalCategory} setVisible={setModalCategory}>
                     <CategoryFormPopup setVisible={setModalCategory} create={createCategory} edit={editCategory} selectedRow={selectedRowCategory===undefined ? undefined : categories.find(category => category.id === selectedRowCategory.id)}/>
@@ -247,10 +283,18 @@ const Category = () => {
                             ))
                         }
                     </Select>
-                    <RoundButton onClick={handleAddProduct}>+</RoundButton>
-                    <RoundButton onClick={handleDeleteProduct}>&minus;</RoundButton>
-                    <RoundButton onClick={handleEditProduct}><img src={edit} width="14px" height="12px"/></RoundButton>
-                    <PrintButton/>
+                    {
+                        isManager
+                        ?
+                            <>
+                            <RoundButton onClick={handleAddProduct}>+</RoundButton>
+                            <RoundButton onClick={handleDeleteProduct}>&minus;</RoundButton>
+                            <RoundButton onClick={handleEditProduct}><img src={edit} width="14px" height="12px"/></RoundButton>
+                            <PrintButton/>
+                            </>
+                        :
+                        null
+                    }
                 </div>
                 <ModalForm visible={modalProduct} setVisible={setModalProduct}>
                     <ProductFormPopup
@@ -261,7 +305,14 @@ const Category = () => {
                 </ModalForm>
             </div>
             <div className="two-tables-div">
-                <Table tableData={tableDataCategory} rowData={categories} setSelectedRow={setSelectedRowCategory}/>
+                {
+                    isManager
+                        ?
+                        <Table tableData={tableDataCategory} rowData={categories}
+                               setSelectedRow={setSelectedRowCategory}/>
+                        :
+                        null
+                }
                 <Table tableData={tableDataProduct} rowData={transformProducts(products)} setSelectedRow={setSelectedRowProduct}/>
             </div>
         </div>

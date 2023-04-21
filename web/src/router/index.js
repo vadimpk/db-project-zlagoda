@@ -19,5 +19,6 @@ export const cashierRoutes = [
     {path: '/', element: <Login/>, exact: true},
     {path: '/customers', element: <Customers/>, exact: true},
     {path: '/checks', element: <Checks/>, exact: true},
-    {path: '/products', element: <Products/>, exact: true}
+    {path: '/products', element: <Products/>, exact: true},
+    {path: '/categories', element: <Category/>, exact: true}
 ]

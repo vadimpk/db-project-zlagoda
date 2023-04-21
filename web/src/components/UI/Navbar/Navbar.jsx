@@ -1,5 +1,4 @@
-import React, {useContext, useState} from 'react';
-import {ManagerContext} from "../../../context";
+import React, {useState} from 'react';
 import logoPicture from '../../../assets/images/logo-small.png'
 import profile from '../../../assets/images/profile.png'
 import ProfilePopup from "../../popups/ProfilePopup";
@@ -27,15 +26,10 @@ const Navbar = () => {
                 <li><a href="/checks">Чеки</a></li>
                 <li className="has-dropdown">
                     <a href="/products">Товари</a>
-                    {isManager
-                        ?
-                        <ul className="dropdown-menu">
-                            <li><a href="/categories">Товари/Категорії</a></li>
-                            <li><a href="/products">Товари в магазині</a></li>
-                        </ul>
-                        :
-                        null
-                    }
+                    <ul className="dropdown-menu">
+                        <li><a href="/categories">Товари/Категорії</a></li>
+                        <li><a href="/products">Товари в магазині</a></li>
+                    </ul>
 
                 </li>
             </ul>

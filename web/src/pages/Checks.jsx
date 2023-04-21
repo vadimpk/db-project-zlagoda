@@ -27,7 +27,6 @@ const Checks = () => {
     const checksHeadersM = ['Номер чеку','Дата','Загальна сума','ПДВ','Карта клієнта','Касир'];
     const checkHeaders = ['Назва товару','Кількість','Ціна'];
     const [isOpenSearch, setOpenSearch] = useState(false);
-    const [createdCheck, setCreatedCheck] = useState(false);
     const [checks, setChecks] = useState([])
     const [cashiers, setCashiers] = useState([]);
     const [selectedRow, setSelectedRow] = useState();
@@ -156,7 +155,7 @@ const Checks = () => {
                     }
                 })
         }
-    }, [selectedRow])
+    }, [selectedRow]);
 
     async function updateProducts() {
         const productsResponse = await axios.get("http://localhost:8082/product", {
