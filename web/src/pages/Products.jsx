@@ -17,8 +17,8 @@ import ProductFormPopup from "../components/popups/ProductStoreFormPopup";
 import axios from "axios";
 const Products = () => {
     const authToken = localStorage.getItem('authToken');
-
-    const {isManager, setIsManager} = useContext(ManagerContext);
+    const employee = JSON.parse(localStorage.getItem('employee'));
+    const isManager = employee.role!=='Касир';
     const [products, setProducts] = useState( []);
     const [selectPromotion, setSelectPromotion] = useState('');
     const [selectSort, setSelectSort] = useState('');
