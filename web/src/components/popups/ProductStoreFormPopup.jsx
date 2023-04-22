@@ -88,7 +88,7 @@ const ProductStoreFormPopup = ({setVisible, create, selectedRow, edit}) => {
         const countPattern = /^\d+(\.\d+)?$/; // дозволено тільки цифри та десяткові точки, включаючи від'ємні числа
         const errors = {};
 
-        if(product.id.length!=12&&selectedRow!==undefined){
+        if(product.id.length!=12&&selectedRow===undefined){
             errors.id='Довжина коду має бути 12 символів';
         }
 

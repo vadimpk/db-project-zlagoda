@@ -23,7 +23,7 @@ const Category = () => {
         name:''
     });
     const tableDataCategory = ["Номер", 'Назва'];
-    const [select, setSelect] = useState("")
+    const [select, setSelect] = useState("");
     const [products, setProducts] = useState( []);
     const [selectedRowProduct, setSelectedRowProduct] = useState({
         category_id:0,
