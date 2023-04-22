@@ -60,7 +60,7 @@ func (r *employeeRoutes) createEmployee(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
-	employee.Password = ""
+	createdEmployee.Password = ""
 	c.JSON(http.StatusOK, createdEmployee)
 }
 
