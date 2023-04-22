@@ -21,28 +21,28 @@ func setupProductRoutes(options *Options, handler *gin.Engine) {
 
 	productGroup := handler.Group("/product")
 	{
-		productGroup.POST("/", newAuthMiddleware(options, "менеджер"), routes.createProduct)
+		productGroup.POST("/", newAuthMiddleware(options, "Менеджер"), routes.createProduct)
 		productGroup.GET("/:id", newAuthMiddleware(options, ""), routes.getProduct)
 		productGroup.GET("/", newAuthMiddleware(options, ""), routes.listProducts)
-		productGroup.PUT("/:id", newAuthMiddleware(options, "менеджер"), routes.updateProduct)
-		productGroup.DELETE("/:id", newAuthMiddleware(options, "менеджер"), routes.deleteProduct)
+		productGroup.PUT("/:id", newAuthMiddleware(options, "Менеджер"), routes.updateProduct)
+		productGroup.DELETE("/:id", newAuthMiddleware(options, "Менеджер"), routes.deleteProduct)
 	}
 
 	categoryGroup := productGroup.Group("/category")
 	{
-		categoryGroup.POST("/", newAuthMiddleware(options, "менеджер"), routes.createCategory)
+		categoryGroup.POST("/", newAuthMiddleware(options, "Менеджер"), routes.createCategory)
 		categoryGroup.GET("/", newAuthMiddleware(options, ""), routes.listCategories)
-		categoryGroup.PUT("/:id", newAuthMiddleware(options, "менеджер"), routes.updateCategory)
-		categoryGroup.DELETE("/:id", newAuthMiddleware(options, "менеджер"), routes.deleteCategory)
+		categoryGroup.PUT("/:id", newAuthMiddleware(options, "Менеджер"), routes.updateCategory)
+		categoryGroup.DELETE("/:id", newAuthMiddleware(options, "Менеджер"), routes.deleteCategory)
 	}
 
 	storeProductGroup := productGroup.Group("/store")
 	{
-		storeProductGroup.POST("/", newAuthMiddleware(options, "менеджер"), routes.createStoreProduct)
+		storeProductGroup.POST("/", newAuthMiddleware(options, "Менеджер"), routes.createStoreProduct)
 		storeProductGroup.GET("/:id", newAuthMiddleware(options, ""), routes.getStoreProduct)
 		storeProductGroup.GET("/", newAuthMiddleware(options, ""), routes.listStoreProducts)
-		storeProductGroup.PUT("/:id", newAuthMiddleware(options, "менеджер"), routes.updateStoreProduct)
-		storeProductGroup.DELETE("/:id", newAuthMiddleware(options, "менеджер"), routes.deleteStoreProduct)
+		storeProductGroup.PUT("/:id", newAuthMiddleware(options, "Менеджер"), routes.updateStoreProduct)
+		storeProductGroup.DELETE("/:id", newAuthMiddleware(options, "Менеджер"), routes.deleteStoreProduct)
 
 	}
 }

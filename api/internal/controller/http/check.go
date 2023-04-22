@@ -24,7 +24,7 @@ func setupCheckRoutes(options *Options, handler *gin.Engine) {
 		checkGroup.GET("/:id", newAuthMiddleware(options, ""), routes.getCheck)
 		checkGroup.GET("/", newAuthMiddleware(options, ""), routes.listChecks)
 		//checkGroup.PUT("/:id", routes.updateCheck)
-		checkGroup.DELETE("/:id", newAuthMiddleware(options, "менеджер"), routes.deleteCheck)
+		checkGroup.DELETE("/:id", newAuthMiddleware(options, "Менеджер"), routes.deleteCheck)
 	}
 
 	checkItemGroup := checkGroup.Group("/check-item")
@@ -33,7 +33,7 @@ func setupCheckRoutes(options *Options, handler *gin.Engine) {
 		checkItemGroup.GET("/", newAuthMiddleware(options, ""), routes.getCheckItem)
 		checkItemGroup.GET("/list", newAuthMiddleware(options, ""), routes.listCheckItems)
 		checkItemGroup.PUT("/", newAuthMiddleware(options, ""), routes.updateCheckItem)
-		checkItemGroup.DELETE("/", newAuthMiddleware(options, "менеджер"), routes.deleteCheckItem)
+		checkItemGroup.DELETE("/", newAuthMiddleware(options, "Менеджер"), routes.deleteCheckItem)
 	}
 }
 

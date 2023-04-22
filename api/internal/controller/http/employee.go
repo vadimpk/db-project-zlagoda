@@ -21,11 +21,11 @@ func setupEmployeeRoutes(options *Options, handler *gin.Engine) {
 
 	group := handler.Group("/employee")
 	{
-		group.POST("/", newAuthMiddleware(options, "менеджер"), routes.createEmployee)
+		group.POST("/", newAuthMiddleware(options, "Менеджер"), routes.createEmployee)
 		group.GET("/:id", newAuthMiddleware(options, ""), routes.getEmployee)
-		group.GET("/", newAuthMiddleware(options, "менеджер"), routes.listEmployee)
-		group.PUT("/:id", newAuthMiddleware(options, "менеджер"), routes.updateEmployee)
-		group.DELETE("/:id", newAuthMiddleware(options, "менеджер"), routes.deleteEmployee)
+		group.GET("/", newAuthMiddleware(options, "Менеджер"), routes.listEmployee)
+		group.PUT("/:id", newAuthMiddleware(options, "Менеджер"), routes.updateEmployee)
+		group.DELETE("/:id", newAuthMiddleware(options, "Менеджер"), routes.deleteEmployee)
 
 		group.POST("/login", routes.login)
 	}

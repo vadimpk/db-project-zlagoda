@@ -24,7 +24,7 @@ func setupCustomerCardRoutes(options *Options, handler *gin.Engine) {
 		customerCardGroup.GET("/:id", newAuthMiddleware(options, ""), routes.getCard)
 		customerCardGroup.GET("/", newAuthMiddleware(options, ""), routes.listCards)
 		customerCardGroup.PUT("/:id", newAuthMiddleware(options, ""), routes.updateCard)
-		customerCardGroup.DELETE("/:id", newAuthMiddleware(options, "менеджер"), routes.deleteCard)
+		customerCardGroup.DELETE("/:id", newAuthMiddleware(options, "Менеджер"), routes.deleteCard)
 
 	}
 }
