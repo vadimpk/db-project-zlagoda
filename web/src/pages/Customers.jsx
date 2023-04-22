@@ -15,8 +15,10 @@ import axios from "axios";
 
 const Customers = () => {
     const authToken = localStorage.getItem('authToken');
-    const {isManager, setIsManager} = useContext(ManagerContext);
+    const employee = JSON.parse(localStorage.getItem('employee'));
+    const isManager = employee.role!=='Касир';
     const [modal, setModal] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
     const tableData = ['Номер карти','Прізвище','Ім\'я','По-батькові','Телефон','Місто','Вулиця','Індекс','Відсоток']
     const [selectedRow, setSelectedRow] = useState({
         id: '',
@@ -49,32 +51,42 @@ const Customers = () => {
             });
     }, []);
 
-    function handleSearch(discount) {
+    function handleSearch(param) {
+        const params={
+            sortAscending: true,
+            sortSurname: true,
+        };
+        if(isManager){
+            params.discount=param;
+        }else {
+            params.search=param;
+        }
         axios.get('http://localhost:8082/customer-card', {
             headers: {
                 Authorization: `Bearer ${authToken}`
             },
-            params: {
-                sortAscending: true,
-                sortSurname: true,
-                discount: discount
-            }
+            params
         })
             .then(response => {
-                setCustomers(response.data);
+                if(response.data===null){
+                    alert('Таких постійних клієнтів не знайдено');
+                } else {
+                    setCustomers(response.data);
+                }
             })
             .catch(error => {
                 console.log(error);
             });
     }
     function handleAdd() {
-        setSelectedRow(undefined);
+        setIsEditing(false);
         setModal(true);
     }
     function handleEdit() {
         if (selectedRow.id===''){
             alert('Виберіть клієнта для редагування')
         } else {
+            setIsEditing(true);
             setModal(true)
         }
     }
@@ -149,7 +161,7 @@ const Customers = () => {
                         null
                     }
                     <ModalForm visible={modal} setVisible={setModal}>
-                        <CustomerFormPopup setVisible={setModal} create={createCustomer} edit={editCustomer} selectedRow={selectedRow===undefined ? undefined : customers.find(customer => customer.id === selectedRow.id)}/>
+                        <CustomerFormPopup setVisible={setModal} create={createCustomer} edit={editCustomer} selectedRow={isEditing  ? customers.find(customer => customer.id === selectedRow.id):undefined}/>
                     </ModalForm>
                 </div>
             </div>

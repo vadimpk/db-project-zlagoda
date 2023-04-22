@@ -36,7 +36,7 @@ const CheckPopup = ({setVisible, cashier, startDate, endDate, sum}) => {
                                 </h3>
                                 <hr width="116px"/>
                                 <p>
-                                    {cashier==='Касир' ? cashier : "Не вказано"}
+                                    {cashier ? cashier : "Не вказано"}
                                 </p>
                             </div>
                             <div className="profile-p">

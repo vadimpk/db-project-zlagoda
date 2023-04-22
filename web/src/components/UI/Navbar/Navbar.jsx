@@ -32,6 +32,12 @@ const Navbar = () => {
                     </ul>
 
                 </li>
+                {isManager
+                    ?
+                    <li><a href="/statistics">Статистика</a></li>
+                    :
+                    null
+                }
             </ul>
             </div>
             {!isManager

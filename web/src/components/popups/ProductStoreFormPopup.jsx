@@ -85,11 +85,23 @@ const ProductStoreFormPopup = ({setVisible, create, selectedRow, edit}) => {
     const validateForm = () => {
         const idPattern = /^\d+$/; // дозволено тільки цифри
         const pricePattern = /^\d+(\.\d+)?$/; // дозволено тільки цифри та десяткові точки
-        const countPattern = /^-?\d+(\.\d+)?$/; // дозволено тільки цифри та десяткові точки, включаючи від'ємні числа
+        const countPattern = /^\d+(\.\d+)?$/; // дозволено тільки цифри та десяткові точки, включаючи від'ємні числа
         const errors = {};
 
-        if (!idPattern.test(product.id) || !idPattern.test(product.product_id) || !countPattern.test(product.count) || !pricePattern.test(product.price)) {
-            errors.id='Будь ласка, введіть коректні числові значення для id, product_id, count та price.';
+        if(product.id.length!=12&&selectedRow!==undefined){
+            errors.id='Довжина коду має бути 12 символів';
+        }
+
+        if(product.promotional_id!==''&&product.promotional_id!==null){
+            if(product.promotional_id.length!=12){
+                errors.promotional_id='Довжина коду акційного товару має бути 12 символів';
+            }
+        }
+        if(product.promotional&&(product.promotional_id===''&&product.promotional_id===null)){
+            errors.promotional='Якщо товар акційний повинно бути вказано UPC не акційного товару';
+        }
+        if (!idPattern.test(product.product_id) || !countPattern.test(product.count) || !pricePattern.test(product.price)) {
+            errors.price='Будь ласка, введіть коректні числові значення для product_id, count та price.';
             return false;
         }
 
@@ -140,7 +152,7 @@ const ProductStoreFormPopup = ({setVisible, create, selectedRow, edit}) => {
                         name={"ID"}
                         placeholder={"ID"}
                         value={ product.product_id}
-                        onChange={e => setProduct({...product, product_id: e.target.value})}>ID</InputTextForm>
+                        onChange={e => setProduct({...product, product_id: e.target.value})}>ID товару</InputTextForm>
                     <InputTextForm
                         name={"count"}
                         placeholder={"Кількість"}
@@ -149,8 +161,8 @@ const ProductStoreFormPopup = ({setVisible, create, selectedRow, edit}) => {
                     <InputTextForm
                         name={"promotional_id"}
                         placeholder={"ID"}
-                        value={product.promotional_id}
-                        onChange={e => setProduct({...product, promotional_id: e.target.value})}>ID акційного товару</InputTextForm>
+                        value={product.promotional_id===null ? '' : product.promotional_id}
+                        onChange={e => setProduct({...product, promotional_id: e.target.value})}>UPC не акційного товару</InputTextForm>
                 </div>
             </div>
 

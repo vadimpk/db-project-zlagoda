@@ -31,6 +31,12 @@ const Category = () => {
         id: 0,
         name:''
     });
+    const [searchedProduct, setSearchedProduct] = useState({
+        category_id:0,
+        characteristics:'',
+        id: 0,
+        name:''
+    });
     const tableDataProduct = ["ID", 'Назва',"Категорія", "Характеристика"];
     const [modalCategory, setModalCategory] = useState(false);
     const [modalProduct, setModalProduct] = useState(false);
@@ -226,14 +232,14 @@ const Category = () => {
                 });
     }, [select]);
     useEffect(() => {
-        if (selectedRowProduct !== undefined) {
+        if (searchedProduct !== undefined) {
             axios
                 .get('http://localhost:8082/product', {
                     headers: {
                         Authorization: `Bearer ${authToken}`,
                     },
                     params: {
-                        search: selectedRowProduct.name
+                        search: searchedProduct.name
                     }
                 })
                 .then(response => {
@@ -243,9 +249,9 @@ const Category = () => {
                     alert("Товарів з такою назвою немає");
             })
         }
-    }, [selectedRowProduct])
+    }, [searchedProduct])
     function handleSearch(name) {
-        setSelectedRowProduct(prevState => {
+        setSearchedProduct(prevState => {
             return {
                 ...prevState,
                 name: name

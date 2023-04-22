@@ -92,11 +92,10 @@ const EmployeeFormPopup = ({setVisible, create, selectedRow, edit}) => {
     const validateForm = () => {
         const errors ={}
             const nameRegExp = /^[а-щА-ЩЬьЮюЯяЇїІіЄєҐґ']{1,50}$/;
-            const idRegExp = /^\d{10}$/;
             const phoneRegExp = /^\+380\d{9}$/;
             const salaryRegExp = /^\d+(\.\d+)?$/;
-            const zipRegExp = /^\d{5}$/;
-            const addressRegExp = /^[а-щА-ЩЬьЮюЯяЇїІіЄєҐґ0-9'.,\s-]{1,50}$/;
+            const zipRegExp = /^\d{5}(\d{4})?$/;
+        const addressRegExp = /^[а-щА-ЩЬьЮюЯяЇїІіЄєҐґ0-9'.,\s-]{1,50}$/;
         const now = new Date();
         const birthDate = new Date(employee.date_of_birth);
         let age = now.getFullYear() - birthDate.getFullYear();
@@ -117,9 +116,9 @@ const EmployeeFormPopup = ({setVisible, create, selectedRow, edit}) => {
                 errors.patronymic="По-батькові має містити від 1 до 50 букв українського алфавіту";
             }
 
-            /*if (!idRegExp.test(employee.id)) {
-                errors.id="id має містити 10 цифр";
-            }*/
+            if (employee.id.length>10) {
+                errors.id="id має містити не більше 10 цифр";
+            }
 
             if (!salaryRegExp.test(employee.salary)) {
                 errors.salary="Зарплата має бути числом";
