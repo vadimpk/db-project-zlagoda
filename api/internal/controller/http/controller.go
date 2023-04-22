@@ -3,6 +3,7 @@ package http
 import (
 	"github.com/apsdehal/go-logger"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/vadimpk/db-project-zlagoda/api/config"
@@ -17,11 +18,15 @@ type Options struct {
 	Storages service.Storages
 	Logger   logger.Logger
 	Config   *config.Config
+	validate validator.Validate
 }
 
 func New(options Options) http.Handler {
 	handler := gin.New()
 	handler.Use(corsMiddleware)
+
+	validate := validator.New()
+	options.validate = *validate
 
 	{
 		setupEmployeeRoutes(&options, handler)
@@ -36,7 +41,7 @@ func New(options Options) http.Handler {
 }
 
 // newAuthMiddleware is used to get auth token from request headers and validate it.
-func newAuthMiddleware(opts *Options) gin.HandlerFunc {
+func newAuthMiddleware(opts *Options, role string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Get token and check if empty ("Bearer token")
 		tokenStringRaw := c.GetHeader("Authorization")
@@ -66,6 +71,9 @@ func newAuthMiddleware(opts *Options) gin.HandlerFunc {
 			opts.Logger.Infof("failed to verify access token", "tokenStringArr", tokenStringArr)
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "failed to verify access token"})
 			return
+		}
+		if role != "" && user.Role != role {
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 		}
 		c.Set("userID", user.ID)
 		return

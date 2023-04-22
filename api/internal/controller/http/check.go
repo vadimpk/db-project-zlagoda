@@ -2,6 +2,7 @@ package http
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/entity"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/service"
 	"github.com/vadimpk/db-project-zlagoda/api/pkg/errs"
@@ -18,22 +19,21 @@ func setupCheckRoutes(options *Options, handler *gin.Engine) {
 	}
 
 	checkGroup := handler.Group("/check")
-	checkGroup.Use(newAuthMiddleware(options))
 	{
-		checkGroup.POST("/", routes.createCheck)
-		checkGroup.GET("/:id", routes.getCheck)
-		checkGroup.GET("/", routes.listChecks)
+		checkGroup.POST("/", newAuthMiddleware(options, ""), routes.createCheck)
+		checkGroup.GET("/:id", newAuthMiddleware(options, ""), routes.getCheck)
+		checkGroup.GET("/", newAuthMiddleware(options, ""), routes.listChecks)
 		//checkGroup.PUT("/:id", routes.updateCheck)
-		checkGroup.DELETE("/:id", routes.deleteCheck)
+		checkGroup.DELETE("/:id", newAuthMiddleware(options, "менеджер"), routes.deleteCheck)
 	}
 
 	checkItemGroup := checkGroup.Group("/check-item")
 	{
-		checkItemGroup.POST("/", routes.createCheckItem)
-		checkItemGroup.GET("/", routes.getCheckItem)
-		checkItemGroup.GET("/list", routes.listCheckItems)
-		checkItemGroup.PUT("/", routes.updateCheckItem)
-		checkItemGroup.DELETE("/", routes.deleteCheckItem)
+		checkItemGroup.POST("/", newAuthMiddleware(options, ""), routes.createCheckItem)
+		checkItemGroup.GET("/", newAuthMiddleware(options, ""), routes.getCheckItem)
+		checkItemGroup.GET("/list", newAuthMiddleware(options, ""), routes.listCheckItems)
+		checkItemGroup.PUT("/", newAuthMiddleware(options, ""), routes.updateCheckItem)
+		checkItemGroup.DELETE("/", newAuthMiddleware(options, "менеджер"), routes.deleteCheckItem)
 	}
 }
 
@@ -49,6 +49,10 @@ func (r *checkRoutes) createCheck(c *gin.Context) {
 	var check entity.Check
 	if err := c.ShouldBindJSON(&check); err != nil {
 		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	if err := r.opts.validate.Struct(check); err != nil {
+		c.JSON(http.StatusBadRequest, err.(validator.ValidationErrors).Error())
 		return
 	}
 
@@ -198,6 +202,10 @@ func (r *checkRoutes) createCheckItem(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, err)
 		return
 	}
+	if err := r.opts.validate.Struct(checkItem); err != nil {
+		c.JSON(http.StatusBadRequest, err.(validator.ValidationErrors).Error())
+		return
+	}
 
 	output, err := r.opts.Services.Check.CreateCheckItem(&checkItem)
 	if err != nil {
@@ -317,6 +325,10 @@ func (r *checkRoutes) updateCheckItem(c *gin.Context) {
 	var checkItem entity.CheckItem
 	if err := c.ShouldBindJSON(&checkItem); err != nil {
 		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	if err := r.opts.validate.Struct(checkItem); err != nil {
+		c.JSON(http.StatusBadRequest, err.(validator.ValidationErrors).Error())
 		return
 	}
 

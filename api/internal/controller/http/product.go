@@ -2,6 +2,7 @@ package http
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/entity"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/service"
 	"github.com/vadimpk/db-project-zlagoda/api/pkg/errs"
@@ -20,28 +21,28 @@ func setupProductRoutes(options *Options, handler *gin.Engine) {
 
 	productGroup := handler.Group("/product")
 	{
-		productGroup.POST("/", newAuthMiddleware(options), routes.createProduct)
-		productGroup.GET("/:id", newAuthMiddleware(options), routes.getProduct)
-		productGroup.GET("/", newAuthMiddleware(options), routes.listProducts)
-		productGroup.PUT("/:id", newAuthMiddleware(options), routes.updateProduct)
-		productGroup.DELETE("/:id", newAuthMiddleware(options), routes.deleteProduct)
+		productGroup.POST("/", newAuthMiddleware(options, "менеджер"), routes.createProduct)
+		productGroup.GET("/:id", newAuthMiddleware(options, ""), routes.getProduct)
+		productGroup.GET("/", newAuthMiddleware(options, ""), routes.listProducts)
+		productGroup.PUT("/:id", newAuthMiddleware(options, "менеджер"), routes.updateProduct)
+		productGroup.DELETE("/:id", newAuthMiddleware(options, "менеджер"), routes.deleteProduct)
 	}
 
 	categoryGroup := productGroup.Group("/category")
 	{
-		categoryGroup.POST("/", newAuthMiddleware(options), routes.createCategory)
-		categoryGroup.GET("/", newAuthMiddleware(options), routes.listCategories)
-		categoryGroup.PUT("/:id", newAuthMiddleware(options), routes.updateCategory)
-		categoryGroup.DELETE("/:id", newAuthMiddleware(options), routes.deleteCategory)
+		categoryGroup.POST("/", newAuthMiddleware(options, "менеджер"), routes.createCategory)
+		categoryGroup.GET("/", newAuthMiddleware(options, ""), routes.listCategories)
+		categoryGroup.PUT("/:id", newAuthMiddleware(options, "менеджер"), routes.updateCategory)
+		categoryGroup.DELETE("/:id", newAuthMiddleware(options, "менеджер"), routes.deleteCategory)
 	}
 
 	storeProductGroup := productGroup.Group("/store")
 	{
-		storeProductGroup.POST("/", newAuthMiddleware(options), routes.createStoreProduct)
-		storeProductGroup.GET("/:id", newAuthMiddleware(options), routes.getStoreProduct)
-		storeProductGroup.GET("/", newAuthMiddleware(options), routes.listStoreProducts)
-		storeProductGroup.PUT("/:id", newAuthMiddleware(options), routes.updateStoreProduct)
-		storeProductGroup.DELETE("/:id", newAuthMiddleware(options), routes.deleteStoreProduct)
+		storeProductGroup.POST("/", newAuthMiddleware(options, "менеджер"), routes.createStoreProduct)
+		storeProductGroup.GET("/:id", newAuthMiddleware(options, ""), routes.getStoreProduct)
+		storeProductGroup.GET("/", newAuthMiddleware(options, ""), routes.listStoreProducts)
+		storeProductGroup.PUT("/:id", newAuthMiddleware(options, "менеджер"), routes.updateStoreProduct)
+		storeProductGroup.DELETE("/:id", newAuthMiddleware(options, "менеджер"), routes.deleteStoreProduct)
 
 	}
 }
@@ -59,6 +60,10 @@ func (r *productRoutes) createProduct(c *gin.Context) {
 	var product entity.Product
 	if err := c.ShouldBindJSON(&product); err != nil {
 		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	if err := r.opts.validate.Struct(product); err != nil {
+		c.JSON(http.StatusBadRequest, err.(validator.ValidationErrors).Error())
 		return
 	}
 
@@ -160,6 +165,10 @@ func (r *productRoutes) updateProduct(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, err)
 		return
 	}
+	if err := r.opts.validate.Struct(product); err != nil {
+		c.JSON(http.StatusBadRequest, err.(validator.ValidationErrors).Error())
+		return
+	}
 
 	updatedProduct, err := r.opts.Services.Product.UpdateProduct(productID, &product)
 	if err != nil {
@@ -217,6 +226,10 @@ func (r *productRoutes) createCategory(c *gin.Context) {
 	var category entity.ProductCategory
 	if err := c.ShouldBindJSON(&category); err != nil {
 		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	if err := r.opts.validate.Struct(category); err != nil {
+		c.JSON(http.StatusBadRequest, err.(validator.ValidationErrors).Error())
 		return
 	}
 
@@ -284,6 +297,10 @@ func (r *productRoutes) updateCategory(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, err)
 		return
 	}
+	if err := r.opts.validate.Struct(category); err != nil {
+		c.JSON(http.StatusBadRequest, err.(validator.ValidationErrors).Error())
+		return
+	}
 
 	updatedCategory, err := r.opts.Services.Product.UpdateProductCategory(categoryID, &category)
 	if err != nil {
@@ -334,13 +351,17 @@ func (r *productRoutes) deleteCategory(c *gin.Context) {
 // @Tags product in store
 // @Description Create store product
 // @Param store_product body entity.StoreProduct true "Store product"
-// @Success 200 {object} entity.StoreProduct
+// @Success 200 {object} service.CreateStoreProductOutput
 // @Failure 400 {object} error
 // @Router /product/store [post]
 func (r *productRoutes) createStoreProduct(c *gin.Context) {
 	var storeProduct entity.StoreProduct
 	if err := c.ShouldBindJSON(&storeProduct); err != nil {
 		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	if err := r.opts.validate.Struct(storeProduct); err != nil {
+		c.JSON(http.StatusBadRequest, err.(validator.ValidationErrors).Error())
 		return
 	}
 
@@ -430,6 +451,10 @@ func (r *productRoutes) updateStoreProduct(c *gin.Context) {
 	var storeProduct entity.StoreProduct
 	if err := c.ShouldBindJSON(&storeProduct); err != nil {
 		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	if err := r.opts.validate.Struct(storeProduct); err != nil {
+		c.JSON(http.StatusBadRequest, err.(validator.ValidationErrors).Error())
 		return
 	}
 

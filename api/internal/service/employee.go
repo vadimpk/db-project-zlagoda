@@ -7,6 +7,7 @@ import (
 	"github.com/vadimpk/db-project-zlagoda/api/config"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/entity"
 	"github.com/vadimpk/db-project-zlagoda/api/pkg/token"
+	"golang.org/x/crypto/bcrypt"
 	"time"
 )
 
@@ -36,6 +37,13 @@ func (s *employeeService) Create(employee *entity.Employee) (*entity.Employee, e
 		s.logger.Infof("employee already exists")
 		return nil, ErrCreateEmployeeAlreadyExists
 	}
+
+	employee.Password, err = HashPassword(employee.Password)
+	if err != nil {
+		s.logger.Errorf("failed to hash password: %v", err)
+		return nil, fmt.Errorf("failed to hash password: %w", err)
+	}
+
 	s.logger.Infof("creating employee: %#v", employee)
 	return s.storages.Employee.Create(employee)
 }
@@ -70,6 +78,16 @@ func (s *employeeService) Update(id string, employee *entity.Employee) (*entity.
 	if employeeWithID != nil && employeeWithID.ID != id {
 		s.logger.Errorf("employee with this id already exists")
 		return nil, ErrEmployeeWithIDAlreadyExists
+	}
+
+	if employee.Password != "" {
+		employee.Password, err = HashPassword(employee.Password)
+		if err != nil {
+			s.logger.Errorf("failed to hash password: %v", err)
+			return nil, fmt.Errorf("failed to hash password: %w", err)
+		}
+	} else {
+		employee.Password = previousEmployee.Password
 	}
 
 	return s.storages.Employee.Update(id, employee)
@@ -114,7 +132,7 @@ func (s *employeeService) Login(id string, password string) (*entity.Employee, s
 		return nil, "", ErrLoginEmployeeNotFound
 	}
 
-	isValidPassword := password == employee.Password
+	isValidPassword := CheckPassword(password, employee.Password)
 	if !isValidPassword {
 		s.logger.Infof("invalid password")
 		return nil, "", ErrLoginEmployeeInvalidPassword
@@ -156,4 +174,20 @@ func (s *employeeService) VerifyAccessToken(authToken string) (*entity.Employee,
 
 	s.logger.Infof("succesfully verified access token")
 	return user, nil
+}
+
+// HashPassword takes a plaintext password and returns its hashed value
+func HashPassword(password string) (string, error) {
+	hashedPasswordBytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+	hashedPassword := string(hashedPasswordBytes)
+	return hashedPassword, nil
+}
+
+// CheckPassword takes a plaintext password and a hashed password, and returns whether they match
+func CheckPassword(password, hashedPassword string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+	return err == nil
 }

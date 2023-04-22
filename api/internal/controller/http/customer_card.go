@@ -2,6 +2,7 @@ package http
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/entity"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/service"
 	"github.com/vadimpk/db-project-zlagoda/api/pkg/errs"
@@ -18,13 +19,12 @@ func setupCustomerCardRoutes(options *Options, handler *gin.Engine) {
 	}
 
 	customerCardGroup := handler.Group("/customer-card")
-	customerCardGroup.Use(newAuthMiddleware(options))
 	{
-		customerCardGroup.POST("/", routes.createCard)
-		customerCardGroup.GET("/:id", routes.getCard)
-		customerCardGroup.GET("/", routes.listCards)
-		customerCardGroup.PUT("/:id", routes.updateCard)
-		customerCardGroup.DELETE("/:id", routes.deleteCard)
+		customerCardGroup.POST("/", newAuthMiddleware(options, ""), routes.createCard)
+		customerCardGroup.GET("/:id", newAuthMiddleware(options, ""), routes.getCard)
+		customerCardGroup.GET("/", newAuthMiddleware(options, ""), routes.listCards)
+		customerCardGroup.PUT("/:id", newAuthMiddleware(options, ""), routes.updateCard)
+		customerCardGroup.DELETE("/:id", newAuthMiddleware(options, "менеджер"), routes.deleteCard)
 
 	}
 }
@@ -43,6 +43,11 @@ func (r *customerCardRoutes) createCard(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, err)
 		return
 	}
+	if err := r.opts.validate.Struct(card); err != nil {
+		c.JSON(http.StatusBadRequest, err.(validator.ValidationErrors).Error())
+		return
+	}
+
 	createdCard, err := r.opts.Services.CustomerCard.Create(&card)
 	if err != nil {
 		if errs.IsExpected(err) {
@@ -125,6 +130,10 @@ func (r *customerCardRoutes) updateCard(c *gin.Context) {
 	var card entity.CustomerCard
 	if err := c.ShouldBindJSON(&card); err != nil {
 		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	if err := r.opts.validate.Struct(card); err != nil {
+		c.JSON(http.StatusBadRequest, err.(validator.ValidationErrors).Error())
 		return
 	}
 

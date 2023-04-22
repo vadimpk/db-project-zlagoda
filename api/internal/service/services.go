@@ -32,18 +32,18 @@ type EmployeeService interface {
 }
 
 var (
-	ErrCreateEmployeeAlreadyExists = errs.New("employee already exists")
+	ErrCreateEmployeeAlreadyExists = errs.New("Працівник з таким ID вже існує")
 
-	ErrEmployeeNotFound            = errs.New("employee not found")
-	ErrEmployeeWithIDAlreadyExists = errs.New("employee with id already exists")
+	ErrEmployeeNotFound            = errs.New("Працівника не знайдено")
+	ErrEmployeeWithIDAlreadyExists = errs.New("Працівник з таким ID вже існує")
 
-	ErrDeleteEmployeeChecksExist = errs.New("employee has checks")
+	ErrDeleteEmployeeChecksExist = errs.New("Працівник має чеки, видалення неможливе")
 
-	ErrLoginEmployeeNotFound        = errs.New("employee not found")
-	ErrLoginEmployeeInvalidPassword = errs.New("invalid password")
+	ErrLoginEmployeeNotFound        = errs.New("Такого працівника не існує")
+	ErrLoginEmployeeInvalidPassword = errs.New("Не вірний пароль")
 
-	ErrVerifyAccessTokenInvalidAccessToken = errs.New("invalid access token")
-	ErrVerifyAccessTokenEmployeeNotFound   = errs.New("employee not found")
+	ErrVerifyAccessTokenInvalidAccessToken = errs.New("Не вірний токен")
+	ErrVerifyAccessTokenEmployeeNotFound   = errs.New("Такого працівника не існує")
 )
 
 type ListEmployeeOptions struct {
@@ -62,11 +62,11 @@ type CustomerCardService interface {
 }
 
 var (
-	ErrUpdateCardNotFound      = errs.New("card not found")
-	ErrUpdateCardAlreadyExists = errs.New("card already exists")
+	ErrUpdateCardNotFound      = errs.New("Карта клієнта не знайдена")
+	ErrUpdateCardAlreadyExists = errs.New("Карта клієнта з таким номером вже існує")
 
-	ErrDeleteCardNotFound    = errs.New("card not found")
-	ErrDeleteCardChecksExist = errs.New("card has checks")
+	ErrDeleteCardNotFound    = errs.New("Карта клієнта не знайдена")
+	ErrDeleteCardChecksExist = errs.New("Карта клієнта має чеки, видалення неможливе")
 )
 
 type ListCardOptions struct {
@@ -88,7 +88,7 @@ type ProductService interface {
 	UpdateProductCategory(id int, product *entity.ProductCategory) (*entity.ProductCategory, error)
 	DeleteProductCategory(id int) error
 
-	CreateStoreProduct(storeProduct *entity.StoreProduct) (*entity.StoreProduct, error)
+	CreateStoreProduct(storeProduct *entity.StoreProduct) (*CreateStoreProductOutput, error)
 	GetStoreProduct(id string) (*entity.StoreProduct, error)
 	ListStoreProducts(opts *ListStoreProductsOptions) ([]*entity.StoreProduct, error)
 	UpdateStoreProduct(id string, storeProduct *entity.StoreProduct) (*entity.StoreProduct, error)
@@ -96,24 +96,40 @@ type ProductService interface {
 }
 
 var (
-	ErrCreateProductAlreadyExists      = errs.New("product with such id already exists")
-	ErrUpdateProductAlreadyExists      = errs.New("product with such id already exists")
-	ErrUpdateProductNotFound           = errs.New("product not found")
-	ErrDeleteProductStoreProductsExist = errs.New("store products exist")
-	ErrDeleteProductNotFound           = errs.New("product not found")
-	ErrDeleteProductCategoryNotFound   = errs.New("product category not found")
+	ErrCreateProductAlreadyExists           = errs.New("Такий товар вже існує")
+	ErrCreateProductCategoryNotFound        = errs.New("Категорія товару не знайдена")
+	ErrUpdateProductAlreadyExists           = errs.New("Такий товар вже існує")
+	ErrUpdateProductProductCategoryNotFound = errs.New("Категорія товару не знайдена")
+	ErrUpdateProductNotFound                = errs.New("Товар не знайдено, оновлення неможливе")
+	ErrDeleteProductStoreProductsExist      = errs.New("Товар має товари в магазинах, видалення неможливе")
+	ErrDeleteProductNotFound                = errs.New("Товар не знайдено, видалення неможливе")
 
-	ErrCreateProductCategoryAlreadyExists = errs.New("product category with such id already exists")
-	ErrUpdateProductCategoryAlreadyExists = errs.New("product category with such id already exists")
-	ErrUpdateProductCategoryNotFound      = errs.New("product category not found")
-	ErrDeleteProductCategoryProductsExist = errs.New("products exist")
+	ErrCreateProductCategoryAlreadyExists = errs.New("Така категорія вже існує")
+	ErrUpdateProductCategoryAlreadyExists = errs.New("Така категорія вже існує")
+	ErrUpdateProductCategoryNotFound      = errs.New("Категорія не знайдена, оновлення неможливе")
+	ErrDeleteProductCategoryProductsExist = errs.New("Категорія містить товари, видалення неможливе")
+	ErrDeleteProductCategoryNotFound      = errs.New("Категорія не знайдена, видалення неможливе")
 
-	ErrCreateStoreProductAlreadyExists   = errs.New("store product already exists")
-	ErrUpdateStoreProductAlreadyExists   = errs.New("store product already exists")
-	ErrUpdateStoreProductNotFound        = errs.New("store product not found")
-	ErrDeleteStoreProductCheckItemsExist = errs.New("check items exist")
-	ErrDeleteStoreProductNotFound        = errs.New("store product not found")
+	ErrCreateStoreProductAlreadyExists                                   = errs.New("Такий товар в магазині вже існує")
+	ErrCreateStoreProductProductNotFound                                 = errs.New("Товар не знайдено")
+	ErrCreateStoreProductPromotionalIDRequired                           = errs.New("id не акційного товару обов'язкове")
+	ErrCreateStoreProductDefaultStoreProductNotFound                     = errs.New("Не акційний товар не знайдено")
+	ErrCreateStoreProductDefaultStoreProductIsPromotional                = errs.New("Не акційний товар є акційним")
+	ErrCreateStoreProductDefaultStoreProductHasDifferentProduct          = errs.New("Не акційний товар має інший товар")
+	ErrCreateStoreProductPromotionalCountCannotBeGreaterThanDefaultCount = errs.New("Кількість акційного товару не може бути більшою за кількість не акційного товару")
+
+	ErrUpdateStoreProductAlreadyExists            = errs.New("Такий товар вже існує, оновлення неможливе")
+	ErrUpdateStoreProductProductIDCannotBeChanged = errs.New("id товару не може бути змінено")
+
+	ErrUpdateStoreProductNotFound        = errs.New("Товар не знайдено, оновлення неможливе")
+	ErrDeleteStoreProductCheckItemsExist = errs.New("Товар використовується в чеках, видалення неможливе")
+	ErrDeleteStoreProductNotFound        = errs.New("Товар не знайдено, видалення неможливе")
 )
+
+type CreateStoreProductOutput struct {
+	CreatedStoreProduct *entity.StoreProduct `json:"createdStoreProduct"`
+	UpdatedStoreProduct *entity.StoreProduct `json:"updatedStoreProduct"`
+}
 
 type ListProductsOptions struct {
 	Search        *string `form:"search"`
@@ -160,13 +176,13 @@ type CheckService interface {
 }
 
 var (
-	ErrDeleteCheckNotFound              = errs.New("check not found")
-	ErrCreateCheckItemProductNotFound   = errs.New("product not found")
-	ErrCreateCheckItemNotEnoughProducts = errs.New("not enough products")
+	ErrDeleteCheckNotFound              = errs.New("Чеку не знайдено, видалення неможливе")
+	ErrCreateCheckItemProductNotFound   = errs.New("Товар не знайдено, додавання неможливе")
+	ErrCreateCheckItemNotEnoughProducts = errs.New("Не достатньо товарів на складі")
 
-	ErrUpdateCheckItemNotEnoughProducts = errs.New("not enough products")
+	ErrUpdateCheckItemNotEnoughProducts = errs.New("Не достатньо товарів на складі")
 
-	ErrDeleteCheckItemNotFound = errs.New("check item not found")
+	ErrDeleteCheckItemNotFound = errs.New("Товару в чеку не знайдено, видалення неможливе")
 )
 
 type CreateOrUpdateCheckItemOutput struct {

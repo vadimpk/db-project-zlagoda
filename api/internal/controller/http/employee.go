@@ -2,6 +2,7 @@ package http
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/entity"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/service"
 	"github.com/vadimpk/db-project-zlagoda/api/pkg/errs"
@@ -20,11 +21,11 @@ func setupEmployeeRoutes(options *Options, handler *gin.Engine) {
 
 	group := handler.Group("/employee")
 	{
-		group.POST("/", newAuthMiddleware(options), routes.createEmployee)
-		group.GET("/:id", newAuthMiddleware(options), routes.getEmployee)
-		group.GET("/", newAuthMiddleware(options), routes.listEmployee)
-		group.PUT("/:id", newAuthMiddleware(options), routes.updateEmployee)
-		group.DELETE("/:id", newAuthMiddleware(options), routes.deleteEmployee)
+		group.POST("/", newAuthMiddleware(options, "менеджер"), routes.createEmployee)
+		group.GET("/:id", newAuthMiddleware(options, ""), routes.getEmployee)
+		group.GET("/", newAuthMiddleware(options, "менеджер"), routes.listEmployee)
+		group.PUT("/:id", newAuthMiddleware(options, "менеджер"), routes.updateEmployee)
+		group.DELETE("/:id", newAuthMiddleware(options, "менеджер"), routes.deleteEmployee)
 
 		group.POST("/login", routes.login)
 	}
@@ -45,6 +46,10 @@ func (r *employeeRoutes) createEmployee(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, err)
 		return
 	}
+	if err := r.opts.validate.Struct(employee); err != nil {
+		c.JSON(http.StatusBadRequest, err.(validator.ValidationErrors).Error())
+		return
+	}
 
 	createdEmployee, err := r.opts.Services.Employee.Create(&employee)
 	if err != nil {
@@ -55,7 +60,7 @@ func (r *employeeRoutes) createEmployee(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
-
+	employee.Password = ""
 	c.JSON(http.StatusOK, createdEmployee)
 }
 
@@ -84,6 +89,7 @@ func (r *employeeRoutes) getEmployee(c *gin.Context) {
 		c.JSON(http.StatusNotFound, nil)
 		return
 	}
+	employee.Password = ""
 	c.JSON(http.StatusOK, employee)
 }
 
@@ -112,6 +118,9 @@ func (r *employeeRoutes) listEmployee(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
+	for i := range employees {
+		employees[i].Password = ""
+	}
 	c.JSON(http.StatusOK, employees)
 }
 
@@ -133,6 +142,10 @@ func (r *employeeRoutes) updateEmployee(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, err)
 		return
 	}
+	if err := r.opts.validate.Struct(employee); err != nil {
+		c.JSON(http.StatusBadRequest, err.(validator.ValidationErrors).Error())
+		return
+	}
 
 	updatedEmployee, err := r.opts.Services.Employee.Update(id, &employee)
 	if err != nil {
@@ -143,6 +156,7 @@ func (r *employeeRoutes) updateEmployee(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
+	updatedEmployee.Password = ""
 
 	c.JSON(http.StatusOK, updatedEmployee)
 }
@@ -204,6 +218,7 @@ func (r *employeeRoutes) login(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
+	employee.Password = ""
 	c.JSON(http.StatusOK, loginResponseBody{
 		Employee:  *employee,
 		AuthToken: token,
