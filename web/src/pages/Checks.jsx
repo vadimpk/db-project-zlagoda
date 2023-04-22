@@ -3,11 +3,9 @@ import Navbar from "../components/UI/Navbar/Navbar";
 import Searchbar from "../components/UI/SearchBar/Searchbar";
 import RoundButton from "../components/UI/buttons/RoundButton";
 import PrintButton from "../components/UI/buttons/PrintButton";
-import {ManagerContext} from "../context";
 import Select from "../components/UI/select/Select";
 import DateInput from "../components/UI/inputs/date/DateInput";
 import Table from "../components/UI/table/Table";
-import moment from "moment";
 import Modal from "../components/UI/Modal/Modal";
 import CheckPopup from "../components/popups/CheckPopup";
 import ModalForm from "../components/UI/Modal/ModalForm";
@@ -106,8 +104,8 @@ const Checks = () => {
             params.startDate = new Date(startDate);
             params.endDate = new Date(endDate);
         }
-        if(selectedCashier!==""){
-            params.employeeID = selectedCashier;
+        if(selectedCashier.employee_id!==""){
+            params.employeeID = selectedCashier.employee_id;
         }
             axios.get("http://localhost:8082/check", {
                 headers: {
@@ -318,10 +316,10 @@ const Checks = () => {
                         {
                     isManager
                     ?
-                        <Select value={selectedCashier} onChange={(e) => setSelectedCashier(e.target.value)}>
+                        <Select value={JSON.stringify(selectedCashier)} onChange={(e) => setSelectedCashier(JSON.parse(e.target.value))}>
                             {
                                 cashiers.map((item, index) => (
-                                    <option key={index} value={item.employee_id}>
+                                    <option key={index} value={JSON.stringify({ employee_id: item.employee_id, fullName: item.fullName })}>
                                         {item.fullName}
                                     </option>
                                 ))
@@ -351,7 +349,7 @@ const Checks = () => {
                             <PrintButton/>
                         </div>
                             <Modal visible={isOpenSearch} setVisible={setOpenSearch}>
-                                <CheckPopup setVisible={setOpenSearch} startDate={startDate} endDate={endDate} sum={sum} cashier={selectedCashier}/>
+                                <CheckPopup setVisible={setOpenSearch} startDate={startDate} endDate={endDate} sum={sum} cashier={selectedCashier.fullName}/>
                             </Modal>
                     </>
                         :

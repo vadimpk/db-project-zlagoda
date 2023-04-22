@@ -22,7 +22,7 @@ const Products = () => {
     const [products, setProducts] = useState( []);
     const [selectPromotion, setSelectPromotion] = useState('');
     const [selectSort, setSelectSort] = useState('');
-
+    const [isEditing, setIsEditing] = useState(false);
     const [product, setProduct] = useState({
         name:'',
         count:0,
@@ -30,15 +30,7 @@ const Products = () => {
         product_id:0,
         characteristics: ''
     });
-    const [selectedRow, setSelectedRow] = useState({
-        id:'',
-        product_id:0,
-        name:'',
-        count:0,
-        price:0,
-        promotional: false,
-        promotional_id:''
-    });
+    const [selectedRow, setSelectedRow] = useState({});
     const tableData = ["UPC", "ID", 'Назва', "Кількість", "Ціна", "Акційний товар"];
     const [modal, setModal] = useState(false);
     const [isOpenSearch, setOpenSearch] = useState(false);
@@ -143,13 +135,14 @@ const Products = () => {
     }, [selectPromotion, selectSort]);
 
     function handleAdd() {
-        setSelectedRow(undefined);
+        setIsEditing(false);
         setModal(true);
     }
     function handleEdit() {
         if (selectedRow.id===''){
             alert('Виберіть товар для редагування')
         } else {
+            setIsEditing(true);
             setModal(true)
         }
     }
@@ -252,7 +245,7 @@ const Products = () => {
                          null
                     }
                 <ModalForm visible={modal} setVisible={setModal}>
-                    <ProductFormPopup setVisible={setModal} create={createProduct} edit={editProduct} selectedRow={selectedRow===undefined ? undefined : products.find(product => product.id === selectedRow.id)}/>
+                    <ProductFormPopup setVisible={setModal} create={createProduct} edit={editProduct} selectedRow={isEditing ? products.find(product => product.id === selectedRow.id):undefined }/>
                 </ModalForm>
             </div>
             <Table tableData={tableData} rowData={changeFieldsOrder(products)} setSelectedRow={setSelectedRow}/>

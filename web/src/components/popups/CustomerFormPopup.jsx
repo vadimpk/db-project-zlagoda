@@ -66,17 +66,12 @@ const CustomerFormPopup = ({setVisible, create, selectedRow, edit}) => {
         setVisible(false)
     }
     const validateForm = () => {
-        const idRegExp = /^\d{13}$/;
         const nameRegExp = /^[а-щА-ЩЬьЮюЯяЇїІіЄєҐґ']{1,50}$/;
         const phone_numberRegExp = /^\+380\d{9}$/;
-        const zipRegExp = /^\d{5}$/;
+        const zipRegExp = /^\d{5}(\d{4})?$/;
         const discountRegExp = /^[1-9]\d*$/;
         const addressRegExp = /^[а-щА-ЩЬьЮюЯяЇїІіЄєҐґ0-9'.,\s-]{1,50}$/;
         const errors = {};
-
-        if (!idRegExp.test(customer.id)&&selectedRow===undefined) {
-            errors.id="id має містити 13 цифр";
-        }
 
         if (!nameRegExp.test(customer.name)) {
             errors.name="Ім'я має містити від 1 до 50 букв українського алфавіту";
@@ -105,7 +100,7 @@ const CustomerFormPopup = ({setVisible, create, selectedRow, edit}) => {
         }
 
         if (!zipRegExp.test(customer.zip_code)) {
-            errors.zip_code="Індекс має містити 5 цифр (або 9, якщо використовується формат XXXXX-XXXX)";
+            errors.zip_code="Індекс має містити 5 цифр (або 9, якщо використовується формат XXXXXXXXX)";
         }
 
         if (Object.keys(errors).length > 0) {
@@ -147,11 +142,6 @@ const CustomerFormPopup = ({setVisible, create, selectedRow, edit}) => {
                         onChange={e => setCustomer({...customer, patronymic: e.target.value })}>По-батькові</InputTextForm>
                 </div>
                 <div className="form-content">
-                    <InputTextForm
-                        name={"id"}
-                        placeholder={"Номер карти"}
-                        value={ customer.id }
-                        onChange={e => setCustomer({...customer, id: e.target.value})}>Номер карти</InputTextForm>
                     <InputTextForm
                         name={"percent"}
                         placeholder={"Відсоток"}

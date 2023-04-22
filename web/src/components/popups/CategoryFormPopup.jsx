@@ -44,16 +44,15 @@ const CategoryFormPopup = ({setVisible, create, selectedRow, edit}) => {
         setVisible(false)
     }
     const validateForm = () => {
-        const nameRegex = /^[іїа-яА-Я\s]+$/;
         const numberRegex = /^\d+$/;
         const errors = {};
 
-        if (!category.name || !nameRegex.test(category.name.trim())) {
-            errors.name = 'Некоректна назва категорії';
+        if (!category.name.length > 50) {
+            errors.name = 'Назва повинна бути не більше 50 символів';
         }
         if(selectedRow===undefined)
         if (!numberRegex.test(category.id.trim())) {
-            errors.id = 'Некоректний номер категорії';
+            errors.id = 'Номер категорії має складатись лише з чисел';
         }
 
         if (Object.keys(errors).length > 0) {

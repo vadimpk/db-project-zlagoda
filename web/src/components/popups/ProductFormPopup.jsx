@@ -67,6 +67,9 @@ const ProductFormPopup = ({setVisible, create, selectedRow, edit}) => {
         if (!/^\d+$/.test(product.id)) {
             errors.id = "ID повинен складатися тільки з цифр";
         }
+        if (!/^\d+$/.test(product.category_id)) {
+            errors.category_id = "ID категорії повинен складатися тільки з цифр";
+        }
         if (product.name.length > 50) {
             errors.name = "Назва повинна бути не більше 50 символів";
         }
