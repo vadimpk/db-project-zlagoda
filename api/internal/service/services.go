@@ -176,6 +176,9 @@ type CheckService interface {
 }
 
 var (
+	ErrCreateCheckCustomerNotFound = errs.New("Клієнта не знайдено, додавання неможливе")
+	ErrCreateCheckEmployeeNotFound = errs.New("Працівника не знайдено, додавання неможливе")
+
 	ErrDeleteCheckNotFound              = errs.New("Чеку не знайдено, видалення неможливе")
 	ErrCreateCheckItemProductNotFound   = errs.New("Товар не знайдено, додавання неможливе")
 	ErrCreateCheckItemNotEnoughProducts = errs.New("Не достатньо товарів на складі")

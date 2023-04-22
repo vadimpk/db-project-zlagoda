@@ -26,6 +26,27 @@ var _ CheckService = (*checkService)(nil)
 func (s *checkService) CreateCheck(check *entity.Check) (*entity.Check, error) {
 	s.logger.Infof("creating check: %#v", check)
 	check.ID = randstr.String(10)
+	if check.CustomerCardID != nil {
+		customer, err := s.storages.CustomerCard.Get(*check.CustomerCardID)
+		if err != nil {
+			s.logger.Errorf("error getting customer: %#v", err)
+			return nil, err
+		}
+		if customer == nil {
+			s.logger.Errorf("customer with id %s not found", *check.CustomerCardID)
+			return nil, ErrCreateCheckCustomerNotFound
+		}
+	}
+	employee, err := s.storages.Employee.Get(check.EmployeeID)
+	if err != nil {
+		s.logger.Errorf("error getting employee: %#v", err)
+		return nil, err
+	}
+	if employee == nil {
+		s.logger.Errorf("employee with id %s not found", check.EmployeeID)
+		return nil, ErrCreateCheckEmployeeNotFound
+	}
+
 	return s.storages.Check.CreateCheck(check)
 }
 
