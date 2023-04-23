@@ -66,4 +66,5 @@ type StatisticsStorage interface {
 	GetSalesByCategory(opts *GetSalesByCategoryOptions) ([]*entity.CategorySale, error)
 	GetEmployeesChecks(opts *GetEmployeesChecksOptions) ([]*entity.EmployeeCheck, error)
 	GetCustomersBuyAllCategories(opts *GetCustomersBuyAllCategoriesOptions) ([]*entity.CustomerBuyAllCategories, error)
+	GetCustomersChecks(opts *GetCustomersChecksOptions) ([]*entity.CustomerCheck, error)
 }

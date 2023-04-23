@@ -106,7 +106,7 @@ SELECT
 FROM
     employee e
 JOIN
-    checks ch ON e.id_employee = ch.fk_id_employee
+    checks ch ON e.id = ch.fk_id_employee
 LEFT JOIN
     customer_card cc ON ch.fk_card_number = cc.card_number
  %s 
@@ -190,15 +190,63 @@ WHERE NOT EXISTS (
 	for rows.Next() {
 		var customer entity.CustomerBuyAllCategories
 		err := rows.Scan(
-			&customer.CardNumber,
-			&customer.CustSurname,
-			&customer.CustName,
-			&customer.CustPatronymic,
+			&customer.CustomerCardID,
+			&customer.CustomerName,
+			&customer.CustomerSurname,
+			&customer.CustomerPatr,
 		)
 		if err != nil {
 			return nil, err
 		}
 		results = append(results, &customer)
+	}
+	return results, nil
+}
+
+func (s *statisticsStorage) GetCustomersChecks(opts *service.GetCustomersChecksOptions) ([]*entity.CustomerCheck, error) {
+	var dateFilter string
+	var args []interface{}
+	if opts.StartDate != nil && opts.EndDate != nil {
+		dateFilter = "WHERE ch.print_date BETWEEN $1 AND $2 "
+		args = append(args, opts.StartDate, opts.EndDate)
+	}
+
+	query := fmt.Sprintf(`
+	SELECT c.card_number AS customer_id,
+    c.cust_surname, 
+    c.cust_name, 
+    c.cust_patronymic,
+    COUNT(ch.check_number) AS check_count, 
+    AVG(ch.sum_total) AS avg_check_price, 
+    SUM(ch.sum_total) AS total_check_amount 
+	FROM customer_card c 
+	LEFT JOIN checks ch ON c.card_number = ch.fk_card_number 
+	GROUP BY c.card_number, c.cust_surname, c.cust_name, c.cust_patronymic;
+`, dateFilter)
+	s.logger.Infof("executing query: %s", query)
+	rows, err := s.db.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var results []*entity.CustomerCheck
+	for rows.Next() {
+		var customer entity.CustomerCheck
+		err := rows.Scan(
+			&customer.CustomerID,
+			&customer.CustomerSurname,
+			&customer.CustomerName,
+			&customer.CustomerPatr,
+			&customer.CheckCount,
+			&customer.TotalCheckPrice,
+			&customer.AverageCheckPrice,
+		)
+		if err != nil {
+			return nil, err
+		}
+		results = append(results, &customer)
+
 	}
 	return results, nil
 }

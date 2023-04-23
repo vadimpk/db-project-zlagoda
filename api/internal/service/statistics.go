@@ -36,3 +36,8 @@ func (s *statisticsService) GetCustomersBuyAllCategories(opts *GetCustomersBuyAl
 	s.logger.Infof("GetCustomersBuyAllCategories: opts=%v", opts)
 	return s.storages.Statistics.GetCustomersBuyAllCategories(opts)
 }
+
+func (s *statisticsService) GetCustomersChecks(opts *GetCustomersChecksOptions) ([]*entity.CustomerCheck, error) {
+	s.logger.Infof("GetCustomersChecks: opts=%v", opts)
+	return s.storages.Statistics.GetCustomersChecks(opts)
+}
