@@ -3,6 +3,7 @@ import Navbar from "../components/UI/Navbar/Navbar";
 import Searchbar from "../components/UI/SearchBar/Searchbar";
 import DateInput from "../components/UI/inputs/date/DateInput";
 import axios from "axios";
+import Table from "../components/UI/table/Table";
 
 const Statistics = () => {
     const authToken = localStorage.getItem('authToken');
@@ -12,7 +13,8 @@ const Statistics = () => {
     const [upc, setUpc] = useState(undefined);
     const [productCount, setProductCount] = useState(0);
     const [productName, setProductName] = useState(undefined);
-
+    const headersCustCat = ["Номер карти", "Ім'я", 'Прізвище', "По-батькові"];
+    const [customersCategory, setCustomersCategory] = useState(undefined);
     function handleSearch(upc){
         setUpc(upc);
         if (startDate === undefined && endDate===undefined) {
@@ -20,7 +22,7 @@ const Statistics = () => {
         }
     }
     useEffect(() => {
-        if (startDate !== undefined && endDate!==undefined) {
+        if (startDate !== undefined && endDate!==undefined && upc!=undefined) {
             axios
                 .get('http://localhost:8082/check/check-item/list', {
                     headers: {
@@ -45,6 +47,79 @@ const Statistics = () => {
                 })
         }
     }, [upc]);
+    useEffect(()=>{
+        if(startDate!==undefined&&endDate!==undefined){
+            axios.get('http://localhost:8082/statistics/customers-buy-all-categories', {
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                },
+                params: {
+                    startDate: new Date(startDate),
+                    endDate:new Date(endDate)
+                }
+            }).then(response => {
+                console.log(response.data);
+            }).catch(e => {
+                console.log(e);
+            })
+            ////////////
+            axios.get('http://localhost:8082/statistics/customers-checks', {
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                },
+                params: {
+                    startDate: new Date(startDate),
+                    endDate:new Date(endDate)
+                }
+            }).then(response => {
+                console.log(response.data);
+            }).catch(e => {
+                console.log(e);
+            })
+            ///////////
+            axios.get('http://localhost:8082/statistics/employees-checks', {
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                },
+                params: {
+                    startDate: new Date(startDate),
+                    endDate:new Date(endDate)
+                }
+            }).then(response => {
+                console.log(response.data);
+            }).catch(e => {
+                console.log(e);
+            })
+            ///////////////
+            axios.get('http://localhost:8082/statistics/employees-without-checks', {
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                },
+                params: {
+                    startDate: new Date(startDate),
+                    endDate:new Date(endDate)
+                }
+            }).then(response => {
+                console.log(response.data);
+            }).catch(e => {
+                console.log(e);
+            })
+            ////////
+            axios.get('http://localhost:8082/statistics/sales-by-category', {
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                },
+                params: {
+                    startDate: new Date(startDate),
+                    endDate:new Date(endDate)
+                }
+            }).then(response => {
+                console.log(response.data);
+            }).catch(e => {
+                console.log(e);
+            })
+        }
+    }, [startDate,endDate]);
     return (
         <div>
             <Navbar/>
@@ -82,6 +157,18 @@ const Statistics = () => {
                     :
                     null
             }
+            {
+                customersCategory!==undefined
+                ?
+                <div style={{margin: '10px 30px',}}>
+                    <h3 style={{margin: '10px 0',}}>Постійні клієнти, які купували товари з усіх категорій:</h3>
+                    <Table tableData={headersCustCat} rowData={customersCategory}/>
+
+                </div>
+                :
+                null
+            }
+
         </div>
     );
 };
