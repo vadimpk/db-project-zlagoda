@@ -1,0 +1,1342 @@
+basePath: /
+definitions:
+  entity.CategorySale:
+    properties:
+      avgDiscount:
+        type: number
+      avgSellingPrice:
+        type: number
+      categoryName:
+        type: string
+      categoryNumber:
+        type: integer
+      totalProductsSold:
+        type: integer
+      totalSales:
+        type: integer
+    type: object
+  entity.Check:
+    properties:
+      customer_card_id:
+        type: string
+      date:
+        format: date-time
+        type: string
+      employee_id:
+        type: string
+      id:
+        type: string
+      total_price:
+        type: number
+      vat:
+        type: number
+    type: object
+  entity.CheckItem:
+    properties:
+      id:
+        $ref: '#/definitions/entity.CheckItemID'
+      product_count:
+        type: integer
+      product_price:
+        type: number
+    type: object
+  entity.CheckItemID:
+    properties:
+      check_id:
+        type: string
+      store_product_id:
+        type: string
+    type: object
+  entity.CustomerBuyAllCategories:
+    properties:
+      customerCardID:
+        type: string
+      customerName:
+        type: string
+      customerPatr:
+        type: string
+      customerSurname:
+        type: string
+    type: object
+  entity.CustomerCard:
+    properties:
+      city:
+        maxLength: 50
+        type: string
+      discount:
+        type: integer
+      id:
+        maxLength: 13
+        type: string
+      name:
+        maxLength: 50
+        type: string
+      patronymic:
+        maxLength: 50
+        type: string
+      phone_number:
+        maxLength: 13
+        type: string
+      street:
+        maxLength: 50
+        type: string
+      surname:
+        maxLength: 50
+        type: string
+      zip_code:
+        maxLength: 9
+        type: string
+    required:
+    - city
+    - id
+    - name
+    - patronymic
+    - phone_number
+    - street
+    - surname
+    - zip_code
+    type: object
+  entity.CustomerCheck:
+    properties:
+      averageCheckPrice:
+        type: number
+      checkCount:
+        type: integer
+      customerID:
+        type: string
+      customerName:
+        type: string
+      customerPatr:
+        type: string
+      customerSurname:
+        type: string
+      totalCheckPrice:
+        type: number
+    type: object
+  entity.Employee:
+    properties:
+      city:
+        maxLength: 50
+        type: string
+      date_of_birth:
+        example: "2000-01-01T00:00:00Z"
+        format: date-time
+        type: string
+      date_of_start:
+        example: "2021-01-01T00:00:00Z"
+        format: date-time
+        type: string
+      id:
+        maxLength: 10
+        type: string
+      name:
+        maxLength: 50
+        type: string
+      password:
+        type: string
+      patronymic:
+        maxLength: 50
+        type: string
+      phone:
+        maxLength: 13
+        type: string
+      role:
+        maxLength: 10
+        type: string
+      salary:
+        type: number
+      street:
+        maxLength: 50
+        type: string
+      surname:
+        maxLength: 50
+        type: string
+      zip:
+        maxLength: 9
+        type: string
+    required:
+    - city
+    - date_of_birth
+    - date_of_start
+    - id
+    - name
+    - patronymic
+    - phone
+    - role
+    - salary
+    - street
+    - surname
+    - zip
+    type: object
+  entity.EmployeeCheck:
+    properties:
+      averageCheckPrice:
+        type: number
+      checkCount:
+        type: integer
+      differentCustomers:
+        type: integer
+      emplName:
+        type: string
+      emplSurname:
+        type: string
+      idEmployee:
+        type: string
+      totalCheckPrice:
+        type: number
+      totalDiscount:
+        type: number
+    type: object
+  entity.Product:
+    properties:
+      category_id:
+        type: integer
+      characteristics:
+        maxLength: 100
+        type: string
+      id:
+        type: integer
+      name:
+        maxLength: 50
+        type: string
+    required:
+    - category_id
+    - characteristics
+    - id
+    - name
+    type: object
+  entity.ProductCategory:
+    properties:
+      id:
+        type: integer
+      name:
+        maxLength: 50
+        type: string
+    required:
+    - id
+    - name
+    type: object
+  entity.StoreProduct:
+    properties:
+      count:
+        type: integer
+      id:
+        maxLength: 12
+        type: string
+      price:
+        type: number
+      product_id:
+        type: integer
+      promotional:
+        type: boolean
+      promotional_id:
+        maxLength: 12
+        type: string
+    required:
+    - count
+    - id
+    - price
+    - product_id
+    - promotional
+    type: object
+  http.createCheckItemResponseBody:
+    properties:
+      check:
+        $ref: '#/definitions/entity.Check'
+      checkItem:
+        $ref: '#/definitions/entity.CheckItem'
+      product:
+        $ref: '#/definitions/entity.StoreProduct'
+    type: object
+  http.deleteCheckItemsRequestBody:
+    properties:
+      id:
+        $ref: '#/definitions/entity.CheckItemID'
+    type: object
+  http.deleteCheckItemsResponseBody:
+    properties:
+      check:
+        $ref: '#/definitions/entity.Check'
+      product:
+        $ref: '#/definitions/entity.StoreProduct'
+    type: object
+  http.loginRequestBody:
+    properties:
+      employeeId:
+        type: string
+      password:
+        type: string
+    required:
+    - employeeId
+    - password
+    type: object
+  http.loginResponseBody:
+    properties:
+      authToken:
+        type: string
+      employee:
+        $ref: '#/definitions/entity.Employee'
+    type: object
+  http.updateCheckItemResponseBody:
+    properties:
+      check:
+        $ref: '#/definitions/entity.Check'
+      checkItem:
+        $ref: '#/definitions/entity.CheckItem'
+      product:
+        $ref: '#/definitions/entity.StoreProduct'
+    type: object
+  service.CreateStoreProductOutput:
+    properties:
+      createdStoreProduct:
+        $ref: '#/definitions/entity.StoreProduct'
+      updatedStoreProduct:
+        $ref: '#/definitions/entity.StoreProduct'
+    type: object
+host: localhost:8082
+info:
+  contact: {}
+  description: project for db market zlagoda
+  title: App Zlagoda api
+  version: "1.0"
+paths:
+  /check:
+    get:
+      description: List checks
+      operationId: list-checks
+      parameters:
+      - in: query
+        name: cardID
+        type: string
+      - in: query
+        name: employeeID
+        type: string
+      - example: "2000-01-01T00:00:00Z"
+        format: date-time
+        in: query
+        name: endDate
+        type: string
+      - example: "2000-01-01T00:00:00Z"
+        format: date-time
+        in: query
+        name: startDate
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Check'
+            type: array
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: List checks
+      tags:
+      - check
+    post:
+      operationId: Create check
+      parameters:
+      - description: Check
+        in: body
+        name: check
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Check'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Check'
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: Create check
+      tags:
+      - check
+  /check/{id}:
+    delete:
+      description: Delete checks
+      operationId: delete-checks
+      parameters:
+      - description: Check ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: Delete checks
+      tags:
+      - check
+    get:
+      description: Get check
+      operationId: get-check
+      parameters:
+      - description: Check ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Check'
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: Get check
+      tags:
+      - check
+  /check/check-item:
+    delete:
+      description: Delete check items
+      operationId: delete-check-items
+      parameters:
+      - description: Check item ID
+        in: body
+        name: id
+        required: true
+        schema:
+          $ref: '#/definitions/http.deleteCheckItemsRequestBody'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.deleteCheckItemsResponseBody'
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: Delete check items
+      tags:
+      - check-item
+    get:
+      description: Get check item
+      operationId: get-check-item
+      parameters:
+      - in: query
+        name: checkId
+        type: string
+      - in: query
+        name: storeProductId
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CheckItem'
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: Get check item
+      tags:
+      - check-item
+    post:
+      operationId: Create check item
+      parameters:
+      - description: Check item
+        in: body
+        name: check-item
+        required: true
+        schema:
+          $ref: '#/definitions/entity.CheckItem'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.createCheckItemResponseBody'
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: Create check item
+      tags:
+      - check-item
+    put:
+      description: Update check item
+      operationId: update-check-item
+      parameters:
+      - in: query
+        name: checkId
+        type: string
+      - in: query
+        name: storeProductId
+        type: string
+      - description: Check item
+        in: body
+        name: check-item
+        required: true
+        schema:
+          $ref: '#/definitions/entity.CheckItem'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.updateCheckItemResponseBody'
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: Update check item
+      tags:
+      - check-item
+  /check/check-item/list:
+    get:
+      description: List check items
+      operationId: list-check-items
+      parameters:
+      - in: query
+        name: checkID
+        type: string
+      - example: "2000-01-01T00:00:00Z"
+        format: date-time
+        in: query
+        name: endDate
+        type: string
+      - example: "2000-01-01T00:00:00Z"
+        format: date-time
+        in: query
+        name: startDate
+        type: string
+      - in: query
+        name: storeProductID
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.CheckItem'
+            type: array
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: List check items
+      tags:
+      - check-item
+  /customer-card:
+    get:
+      operationId: List customer cards
+      parameters:
+      - in: query
+        name: discount
+        type: integer
+      - in: query
+        name: search
+        type: string
+      - in: query
+        name: sortAscending
+        type: boolean
+      - in: query
+        name: sortSurname
+        type: boolean
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.CustomerCard'
+            type: array
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: List customer cards
+      tags:
+      - customer-card
+    post:
+      operationId: Create customer card
+      parameters:
+      - description: Card
+        in: body
+        name: card
+        required: true
+        schema:
+          $ref: '#/definitions/entity.CustomerCard'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomerCard'
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: Create customer card
+      tags:
+      - customer-card
+  /customer-card/{id}:
+    delete:
+      description: Delete customer cards
+      operationId: delete-cards
+      parameters:
+      - description: Card ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: Delete customer cards
+      tags:
+      - customer-card
+    get:
+      description: Get customer card
+      operationId: get-card
+      parameters:
+      - description: Card ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomerCard'
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: Get customer card
+      tags:
+      - customer-card
+    put:
+      description: Update customer card
+      operationId: update-card
+      parameters:
+      - description: Card ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Card
+        in: body
+        name: card
+        required: true
+        schema:
+          $ref: '#/definitions/entity.CustomerCard'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomerCard'
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: Update customer card
+      tags:
+      - customer-card
+  /employee:
+    get:
+      description: List employees
+      operationId: list-employee
+      parameters:
+      - in: query
+        name: role
+        type: string
+      - in: query
+        name: search
+        type: string
+      - in: query
+        name: sortAscending
+        type: boolean
+      - in: query
+        name: sortSurname
+        type: boolean
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: slice
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: List employees
+      tags:
+      - employee
+    post:
+      description: Create employee
+      operationId: create-employee
+      parameters:
+      - description: Employee
+        in: body
+        name: employee
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Employee'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Employee'
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: Create employee
+      tags:
+      - employee
+  /employee/{id}:
+    delete:
+      description: Delete employee
+      operationId: delete-employee
+      parameters:
+      - description: Employee ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: Delete employee
+      tags:
+      - employee
+    get:
+      description: Get employee
+      operationId: get-employee
+      parameters:
+      - description: Employee ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Employee'
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: Get employee
+      tags:
+      - employee
+    put:
+      description: Update employee
+      operationId: update-employee
+      parameters:
+      - description: Employee ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Employee
+        in: body
+        name: employee
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Employee'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Employee'
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: Update employee
+      tags:
+      - employee
+  /employee/login:
+    post:
+      description: Login
+      operationId: login
+      parameters:
+      - description: login data
+        in: body
+        name: fields
+        required: true
+        schema:
+          $ref: '#/definitions/http.loginRequestBody'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.loginResponseBody'
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Login
+      tags:
+      - employee
+  /product:
+    get:
+      description: List products
+      operationId: list-products
+      parameters:
+      - in: query
+        name: categoryID
+        type: integer
+      - in: query
+        name: search
+        type: string
+      - in: query
+        name: sortAscending
+        type: boolean
+      - in: query
+        name: sortName
+        type: boolean
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Product'
+            type: array
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: List products
+      tags:
+      - product
+    post:
+      description: Create product (using product category)
+      operationId: create-product
+      parameters:
+      - description: Product
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Product'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Product'
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: Create product
+      tags:
+      - product
+  /product/{id}:
+    delete:
+      description: Delete products
+      operationId: delete-products
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: Delete products
+      tags:
+      - product
+    get:
+      description: Get product
+      operationId: get-product
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Product'
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: Get product
+      tags:
+      - product
+    put:
+      description: Update product
+      operationId: update-product
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Product
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Product'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Product'
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: Update product
+      tags:
+      - product
+  /product/category:
+    get:
+      description: List product categories
+      operationId: list-product-categories
+      parameters:
+      - in: query
+        name: search
+        type: string
+      - in: query
+        name: sortAscending
+        type: boolean
+      - in: query
+        name: sortName
+        type: boolean
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.ProductCategory'
+            type: array
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: List product categories
+      tags:
+      - product category
+    post:
+      description: Create product category
+      operationId: create-product-category
+      parameters:
+      - description: Product category
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/entity.ProductCategory'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.ProductCategory'
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: Create product category
+      tags:
+      - product category
+  /product/category/{id}:
+    delete:
+      description: Delete product categories
+      operationId: delete-product-categories
+      parameters:
+      - description: Product category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: Delete product categories
+      tags:
+      - product category
+    put:
+      description: Update product category
+      operationId: update-product-category
+      parameters:
+      - description: Product category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Product category
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/entity.ProductCategory'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.ProductCategory'
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: Update product category
+      tags:
+      - product category
+  /product/store:
+    delete:
+      description: Delete store products
+      operationId: delete-store-products
+      parameters:
+      - description: Store product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: Delete store products
+      tags:
+      - product in store
+    get:
+      description: List store products
+      operationId: list-store-products
+      parameters:
+      - in: query
+        name: categoryID
+        type: integer
+      - in: query
+        name: productID
+        type: integer
+      - in: query
+        name: promotion
+        type: boolean
+      - in: query
+        name: search
+        type: string
+      - in: query
+        name: sortAscending
+        type: boolean
+      - in: query
+        name: sortCount
+        type: boolean
+      - in: query
+        name: sortName
+        type: boolean
+      - in: query
+        name: sortPrice
+        type: boolean
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.StoreProduct'
+            type: array
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: List store products
+      tags:
+      - product in store
+    post:
+      description: Create store product
+      operationId: create-store-product
+      parameters:
+      - description: Store product
+        in: body
+        name: store_product
+        required: true
+        schema:
+          $ref: '#/definitions/entity.StoreProduct'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/service.CreateStoreProductOutput'
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: Create store product
+      tags:
+      - product in store
+  /product/store/{id}:
+    get:
+      operationId: get-store-products
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.StoreProduct'
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: Get store product
+      tags:
+      - product in store
+    put:
+      description: Update store product
+      operationId: update-store-product
+      parameters:
+      - description: Store product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Store product
+        in: body
+        name: store_product
+        required: true
+        schema:
+          $ref: '#/definitions/entity.StoreProduct'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.StoreProduct'
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: Update store product
+      tags:
+      - product in store
+  /statistics/customers-buy-all-categories:
+    get:
+      consumes:
+      - application/json
+      description: Get customers buy all categories
+      parameters:
+      - example: "2000-01-01T00:00:00Z"
+        format: date-time
+        in: query
+        name: endDate
+        type: string
+      - example: "2000-01-01T00:00:00Z"
+        format: date-time
+        in: query
+        name: startDate
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.CustomerBuyAllCategories'
+            type: array
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: Get customers buy all categories
+      tags:
+      - statistics
+  /statistics/customers-checks:
+    get:
+      consumes:
+      - application/json
+      description: Get customers checks
+      parameters:
+      - example: "2000-01-01T00:00:00Z"
+        format: date-time
+        in: query
+        name: endDate
+        type: string
+      - example: "2000-01-01T00:00:00Z"
+        format: date-time
+        in: query
+        name: startDate
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.CustomerCheck'
+            type: array
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: Get customers checks
+      tags:
+      - statistics
+  /statistics/employees-checks:
+    get:
+      consumes:
+      - application/json
+      description: Get employees checks
+      parameters:
+      - example: "2000-01-01T00:00:00Z"
+        format: date-time
+        in: query
+        name: endDate
+        type: string
+      - example: "2000-01-01T00:00:00Z"
+        format: date-time
+        in: query
+        name: startDate
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.EmployeeCheck'
+            type: array
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: Get employees checks
+      tags:
+      - statistics
+  /statistics/employees-without-checks:
+    get:
+      consumes:
+      - application/json
+      description: Get employees without checks
+      parameters:
+      - example: "2000-01-01T00:00:00Z"
+        format: date-time
+        in: query
+        name: endDate
+        type: string
+      - example: "2000-01-01T00:00:00Z"
+        format: date-time
+        in: query
+        name: startDate
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Employee'
+            type: array
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: Get employees without checks
+      tags:
+      - statistics
+  /statistics/sales-by-category:
+    get:
+      consumes:
+      - application/json
+      description: Get sales by category
+      parameters:
+      - example: "2000-01-01T00:00:00Z"
+        format: date-time
+        in: query
+        name: endDate
+        type: string
+      - example: "2000-01-01T00:00:00Z"
+        format: date-time
+        in: query
+        name: startDate
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.CategorySale'
+            type: array
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - BearerAuth: []
+      summary: Get sales by category
+      tags:
+      - statistics
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
