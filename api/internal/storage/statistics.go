@@ -144,3 +144,61 @@ ORDER BY
 
 	return results, nil
 }
+
+func (s *statisticsStorage) GetCustomersBuyAllCategories(opts *service.GetCustomersBuyAllCategoriesOptions) ([]*entity.CustomerBuyAllCategories, error) {
+	var dateFilter string
+	var args []interface{}
+	if opts.StartDate != nil && opts.EndDate != nil {
+		dateFilter = "WHERE ch.print_date BETWEEN $1 AND $2 "
+		args = append(args, opts.StartDate, opts.EndDate)
+	}
+
+	query := fmt.Sprintf(`SELECT DISTINCT c.card_number, c.cust_surname, c.cust_name, c.cust_patronymic
+FROM customer_card c
+WHERE NOT EXISTS (
+  SELECT k.category_number
+  FROM category k
+  WHERE k.category_number NOT IN (
+    SELECT p.fk_category_number
+    FROM product p
+    WHERE NOT EXISTS (
+      SELECT s.fk_UPC
+      FROM store_product s
+      WHERE s.fk_id_product = p.id_product
+      AND EXISTS (
+        SELECT sa.fk_check_number
+        FROM sale sa
+        WHERE sa.fk_UPC = s.UPC
+        AND sa.fk_check_number IN (
+          SELECT ch.check_number
+          FROM checks ch
+          WHERE ch.fk_card_number = c.card_number
+        )
+      )
+    )
+  )
+);
+`, dateFilter)
+	s.logger.Infof("executing query: %s", query)
+	rows, err := s.db.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var results []*entity.CustomerBuyAllCategories
+	for rows.Next() {
+		var customer entity.CustomerBuyAllCategories
+		err := rows.Scan(
+			&customer.CardNumber,
+			&customer.CustSurname,
+			&customer.CustName,
+			&customer.CustPatronymic,
+		)
+		if err != nil {
+			return nil, err
+		}
+		results = append(results, &customer)
+	}
+	return results, nil
+}

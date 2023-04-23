@@ -31,3 +31,8 @@ func (s *statisticsService) GetEmployeesChecks(opts *GetEmployeesChecksOptions) 
 	s.logger.Infof("GetEmployeesChecks: opts=%v", opts)
 	return s.storages.Statistics.GetEmployeesChecks(opts)
 }
+
+func (s *statisticsService) GetCustomersBuyAllCategories(opts *GetCustomersBuyAllCategoriesOptions) ([]*entity.CustomerBuyAllCategories, error) {
+	s.logger.Infof("GetCustomersBuyAllCategories: opts=%v", opts)
+	return s.storages.Statistics.GetCustomersBuyAllCategories(opts)
+}

@@ -20,6 +20,7 @@ func setupStatisticsRoutes(options *Options, handler *gin.Engine) {
 	{
 		group.GET("/sales-by-category", newAuthMiddleware(options, ""), routes.getSalesByCategory)
 		group.GET("/employees-checks", newAuthMiddleware(options, ""), routes.getEmployeesChecks)
+		group.GET("/customers-buy-all-categories", newAuthMiddleware(options, ""), routes.getCustomersBuyAllCategories)
 	}
 }
 
@@ -73,4 +74,30 @@ func (r *statisticsRoutes) getEmployeesChecks(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, employees)
+}
+
+// @Summary Get customers buy all categories
+// @Description Get customers buy all categories
+// @Security BearerAuth
+// @Tags statistics
+// @Accept json
+// @Produce json
+// @Param listOptions query serviceGetCustomersBuyAllCategoriesOptions true "List options"
+// @Success 200 {array} entityCustomer
+// @Failure 400 {object} error
+// @Router /statistics/customers-buy-all-categories [get]
+func (r *statisticsRoutes) getCustomersBuyAllCategories(c *gin.Context) {
+	var listOptions service.GetCustomersBuyAllCategoriesOptions
+	if err := c.ShouldBindQuery(&listOptions); err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	customers, err := r.opts.Services.Statistics.GetCustomersBuyAllCategories(&listOptions)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, customers)
 }

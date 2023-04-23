@@ -19,3 +19,10 @@ type EmployeeCheck struct {
 	TotalDiscount      float64
 	DifferentCustomers int
 }
+
+type CustomerBuyAllCategories struct {
+	CustomerCardID  string
+	CustomerName    string
+	CustomerSurname string
+	CustomerPatr    string
+}

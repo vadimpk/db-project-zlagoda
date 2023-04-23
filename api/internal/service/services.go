@@ -213,6 +213,7 @@ type ListCheckItemsOptions struct {
 type StatisticsService interface {
 	GetSalesByCategory(opts *GetSalesByCategoryOptions) ([]*entity.CategorySale, error)
 	GetEmployeesChecks(opts *GetEmployeesChecksOptions) ([]*entity.EmployeeCheck, error)
+	GetCustomersBuyAllCategories(opts *GetCustomersBuyAllCategoriesOptions) ([]*entity.CustomerBuyAllCategories, error)
 }
 
 type GetSalesByCategoryOptions struct {
@@ -221,6 +222,11 @@ type GetSalesByCategoryOptions struct {
 }
 
 type GetEmployeesChecksOptions struct {
+	StartDate *time.Time `form:"startDate" format:"date-time" example:"2000-01-01T00:00:00Z"`
+	EndDate   *time.Time `form:"endDate" format:"date-time" example:"2000-01-01T00:00:00Z"`
+}
+
+type GetCustomersBuyAllCategoriesOptions struct {
 	StartDate *time.Time `form:"startDate" format:"date-time" example:"2000-01-01T00:00:00Z"`
 	EndDate   *time.Time `form:"endDate" format:"date-time" example:"2000-01-01T00:00:00Z"`
 }
