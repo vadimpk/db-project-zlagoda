@@ -106,7 +106,7 @@ SELECT
 FROM
     employee e
 JOIN
-    checks ch ON e.id = ch.fk_id_employee
+    checks ch ON e.id_employee = ch.fk_id_employee
 LEFT JOIN
     customer_card cc ON ch.fk_card_number = cc.card_number
  %s 
