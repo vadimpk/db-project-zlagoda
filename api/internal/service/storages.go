@@ -9,6 +9,7 @@ type Storages struct {
 	CustomerCard CustomerCardStorage
 	Product      ProductStorage
 	Check        CheckStorage
+	Statistics   StatisticsStorage
 }
 
 type EmployeeStorage interface {
@@ -59,4 +60,9 @@ type CheckStorage interface {
 	ListCheckItems(opts *ListCheckItemsOptions) ([]*entity.CheckItem, error)
 	UpdateCheckItem(id entity.CheckItemID, checkItem *entity.CheckItem) (*entity.CheckItem, error)
 	DeleteCheckItem(id entity.CheckItemID) error
+}
+
+type StatisticsStorage interface {
+	GetSalesByCategory(opts *GetSalesByCategoryOptions) ([]*entity.CategorySale, error)
+	GetEmployeesChecks(opts *GetEmployeesChecksOptions) ([]*entity.EmployeeCheck, error)
 }

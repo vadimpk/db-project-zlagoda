@@ -5,6 +5,7 @@ import (
 	"github.com/vadimpk/db-project-zlagoda/api/config"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/entity"
 	"github.com/vadimpk/db-project-zlagoda/api/pkg/errs"
+	"time"
 )
 
 type Options struct {
@@ -18,6 +19,7 @@ type Services struct {
 	CustomerCard CustomerCardService
 	Product      ProductService
 	Check        CheckService
+	Statistics   StatisticsService
 }
 
 type EmployeeService interface {
@@ -195,15 +197,30 @@ type CreateOrUpdateCheckItemOutput struct {
 }
 
 type ListChecksOptions struct {
-	CardID     *string `form:"cardID"`
-	EmployeeID *string `form:"employeeID"`
-	StartDate  *string `form:"startDate"`
-	EndDate    *string `form:"endDate"`
+	CardID     *string    `form:"cardID"`
+	EmployeeID *string    `form:"employeeID"`
+	StartDate  *time.Time `form:"startDate" format:"date-time" example:"2000-01-01T00:00:00Z"`
+	EndDate    *time.Time `form:"endDate" format:"date-time" example:"2000-01-01T00:00:00Z"`
 }
 
 type ListCheckItemsOptions struct {
-	CheckID        *string `form:"checkID"`
-	StoreProductID *string `form:"storeProductID"`
-	StartDate      *string `form:"startDate"`
-	EndDate        *string `form:"endDate"`
+	CheckID        *string    `form:"checkID"`
+	StoreProductID *string    `form:"storeProductID"`
+	StartDate      *time.Time `form:"startDate" format:"date-time" example:"2000-01-01T00:00:00Z"`
+	EndDate        *time.Time `form:"endDate" format:"date-time" example:"2000-01-01T00:00:00Z"`
+}
+
+type StatisticsService interface {
+	GetSalesByCategory(opts *GetSalesByCategoryOptions) ([]*entity.CategorySale, error)
+	GetEmployeesChecks(opts *GetEmployeesChecksOptions) ([]*entity.EmployeeCheck, error)
+}
+
+type GetSalesByCategoryOptions struct {
+	StartDate *time.Time `form:"startDate" format:"date-time" example:"2000-01-01T00:00:00Z"`
+	EndDate   *time.Time `form:"endDate" format:"date-time" example:"2000-01-01T00:00:00Z"`
+}
+
+type GetEmployeesChecksOptions struct {
+	StartDate *time.Time `form:"startDate" format:"date-time" example:"2000-01-01T00:00:00Z"`
+	EndDate   *time.Time `form:"endDate" format:"date-time" example:"2000-01-01T00:00:00Z"`
 }

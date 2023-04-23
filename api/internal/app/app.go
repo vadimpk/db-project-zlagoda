@@ -44,6 +44,7 @@ func Run(cfg *config.Config) {
 		CustomerCard: storage.NewCustomerCardStorage(logger, db),
 		Product:      storage.NewProductStorage(logger, db),
 		Check:        storage.NewCheckStorage(logger, db),
+		Statistics:   storage.NewStatisticsStorage(logger, db),
 	}
 
 	serviceOptions := service.Options{
@@ -57,6 +58,7 @@ func Run(cfg *config.Config) {
 		CustomerCard: service.NewCustomerCardService(serviceOptions),
 		Product:      service.NewProductService(serviceOptions),
 		Check:        service.NewCheckService(serviceOptions),
+		Statistics:   service.NewStatisticsService(serviceOptions),
 	}
 
 	httpHandler := http.New(http.Options{

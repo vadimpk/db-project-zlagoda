@@ -33,6 +33,7 @@ func New(options Options) http.Handler {
 		setupCustomerCardRoutes(&options, handler)
 		setupProductRoutes(&options, handler)
 		setupCheckRoutes(&options, handler)
+		setupStatisticsRoutes(&options, handler)
 	}
 
 	handler.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
