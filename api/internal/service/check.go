@@ -84,6 +84,16 @@ func (s *checkService) DeleteCheck(id string) error {
 func (s *checkService) CreateCheckItem(checkItem *entity.CheckItem) (CreateOrUpdateCheckItemOutput, error) {
 	s.logger.Infof("creating check item: %#v", checkItem)
 
+	existingCheckItem, err := s.storages.Check.GetCheckItem(checkItem.ID)
+	if err != nil {
+		s.logger.Errorf("error getting check item: %#v", err)
+		return CreateOrUpdateCheckItemOutput{}, err
+	}
+	if existingCheckItem != nil {
+		s.logger.Infof("check item with id %s already exists", checkItem.ID)
+		return CreateOrUpdateCheckItemOutput{}, ErrCreateCheckItemAlreadyExists
+	}
+
 	// Check if product exists and if there are enough products in store
 	// If there are enough products, then update store product count
 	product, err := s.storages.Product.GetStoreProduct(checkItem.ID.StoreProductID)
