@@ -250,3 +250,49 @@ func (s *statisticsStorage) GetCustomersChecks(opts *service.GetCustomersChecksO
 	}
 	return results, nil
 }
+
+func (s *statisticsStorage) GetEmployeesWithNoChecks(opts *service.GetEmployeesWithNoChecksOptions) ([]*entity.Employee, error) {
+	var dateFilter string
+	var args []interface{}
+	if opts.StartDate != nil && opts.EndDate != nil {
+		dateFilter = "AND ch.print_date BETWEEN $1 AND $2 "
+		args = append(args, opts.StartDate, opts.EndDate)
+	}
+
+	query := fmt.Sprintf(`
+SELECT
+    *
+FROM
+    employee e
+WHERE
+    NOT EXISTS (
+        SELECT 1
+        FROM checks ch
+        WHERE
+            e.id_employee = ch.fk_id_employee
+            %s
+    );
+`, dateFilter)
+
+	s.logger.Infof("executing query: %s", query)
+	rows, err := s.db.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var employees []*entity.Employee
+	for rows.Next() {
+		employee := entity.Employee{}
+		err := rows.Scan(&employee.ID, &employee.Surname, &employee.Name, &employee.Patronymic,
+			&employee.Role, &employee.Salary, &employee.DateOfBirth, &employee.DateOfStart,
+			&employee.Phone, &employee.City, &employee.Street, &employee.Zip, &employee.Password)
+		if err != nil {
+			s.logger.Errorf("error while scanning employee row: %s", err)
+			return nil, err
+		}
+		employees = append(employees, &employee)
+	}
+
+	return employees, nil
+}

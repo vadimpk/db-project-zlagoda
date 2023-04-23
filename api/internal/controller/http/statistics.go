@@ -22,6 +22,7 @@ func setupStatisticsRoutes(options *Options, handler *gin.Engine) {
 		group.GET("/employees-checks", newAuthMiddleware(options, ""), routes.getEmployeesChecks)
 		group.GET("/customers-buy-all-categories", newAuthMiddleware(options, ""), routes.getCustomersBuyAllCategories)
 		group.GET("customers-checks", newAuthMiddleware(options, ""), routes.getCustomersChecks)
+		group.GET("/employees-without-checks", newAuthMiddleware(options, ""), routes.getEmployeesWithoutChecks)
 	}
 }
 
@@ -128,4 +129,30 @@ func (r *statisticsRoutes) getCustomersChecks(c *gin.Context) {
 
 	c.JSON(http.StatusOK, customers)
 
+}
+
+// @Summary Get employees without checks
+// @Description Get employees without checks
+// @Security BearerAuth
+// @Tags statistics
+// @Accept json
+// @Produce json
+// @Param listOptions query service.GetEmployeesWithNoChecksOptions true "List options"
+// @Success 200 {array} entity.Employee
+// @Failure 400 {object} error
+// @Router /statistics/employees-without-checks [get]
+func (r *statisticsRoutes) getEmployeesWithoutChecks(c *gin.Context) {
+	var listOptions service.GetEmployeesWithNoChecksOptions
+	if err := c.ShouldBindQuery(&listOptions); err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	employees, err := r.opts.Services.Statistics.GetEmployeesWithNoChecks(&listOptions)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, employees)
 }

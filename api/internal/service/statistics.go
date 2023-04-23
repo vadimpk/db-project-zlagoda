@@ -41,3 +41,8 @@ func (s *statisticsService) GetCustomersChecks(opts *GetCustomersChecksOptions) 
 	s.logger.Infof("GetCustomersChecks: opts=%v", opts)
 	return s.storages.Statistics.GetCustomersChecks(opts)
 }
+
+func (s *statisticsService) GetEmployeesWithNoChecks(opts *GetEmployeesWithNoChecksOptions) ([]*entity.Employee, error) {
+	s.logger.Infof("GetEmployeesWithNoChecks: opts=%v", opts)
+	return s.storages.Statistics.GetEmployeesWithNoChecks(opts)
+}
