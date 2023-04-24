@@ -218,6 +218,7 @@ type StatisticsService interface {
 	GetCustomersBuyAllCategories(opts *GetCustomersBuyAllCategoriesOptions) ([]*entity.CustomerBuyAllCategories, error)
 	GetCustomersChecks(opts *GetCustomersChecksOptions) ([]*entity.CustomerCheck, error)
 	GetEmployeesWithNoChecks(opts *GetEmployeesWithNoChecksOptions) ([]*entity.Employee, error)
+	GetEmployeesWithCheckSum(opts *GetEmployeesWithCheckSumOptions) ([]*entity.Employee, error)
 }
 
 type GetSalesByCategoryOptions struct {
@@ -243,4 +244,8 @@ type GetCustomersChecksOptions struct {
 type GetEmployeesWithNoChecksOptions struct {
 	StartDate *time.Time `form:"startDate" format:"date-time" example:"2000-01-01T00:00:00Z"`
 	EndDate   *time.Time `form:"endDate" format:"date-time" example:"2000-01-01T00:00:00Z"`
+}
+
+type GetEmployeesWithCheckSumOptions struct {
+	Sum float64 `form:"sum"`
 }

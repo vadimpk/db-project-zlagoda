@@ -15,9 +15,9 @@ type ProductCategory struct {
 
 type StoreProduct struct {
 	ID            string  `json:"id" validate:"required,max=12"`
-	PromotionalID *string `json:"promotional_id" validate:"max=12"`
-	ProductID     int     `json:"product_id" validate:"required"`
-	Price         float64 `json:"price" validate:"required"`
-	Count         int     `json:"count" validate:"required"`
-	Promotional   bool    `json:"promotional" validate:"required"`
+	PromotionalID *string `json:"promotional_id" validate:"omitempty,max=12"`
+	ProductID     int     `json:"product_id"`
+	Price         float64 `json:"price"`
+	Count         int     `json:"count"`
+	Promotional   bool    `json:"promotional"`
 }

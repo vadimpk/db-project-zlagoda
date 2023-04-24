@@ -68,4 +68,5 @@ type StatisticsStorage interface {
 	GetCustomersBuyAllCategories(opts *GetCustomersBuyAllCategoriesOptions) ([]*entity.CustomerBuyAllCategories, error)
 	GetCustomersChecks(opts *GetCustomersChecksOptions) ([]*entity.CustomerCheck, error)
 	GetEmployeesWithNoChecks(opts *GetEmployeesWithNoChecksOptions) ([]*entity.Employee, error)
+	GetEmployeesWithCheckSum(opts *GetEmployeesWithCheckSumOptions) ([]*entity.Employee, error)
 }

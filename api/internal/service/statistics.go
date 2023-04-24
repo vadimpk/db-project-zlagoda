@@ -46,3 +46,8 @@ func (s *statisticsService) GetEmployeesWithNoChecks(opts *GetEmployeesWithNoChe
 	s.logger.Infof("GetEmployeesWithNoChecks: opts=%v", opts)
 	return s.storages.Statistics.GetEmployeesWithNoChecks(opts)
 }
+
+func (s *statisticsService) GetEmployeesWithCheckSum(opts *GetEmployeesWithCheckSumOptions) ([]*entity.Employee, error) {
+	s.logger.Infof("GetEmployeesWithCheckSum: opts=%v", opts)
+	return s.storages.Statistics.GetEmployeesWithCheckSum(opts)
+}

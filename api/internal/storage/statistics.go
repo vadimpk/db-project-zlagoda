@@ -299,3 +299,38 @@ WHERE
 
 	return employees, nil
 }
+
+func (s *statisticsStorage) GetEmployeesWithCheckSum(opts *service.GetEmployeesWithCheckSumOptions) ([]*entity.Employee, error) {
+	query := fmt.Sprintf(`
+	SELECT *
+	FROM employee e
+	WHERE e.id_employee IN (
+			SELECT DISTINCT fk_id_employee
+			FROM checks ch
+			WHERE ch.sum_total > %f
+		)
+	AND e.empl_role = 'Касир';
+`, opts.Sum)
+
+	s.logger.Infof("executing query: %s", query)
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var employees []*entity.Employee
+	for rows.Next() {
+		employee := entity.Employee{}
+		err := rows.Scan(&employee.ID, &employee.Surname, &employee.Name, &employee.Patronymic,
+			&employee.Role, &employee.Salary, &employee.DateOfBirth, &employee.DateOfStart,
+			&employee.Phone, &employee.City, &employee.Street, &employee.Zip, &employee.Password)
+		if err != nil {
+			s.logger.Errorf("error while scanning employee row: %s", err)
+			return nil, err
+		}
+		employees = append(employees, &employee)
+	}
+
+	return employees, nil
+}

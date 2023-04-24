@@ -23,6 +23,7 @@ func setupStatisticsRoutes(options *Options, handler *gin.Engine) {
 		group.GET("/customers-buy-all-categories", newAuthMiddleware(options, ""), routes.getCustomersBuyAllCategories)
 		group.GET("customers-checks", newAuthMiddleware(options, ""), routes.getCustomersChecks)
 		group.GET("/employees-without-checks", newAuthMiddleware(options, ""), routes.getEmployeesWithoutChecks)
+		group.GET("/employees-with-check-sum", newAuthMiddleware(options, ""), routes.getEmployeesWithCheckSum)
 	}
 }
 
@@ -152,6 +153,38 @@ func (r *statisticsRoutes) getEmployeesWithoutChecks(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
+	}
+	for _, employee := range employees {
+		employee.Password = ""
+	}
+
+	c.JSON(http.StatusOK, employees)
+}
+
+// @Summary Get employees with check sum
+// @Description Get employees with check sum
+// @Security BearerAuth
+// @Tags statistics
+// @Accept json
+// @Produce json
+// @Param listOptions query service.GetEmployeesWithCheckSumOptions true "List options"
+// @Success 200 {array} entity.Employee
+// @Failure 400 {object} error
+// @Router /statistics/employees-with-check-sum [get]
+func (r *statisticsRoutes) getEmployeesWithCheckSum(c *gin.Context) {
+	var listOptions service.GetEmployeesWithCheckSumOptions
+	if err := c.ShouldBindQuery(&listOptions); err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	employees, err := r.opts.Services.Statistics.GetEmployeesWithCheckSum(&listOptions)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	for _, employee := range employees {
+		employee.Password = ""
 	}
 
 	c.JSON(http.StatusOK, employees)
