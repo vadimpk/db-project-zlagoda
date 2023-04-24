@@ -139,7 +139,7 @@ const Products = () => {
         setModal(true);
     }
     function handleEdit() {
-        if (selectedRow.id===''){
+        if (selectedRow.id===undefined){
             alert('Виберіть товар для редагування')
         } else {
             setIsEditing(true);
@@ -147,7 +147,7 @@ const Products = () => {
         }
     }
     function handleDelete() {
-        if (selectedRow.id===''){
+        if (selectedRow.id===undefined){
             alert('Виберіть товар для видалення')
         } else {
             axios.delete(`http://localhost:8082/product/store/${selectedRow.id}`,{

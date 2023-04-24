@@ -31,7 +31,7 @@ const LoginForm = () => {
                     localStorage.setItem('employee', JSON.stringify(employee));
                 })
                 .catch(error => {
-                    //alert(error.response.data.massage);
+                    alert("Неправильний пароль");
                     console.error(error);
                 });
     };
