@@ -134,7 +134,7 @@ const Employees = () => {
         setModal(true);
     }
     function handleEdit() {
-        if (selectedRow.id===''){
+        if (selectedRow.id===undefined){
             alert('Виберіть працівника для редагування')
         } else {
             setIsEditing(true);
@@ -142,7 +142,7 @@ const Employees = () => {
         }
     }
     function handleDelete() {
-        if (selectedRow.id===''){
+        if (selectedRow.id===undefined){
             alert('Виберіть працівника для видалення')
         } else {
             axios.delete(`http://localhost:8082/employee/${selectedRow.id}`,{

@@ -20,17 +20,7 @@ const Customers = () => {
     const [modal, setModal] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const tableData = ['Номер карти','Прізвище','Ім\'я','По-батькові','Телефон','Місто','Вулиця','Індекс','Відсоток']
-    const [selectedRow, setSelectedRow] = useState({
-        id: '',
-        name: '',
-        surname:'',
-        patronymic:'',
-        discount: 0,
-        phone_number: '',
-        city: '',
-        street: '',
-        zip_code: ''
-    });
+    const [selectedRow, setSelectedRow] = useState({});
 
     const [customers, setCustomers] = useState([]);
     useEffect(() => {
@@ -83,7 +73,7 @@ const Customers = () => {
         setModal(true);
     }
     function handleEdit() {
-        if (selectedRow.id===''){
+        if (selectedRow.id===undefined){
             alert('Виберіть клієнта для редагування')
         } else {
             setIsEditing(true);
@@ -91,7 +81,7 @@ const Customers = () => {
         }
     }
     function handleDelete() {
-        if (selectedRow.id===''){
+        if (selectedRow.id===undefined){
             alert('Виберіть клієнта для видалення')
         } else {
             axios.delete(`http://localhost:8082/customer-card/${selectedRow.id}`,{
@@ -103,7 +93,7 @@ const Customers = () => {
                     console.log(response.data);
                 })
                 .catch(error => {
-                    alert('Сервер відхилив ваш запит на видалення')
+                    alert('Не можна видалити касира, якщо він створював чеки')
                     console.log(error);
                 });
         }

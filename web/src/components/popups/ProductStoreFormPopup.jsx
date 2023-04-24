@@ -52,7 +52,7 @@ const ProductStoreFormPopup = ({setVisible, create, selectedRow, edit}) => {
             price: '',
             product_id: '',
             count: '',
-            sale: false
+            promotional: false
         });
         setVisible(false)
     }
@@ -78,7 +78,7 @@ const ProductStoreFormPopup = ({setVisible, create, selectedRow, edit}) => {
             price: '',
             product_id: '',
             count: '',
-            sale: false
+            promotional: false
         })
         setVisible(false)
     }
@@ -92,17 +92,28 @@ const ProductStoreFormPopup = ({setVisible, create, selectedRow, edit}) => {
             errors.id='Довжина коду має бути 12 символів';
         }
 
-        if(product.promotional_id!==''&&product.promotional_id!==null){
-            if(product.promotional_id.length!=12){
-                errors.promotional_id='Довжина коду акційного товару має бути 12 символів';
+        if(selectedRow!==undefined){
+            if(selectedRow.promotional&&!product.promotional){
+                errors.promotional='Акційний товар не може стати не акційним';
             }
         }
+
         if(product.promotional&&(product.promotional_id===''&&product.promotional_id===null)){
             errors.promotional='Якщо товар акційний повинно бути вказано UPC не акційного товару';
         }
-        if (!idPattern.test(product.product_id) || !countPattern.test(product.count) || !pricePattern.test(product.price)) {
-            errors.price='Будь ласка, введіть коректні числові значення для product_id, count та price.';
+        if (!idPattern.test(product.product_id)) {
+            errors.product_id='Будь ласка, введіть коректні числові значення для product_id';
             return false;
+        }
+        if (!countPattern.test(product.count)) {
+            errors.count='Будь ласка, введіть коректні числові значення для count';
+            return false;
+        }
+        if(!product.promotional) {
+            if (!pricePattern.test(product.price)) {
+                errors.price = 'Будь ласка, введіть коректні числові значення для price';
+                return false;
+            }
         }
 
         if (Object.keys(errors).length > 0) {
@@ -132,17 +143,14 @@ const ProductStoreFormPopup = ({setVisible, create, selectedRow, edit}) => {
                         value={ product.id }
                         onChange={e => setProduct({...product, id: e.target.value})}>UPC</InputTextForm>
                     <InputTextForm
-                        name={"price"}
-                        placeholder={"Ціна"}
-                        value={product.price}
+                        name={"promotional_id"}
+                        placeholder={"UPC"}
                         style={{marginBottom: '10px'}}
-                        onChange={e => setProduct({
-                            ...product,
-                            price: e.target.value
-                        })}>Ціна продажу</InputTextForm>
+                        value={product.promotional_id===null ? '' : product.promotional_id}
+                        onChange={e => setProduct({...product, promotional_id: e.target.value})}>UPC не акційного товару</InputTextForm>
                     <Checkbox
-                        name={"sale"}
-                        id={"sale"}
+                        name={"promotional"}
+                        id={"promotional"}
                         checked = {product.promotional}
                         onChange={() => setProduct(prevState => ({...prevState, promotional: !prevState.promotional}))}
                         style={st}>Акційний товар</Checkbox>
@@ -158,11 +166,20 @@ const ProductStoreFormPopup = ({setVisible, create, selectedRow, edit}) => {
                         placeholder={"Кількість"}
                         value={product.count}
                         onChange={e => setProduct({...product, count: e.target.value})}>Кількість</InputTextForm>
-                    <InputTextForm
-                        name={"promotional_id"}
-                        placeholder={"ID"}
-                        value={product.promotional_id===null ? '' : product.promotional_id}
-                        onChange={e => setProduct({...product, promotional_id: e.target.value})}>UPC не акційного товару</InputTextForm>
+                    {
+                        product.promotional
+                            ?
+                            null
+                            :
+                            <InputTextForm
+                                name={"price"}
+                                placeholder={"Ціна"}
+                                value={product.price}
+                                onChange={e => setProduct({
+                                    ...product,
+                                    price: e.target.value
+                                })}>Ціна продажу</InputTextForm>
+                    }
                 </div>
             </div>
 
