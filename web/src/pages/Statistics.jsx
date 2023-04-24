@@ -25,6 +25,7 @@ const Statistics = () => {
     const [endDate6, setEndDate6] = useState(new Date());
     const [upc, setUpc] = useState('121212121212');
     const [productCount, setProductCount] = useState(0);
+    const [sum, setSum] = useState(10);
     const [productName, setProductName] = useState(null);
     const headersCustCat = ["Номер карти", "Прізвище", 'Ім\'я', "По-батькові"];
     const [customersCategory, setCustomersCategory] = useState(null);
@@ -36,9 +37,14 @@ const Statistics = () => {
     const [employeesNoCheck, setEmployeesNoCheck] = useState(null);
     const headersSalesCategory = ['ID','Назва','Загальні продажі','Середня знижка','Кількість проданих товарів','Середня ціна продажу'];
     const [salesCategory, setSalesCategory] = useState(null);
+    const headersEmplSum = ['ID','Прізвище','Ім\'я','По-батькові','Посада','Зарплата','Початок роботи','Дата народження','Телефон','Місто','Вулиця','Індекс'];
+    const [employeesSum, setEmployeesSum] = useState(null);
 
     function handleSearch(upc){
         setUpc(upc);
+    }
+    function handleSearchSum(sum){
+        setSum(sum);
     }
     useEffect(() => {
             axios
@@ -144,8 +150,20 @@ const Statistics = () => {
         });
     }, [startDate5,endDate5]);
     useEffect(()=>{
-
-    }, [startDate6,endDate6]);
+        axios.get('http://localhost:8082/statistics/employees-with-check-sum', {
+            headers: {
+                Authorization: `Bearer ${authToken}`,
+            },
+            params: {
+                sum: sum
+            }
+        }).then(response => {
+            setEmployeesSum(response.data);
+            console.log(response.data);
+        }).catch(e => {
+            console.log(e);
+        });
+    }, [sum]);
 
     const transformEmployees = employeesNoCheck!==null ? employeesNoCheck.map(employee => {
         const { password, ...rest } = employee;
@@ -186,7 +204,7 @@ const Statistics = () => {
 
                     </div>
                     :
-                    <div>Цей товар не продавався у вказаний період</div>
+                    <div style={{margin: '0 30px',}}>Цей товар не продавався у вказаний період</div>
             }
             <div className="filter">
                 <div className="filter-right" style={{marginLeft:'-30px', marginTop: '20px', marginBottom:'-10px'}}>
@@ -211,7 +229,7 @@ const Statistics = () => {
 
                 </div>
                 :
-                    <div>Немає клієнтів, які купували товари з усіх категорій у вказані дати</div>
+                    <div style={{margin: '0 30px',}}>Немає клієнтів, які купували товари з усіх категорій у вказані дати</div>
             }
             <div className="filter">
                 <div className="filter-right" style={{marginLeft:'-30px', marginTop: '20px', marginBottom:'-10px'}}>
@@ -236,7 +254,7 @@ const Statistics = () => {
 
                     </div>
                     :
-                    <div>У вказані дати чеків постійних клієнтів немає</div>
+                    <div style={{margin: '0 30px',}}>У вказані дати чеків постійних клієнтів немає</div>
             }
             <div className="filter">
                 <div className="filter-right" style={{marginLeft:'-30px', marginTop: '20px', marginBottom:'-10px'}}>
@@ -261,7 +279,7 @@ const Statistics = () => {
 
                     </div>
                     :
-                    <div>Касири у вказані дати чеків не зробили</div>
+                    <div style={{margin: '0 30px',}}>Касири у вказані дати чеків не зробили</div>
             }
             <div className="filter">
                 <div className="filter-right" style={{marginLeft:'-30px', marginTop: '20px', marginBottom:'-10px'}}>
@@ -286,7 +304,7 @@ const Statistics = () => {
 
                     </div>
                     :
-                    <div>У вказані дати касирів без чеків немає</div>
+                    <div style={{margin: '0 30px',}}>У вказані дати касирів без чеків немає</div>
             }
             <div className="filter">
                 <div className="filter-right" style={{marginLeft:'-30px', marginTop: '20px', marginBottom:'-10px'}}>
@@ -311,7 +329,22 @@ const Statistics = () => {
 
                     </div>
                     :
-                    <div>Продажів у вказані дати не було здійснено</div>
+                    <div style={{margin: '0 30px',}}>Продажів у вказані дати не було здійснено</div>
+            }
+            <div className="filter">
+                <div className="filter-right">
+                    <Searchbar onSearch={handleSearchSum} placeholder={"Введіть суму"}/>
+                </div>
+            </div>
+            {
+                employeesSum!==null
+                    ?
+                    <div style={{margin: '10px 30px',}}>
+                        <h3 style={{margin: '10px 0',}}>Статистика касирів, які мають чеки, де загальна сума вища вказаної:</h3>
+                        <Table tableData={headersEmplSum} rowData={employeesSum}/>
+                    </div>
+                    :
+                    <div style={{margin: '0 30px',}}>Таких касирів не знайдено</div>
             }
 
         </div>
