@@ -32,7 +32,7 @@ const LoginForm = () => {
                 })
                 .catch(error => {
                     //alert(error.response.data.massage);
-                    console.error(error.response.data);
+                    console.error(error);
                 });
     };
 
