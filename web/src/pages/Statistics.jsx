@@ -13,8 +13,17 @@ const Statistics = () => {
     const [upc, setUpc] = useState(undefined);
     const [productCount, setProductCount] = useState(0);
     const [productName, setProductName] = useState(undefined);
-    const headersCustCat = ["Номер карти", "Ім'я", 'Прізвище', "По-батькові"];
+    const headersCustCat = ["Номер карти", "Прізвище", 'Ім\'я', "По-батькові"];
     const [customersCategory, setCustomersCategory] = useState(undefined);
+    const headersCustCheck = ["Номер карти", "Прізвище", 'Ім\'я', "По-батькові", "Кількість чеків", 'Усього', "Середній чек"];
+    const [customersCheck, setCustomersCheck] = useState(undefined);
+    const headersEmplCheck = ["ID", "Прізвище", 'Ім\'я', "Кількість чеків",'Загальна ціна чеків', "Середній чек", "Загальна знижка",'Кількість клієнтів'];
+    const [employeesCheck, setEmployeesCheck] = useState(undefined);
+    const headersEmplNoCheck = ['ID','Прізвище','Ім\'я','По-батькові','Посада','Зарплата','Початок роботи','Дата народження','Телефон','Місто','Вулиця','Індекс'];
+    const [employeesNoCheck, setEmployeesNoCheck] = useState(undefined);
+    const headersSalesCategory = ['ID','Назва','Загальні продажі','Середня знижка','Кількість проданих товарів','Середня ціна продажу'];
+    const [salesCategory, setSalesCategory] = useState(undefined);
+
     function handleSearch(upc){
         setUpc(upc);
         if (startDate === undefined && endDate===undefined) {
@@ -58,11 +67,11 @@ const Statistics = () => {
                     endDate:new Date(endDate)
                 }
             }).then(response => {
-                console.log(response.data);
+                setCustomersCategory(response.data);
             }).catch(e => {
                 console.log(e);
-            })
-            ////////////
+            });
+
             axios.get('http://localhost:8082/statistics/customers-checks', {
                 headers: {
                     Authorization: `Bearer ${authToken}`,
@@ -72,11 +81,12 @@ const Statistics = () => {
                     endDate:new Date(endDate)
                 }
             }).then(response => {
+                setCustomersCheck(response.data);
                 console.log(response.data);
             }).catch(e => {
                 console.log(e);
-            })
-            ///////////
+            });
+
             axios.get('http://localhost:8082/statistics/employees-checks', {
                 headers: {
                     Authorization: `Bearer ${authToken}`,
@@ -86,11 +96,12 @@ const Statistics = () => {
                     endDate:new Date(endDate)
                 }
             }).then(response => {
+                setEmployeesCheck(response.data);
                 console.log(response.data);
             }).catch(e => {
                 console.log(e);
-            })
-            ///////////////
+            });
+
             axios.get('http://localhost:8082/statistics/employees-without-checks', {
                 headers: {
                     Authorization: `Bearer ${authToken}`,
@@ -100,11 +111,12 @@ const Statistics = () => {
                     endDate:new Date(endDate)
                 }
             }).then(response => {
+                setEmployeesNoCheck(response.data);
                 console.log(response.data);
             }).catch(e => {
                 console.log(e);
-            })
-            ////////
+            });
+
             axios.get('http://localhost:8082/statistics/sales-by-category', {
                 headers: {
                     Authorization: `Bearer ${authToken}`,
@@ -114,12 +126,17 @@ const Statistics = () => {
                     endDate:new Date(endDate)
                 }
             }).then(response => {
+                setSalesCategory(response.data);
                 console.log(response.data);
             }).catch(e => {
                 console.log(e);
             })
         }
     }, [startDate,endDate]);
+    const transformEmployees = employeesNoCheck!==undefined ? employeesNoCheck.map(employee => {
+        const { password, ...rest } = employee;
+        return rest;
+    }) : {};
     return (
         <div>
             <Navbar/>
@@ -167,6 +184,53 @@ const Statistics = () => {
                 </div>
                 :
                 null
+            }
+            {
+                customersCheck!==undefined
+                    ?
+                    <div style={{margin: '10px 30px',}}>
+                        <h3 style={{margin: '10px 0',}}>Статистика чеків постійних клієнтів:</h3>
+                        <Table tableData={headersCustCheck} rowData={customersCheck}/>
+
+                    </div>
+                    :
+                    null
+            }
+
+            {
+                employeesCheck!==undefined
+                    ?
+                    <div style={{margin: '10px 30px',}}>
+                        <h3 style={{margin: '10px 0',}}>Статистика чеків, які зробили касири:</h3>
+                        <Table tableData={headersEmplCheck} rowData={employeesCheck}/>
+
+                    </div>
+                    :
+                    null
+            }
+
+            {
+                employeesNoCheck!==undefined
+                    ?
+                    <div style={{margin: '10px 30px',}}>
+                        <h3 style={{margin: '10px 0',}}>Статистика працівників без чеків:</h3>
+                        <Table tableData={headersEmplNoCheck} rowData={transformEmployees}/>
+
+                    </div>
+                    :
+                    null
+            }
+
+            {
+                salesCategory!==undefined
+                    ?
+                    <div style={{margin: '10px 30px',}}>
+                        <h3 style={{margin: '10px 0',}}>Статистика продажів за категоріями:</h3>
+                        <Table tableData={headersSalesCategory} rowData={salesCategory}/>
+
+                    </div>
+                    :
+                    null
             }
 
         </div>
