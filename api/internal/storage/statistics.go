@@ -89,7 +89,7 @@ func (s *statisticsStorage) GetEmployeesChecks(opts *service.GetEmployeesChecksO
 	var dateFilter string
 	var args []interface{}
 	if opts.StartDate != nil && opts.EndDate != nil {
-		dateFilter = "WHERE ch.print_date BETWEEN $1 AND $2 "
+		dateFilter = "AND ch.print_date BETWEEN $1 AND $2 "
 		args = append(args, opts.StartDate, opts.EndDate)
 	}
 
@@ -109,6 +109,8 @@ JOIN
     checks ch ON e.id_employee = ch.fk_id_employee
 LEFT JOIN
     customer_card cc ON ch.fk_card_number = cc.card_number
+WHERE
+    e.empl_role = 'Касир'
  %s 
 GROUP BY
     e.id_employee, e.empl_surname, e.empl_name
