@@ -1,7 +1,7 @@
 package entity
 
 type CustomerCard struct {
-	ID          string `json:"id" validate:"required,max=13"`
+	ID          string `json:"id"`
 	Surname     string `json:"surname" validate:"required,max=50"`
 	Name        string `json:"name" validate:"required,max=50"`
 	Patronymic  string `json:"patronymic" validate:"required,max=50"`
