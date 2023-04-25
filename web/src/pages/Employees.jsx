@@ -11,8 +11,9 @@ import Table from "../components/UI/table/Table";
 import EmployeeFormPopup from "../components/popups/EmployeeFormPopup";
 import ModalForm from "../components/UI/Modal/ModalForm";
 import axios from "axios";
-import Report from "../components/Report";
-import { pdfMake } from '@react-pdf/renderer';
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import {handleDownloadPdf} from "../functions";
 
 const Employees = () => {
     const authToken = localStorage.getItem('authToken');
@@ -167,13 +168,10 @@ const Employees = () => {
         return rest;
     });
 
-    const generatePdf = () => {
-        const document = <Report />;
-        const pdfDocGenerator = pdfMake.createPdf(document);
-        pdfDocGenerator.download('table.pdf');
+    const printRef = React.useRef();
+    function handlePrint(){
+        handleDownloadPdf(printRef,'Employee');
     }
-
-
     return (
         <div>
             <Navbar/>
@@ -192,13 +190,15 @@ const Employees = () => {
                 <RoundButton onClick={handleAdd}>+</RoundButton>
                 <RoundButton onClick={handleDelete}>&minus;</RoundButton>
                 <RoundButton onClick={handleEdit}><img src={edit} width="14px" height="12px"/></RoundButton>
-                <PrintButton/>
+                <PrintButton onClick={handlePrint}/>
                 </div>
             </div>
             <ModalForm visible={modal} setVisible={setModal}>
                 <EmployeeFormPopup setVisible={setModal} create={createEmployee} edit={editEmployee} selectedRow={isEditing ? employees.find(employee => employee.id === selectedRow.id) : undefined}/>
             </ModalForm>
+            <div ref={printRef}>
             <Table tableData={tableData} rowData={transformEmployees} setSelectedRow={setSelectedRow}/>
+            </div>
         </div>
     );
 };

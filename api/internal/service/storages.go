@@ -17,7 +17,7 @@ type EmployeeStorage interface {
 	Get(id string) (*entity.Employee, error)
 	List(opts ListEmployeeOptions) ([]*entity.Employee, error)
 	Update(id string, employee *entity.Employee) (*entity.Employee, error)
-	Delete(ids []string) error
+	Delete(id string) error
 }
 
 type CustomerCardStorage interface {
@@ -25,7 +25,7 @@ type CustomerCardStorage interface {
 	Get(id string) (*entity.CustomerCard, error)
 	List(opts ListCardOptions) ([]*entity.CustomerCard, error)
 	Update(id string, card *entity.CustomerCard) (*entity.CustomerCard, error)
-	Delete(ids []string) error
+	Delete(id string) error
 }
 
 type ProductStorage interface {
@@ -33,32 +33,33 @@ type ProductStorage interface {
 	GetProduct(id int) (*entity.Product, error)
 	ListProducts(opts *ListProductsOptions) ([]*entity.Product, error)
 	UpdateProduct(id int, product *entity.Product) (*entity.Product, error)
-	DeleteProducts(ids []int) error
+	DeleteProduct(id int) error
 
 	CreateProductCategory(category *entity.ProductCategory) (*entity.ProductCategory, error)
+	GetProductCategory(id int) (*entity.ProductCategory, error)
 	ListProductCategories(opts *ListProductCategoriesOptions) ([]*entity.ProductCategory, error)
 	UpdateProductCategory(id int, product *entity.ProductCategory) (*entity.ProductCategory, error)
-	DeleteProductCategories(ids []int) error
+	DeleteProductCategory(id int) error
 
 	CreateStoreProduct(storeProduct *entity.StoreProduct) (*entity.StoreProduct, error)
 	GetStoreProduct(id string) (*entity.StoreProduct, error)
 	ListStoreProducts(opts *ListStoreProductsOptions) ([]*entity.StoreProduct, error)
 	UpdateStoreProduct(id string, storeProduct *entity.StoreProduct) (*entity.StoreProduct, error)
-	DeleteStoreProducts(ids []string) error
+	DeleteStoreProduct(id string) error
 }
 
 type CheckStorage interface {
 	CreateCheck(check *entity.Check) (*entity.Check, error)
 	GetCheck(id string) (*entity.Check, error)
-	ListChecks(opts ListChecksOptions) ([]*entity.Check, error)
+	ListChecks(opts *ListChecksOptions) ([]*entity.Check, error)
 	UpdateCheck(id string, check *entity.Check) (*entity.Check, error)
-	DeleteChecks(ids []string) error
+	DeleteCheck(id string) error
 
 	CreateCheckItem(checkItem *entity.CheckItem) (*entity.CheckItem, error)
 	GetCheckItem(id entity.CheckItemID) (*entity.CheckItem, error)
-	ListCheckItems(opts ListCheckItemsOptions) ([]*entity.CheckItem, error)
+	ListCheckItems(opts *ListCheckItemsOptions) ([]*entity.CheckItem, error)
 	UpdateCheckItem(id entity.CheckItemID, checkItem *entity.CheckItem) (*entity.CheckItem, error)
-	DeleteCheckItems(ids []entity.CheckItemID) error
+	DeleteCheckItem(id entity.CheckItemID) error
 }
 
 type StatisticsStorage interface {

@@ -9,6 +9,7 @@ import (
 	"github.com/vadimpk/db-project-zlagoda/api/config"
 	"github.com/vadimpk/db-project-zlagoda/api/internal/service"
 	"github.com/vadimpk/db-project-zlagoda/api/pkg/errs"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -23,7 +24,7 @@ type Options struct {
 
 func New(options Options) http.Handler {
 	handler := gin.New()
-	handler.Use(corsMiddleware)
+	handler.Use(corsMiddleware())
 
 	validate := validator.New()
 	options.validate = *validate
@@ -81,23 +82,19 @@ func newAuthMiddleware(opts *Options, role string) gin.HandlerFunc {
 	}
 }
 
-// corsMiddleware - used to allow incoming cross-origin requests.
-func corsMiddleware(c *gin.Context) {
-    /*c.Header("Access-Control-Allow-Origin", "*")
-	c.Header("Access-Control-Allow-Methods", "*")
-	c.Header("Access-Control-Allow-Headers", "*")
-	c.Header("Content-Type", "application/json")*/
-	c.Header("Access-Control-Allow-Origin", "http://localhost:3000")
-            c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-            c.Header("Access-Control-Allow-Headers", "Origin, Content-Type, Content-Length, Accept-Encoding, Authorization")
-            c.Header("Access-Control-Allow-Credentials", "true")
+func corsMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		log.Println(c.Request.Header.Get("Origin"))
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, DELETE")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "*")
 
-            // Якщо запит методом OPTIONS, повертаємо статус 200
-            if c.Request.Method == "OPTIONS" {
-                c.AbortWithStatus(200)
-                return
-            }
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(200)
+			return
+		}
 
-            c.Next()
+		c.Next()
+	}
 }
-

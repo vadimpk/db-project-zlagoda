@@ -98,7 +98,7 @@ const ProductStoreFormPopup = ({setVisible, create, selectedRow, edit}) => {
             }
         }
 
-        if(product.promotional&&(product.promotional_id===''&&product.promotional_id===null)){
+        if(product.promotional&&(product.promotional_id===''||product.promotional_id===null)){
             errors.promotional='Якщо товар акційний повинно бути вказано UPC не акційного товару';
         }
         if (!idPattern.test(product.product_id)) {

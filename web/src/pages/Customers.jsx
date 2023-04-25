@@ -12,6 +12,7 @@ import EmployeeFormPopup from "../components/popups/EmployeeFormPopup";
 import ModalForm from "../components/UI/Modal/ModalForm";
 import CustomerFormPopup from "../components/popups/CustomerFormPopup";
 import axios from "axios";
+import {handleDownloadPdf} from "../functions";
 
 const Customers = () => {
     const authToken = localStorage.getItem('authToken');
@@ -130,6 +131,10 @@ const Customers = () => {
             });
         setModal(false)
     }
+    const printRef = React.useRef();
+    function handlePrint(){
+        handleDownloadPdf(printRef,'Customers');
+    }
     return (
         <div>
             <Navbar/>
@@ -139,23 +144,25 @@ const Customers = () => {
                 </div>
                 <div className="filter-left">
                     <RoundButton onClick={handleAdd}>+</RoundButton>
-                    <RoundButton onClick={handleDelete}>&minus;</RoundButton>
                     {
                         isManager
                         ?
                             <>
-                                <RoundButton onClick={handleEdit}><img src={edit} width="14px" height="12px"/></RoundButton>
-                                <PrintButton/>
+                                <RoundButton onClick={handleDelete}>&minus;</RoundButton>
+                                <PrintButton onClick={handlePrint}/>
                             </>
                             :
                         null
                     }
+                    <RoundButton onClick={handleEdit}><img src={edit} width="14px" height="12px"/></RoundButton>
                     <ModalForm visible={modal} setVisible={setModal}>
                         <CustomerFormPopup setVisible={setModal} create={createCustomer} edit={editCustomer} selectedRow={isEditing  ? customers.find(customer => customer.id === selectedRow.id):undefined}/>
                     </ModalForm>
                 </div>
             </div>
+            <div ref={printRef}>
             <Table tableData={tableData} rowData={customers} setSelectedRow={setSelectedRow}/>
+            </div>
         </div>
     );
 };

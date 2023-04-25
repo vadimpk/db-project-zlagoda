@@ -21,8 +21,6 @@ const Statistics = () => {
     const [endDate4, setEndDate4] = useState(new Date());
     const [startDate5, setStartDate5] = useState(dateS);
     const [endDate5, setEndDate5] = useState(new Date());
-    const [startDate6, setStartDate6] = useState(dateS);
-    const [endDate6, setEndDate6] = useState(new Date());
     const [upc, setUpc] = useState('121212121212');
     const [productCount, setProductCount] = useState(0);
     const [sum, setSum] = useState(10);
@@ -96,7 +94,7 @@ const Statistics = () => {
             }
         }).then(response => {
             setCustomersCheck(response.data);
-            console.log(response.data);
+
         }).catch(e => {
             console.log(e);
         });
@@ -112,7 +110,7 @@ const Statistics = () => {
             }
         }).then(response => {
             setEmployeesCheck(response.data);
-            console.log(response.data);
+
         }).catch(e => {
             console.log(e);
         });
@@ -128,7 +126,7 @@ const Statistics = () => {
             }
         }).then(response => {
             setEmployeesNoCheck(response.data);
-            console.log(response.data);
+
         }).catch(e => {
             console.log(e);
         });
@@ -144,7 +142,7 @@ const Statistics = () => {
             }
         }).then(response => {
             setSalesCategory(response.data);
-            console.log(response.data);
+
         }).catch(e => {
             console.log(e);
         });
@@ -159,7 +157,7 @@ const Statistics = () => {
             }
         }).then(response => {
             setEmployeesSum(response.data);
-            console.log(response.data);
+
         }).catch(e => {
             console.log(e);
         });
@@ -196,7 +194,7 @@ const Statistics = () => {
                             Назва: {productName}
                         </p>
                         <p>
-                            Період: з {startDate.toLocaleDateString()} до {endDate.toLocaleDateString()}
+                            Період: з {new Date(startDate).toLocaleDateString()} до {new Date(endDate).toLocaleDateString()}
                         </p>
                         <p>
                         Кількість: {productCount} одиниць

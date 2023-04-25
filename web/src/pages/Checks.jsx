@@ -12,6 +12,7 @@ import ModalForm from "../components/UI/Modal/ModalForm";
 import CheckProductFormPopup from "../components/popups/CheckProductFormPopup";
 import axios from "axios";
 import SearchInput from "../components/UI/inputs/text-password/SearchInput";
+import {handleDownloadPdf} from "../functions";
 
 const Checks = () => {
     const authToken = localStorage.getItem('authToken');
@@ -59,7 +60,8 @@ const Checks = () => {
     async function fetchData() {
         try {
             const params = {}
-            const currentDate = new Date().toISOString().slice(0, 10);
+            const currentDate = new Date();
+            currentDate.setHours(0, 0, 0, 0);
             if (!isManager) {
                 params.employeeID=employee.id;
                 params.startDate= currentDate;
@@ -69,6 +71,7 @@ const Checks = () => {
                     Authorization: `Bearer ${authToken}`,
                 }, params
             });
+
             setChecks(checksResponse.data);
 
             const cashiersResponse = await axios.get(
@@ -98,26 +101,32 @@ const Checks = () => {
     useEffect(() => {
         fetchData();
     }, []);
+
     useEffect(() => {
+        if ((startDate !== undefined && endDate !== undefined)||(selectedCashier.employee_id !== "" && isManager)) {
         const params = {};
-        if (startDate!==undefined&&endDate!==undefined) {
+        if (startDate !== undefined && endDate !== undefined) {
             params.startDate = new Date(startDate);
             params.endDate = new Date(endDate);
         }
-        if(selectedCashier.employee_id!==""){
+        if (selectedCashier.employee_id !== "" && isManager) {
             params.employeeID = selectedCashier.employee_id;
+        } else {
+            params.employeeID = employee.id;
         }
-            axios.get("http://localhost:8082/check", {
-                headers: {
-                    Authorization: `Bearer ${authToken}`,
-                },
-                params
-            }).then(response => {
-                if(response.data===null){
-                    setChecks([]);
-                }
-                setChecks(response.data);
-            })
+        axios.get("http://localhost:8082/check", {
+            headers: {
+                Authorization: `Bearer ${authToken}`,
+            },
+            params
+        }).then(response => {
+            if (response.data === null) {
+                setChecks([]);
+            }
+            console.log(response.data)
+            setChecks(response.data);
+        })
+    }
     }, [startDate, endDate, selectedCashier])
     useEffect(() => {
         let data;
@@ -307,7 +316,10 @@ const Checks = () => {
             items: []
         });
     }
-
+    const printRef = React.useRef();
+    function handlePrint(){
+        handleDownloadPdf(printRef,'Checks');
+    }
     return (
         <div>
             <Navbar/>
@@ -346,7 +358,7 @@ const Checks = () => {
                         <div className="filter-left">
                             <RoundButton onClick={handleDelete}>&minus;</RoundButton>
                             <RoundButton onClick={handleSum}>$</RoundButton>
-                            <PrintButton/>
+                            <PrintButton onClick={handlePrint}/>
                         </div>
                             <Modal visible={isOpenSearch} setVisible={setOpenSearch}>
                                 <CheckPopup setVisible={setOpenSearch} startDate={startDate} endDate={endDate} sum={sum} cashier={selectedCashier.fullName}/>
@@ -368,10 +380,12 @@ const Checks = () => {
                 </ModalForm>
             </div>
             <div className="two-tables-div">
+                <div ref={printRef}>
                 <Table
                     tableData={ isManager ? checksHeadersM : checksHeaders}
                     rowData={transformedData}
                     setSelectedRow={setSelectedRow}/>
+                </div>
                 {
                     selectedCheck!==undefined
                     ?
