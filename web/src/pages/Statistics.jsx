@@ -21,8 +21,6 @@ const Statistics = () => {
     const [endDate4, setEndDate4] = useState(new Date());
     const [startDate5, setStartDate5] = useState(dateS);
     const [endDate5, setEndDate5] = useState(new Date());
-    const [startDate6, setStartDate6] = useState(dateS);
-    const [endDate6, setEndDate6] = useState(new Date());
     const [upc, setUpc] = useState('121212121212');
     const [productCount, setProductCount] = useState(0);
     const [sum, setSum] = useState(10);
