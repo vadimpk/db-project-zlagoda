@@ -211,6 +211,7 @@ func (s *statisticsStorage) GetCustomersChecks(opts *service.GetCustomersChecksO
      SUM(ch.sum_total) AS total_check_amount 
  	FROM customer_card c 
  	LEFT JOIN checks ch ON c.card_number = ch.fk_card_number 
+ 	%s
  	GROUP BY c.card_number, c.cust_surname, c.cust_name, c.cust_patronymic;
  `, dateFilter)
 	s.logger.Infof("executing query: %s", query)
