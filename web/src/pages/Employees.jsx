@@ -11,6 +11,8 @@ import Table from "../components/UI/table/Table";
 import EmployeeFormPopup from "../components/popups/EmployeeFormPopup";
 import ModalForm from "../components/UI/Modal/ModalForm";
 import axios from "axios";
+import Report from "../components/Report";
+import { pdfMake } from '@react-pdf/renderer';
 
 const Employees = () => {
     const authToken = localStorage.getItem('authToken');
@@ -164,6 +166,13 @@ const Employees = () => {
         const { password, ...rest } = employee;
         return rest;
     });
+
+    const generatePdf = () => {
+        const document = <Report />;
+        const pdfDocGenerator = pdfMake.createPdf(document);
+        pdfDocGenerator.download('table.pdf');
+    }
+
 
     return (
         <div>
