@@ -151,38 +151,24 @@ func (s *statisticsStorage) GetCustomersBuyAllCategories(opts *service.GetCustom
 	var dateFilter string
 	var args []interface{}
 	if opts.StartDate != nil && opts.EndDate != nil {
-		dateFilter = "AND ch.print_date >= $1 AND ch.print_date <= $2"
+		dateFilter = "AND ch.print_date BETWEEN $1 AND $2 "
 		args = append(args, opts.StartDate, opts.EndDate)
 	}
 
-	query := fmt.Sprintf(`
-SELECT DISTINCT c.card_number, c.cust_surname, c.cust_name, c.cust_patronymic
-FROM customer_card c
-WHERE NOT EXISTS (
-  SELECT k.category_number
-  FROM category k
-  WHERE k.category_number NOT IN (
-    SELECT p.fk_category_number
-    FROM product p
-    WHERE NOT EXISTS (
-      SELECT s.upc
-      FROM store_product s
-      WHERE s.fk_id_product = p.id_product
-      AND EXISTS (
-        SELECT sa.fk_check_number
-        FROM sale sa
-        WHERE sa.fk_UPC = s.UPC
-        AND sa.fk_check_number IN (
-          SELECT ch.check_number
-          FROM checks ch
-          WHERE ch.fk_card_number = c.card_number
-          %s
-        )
-      )
-    )
-  )
+	query := fmt.Sprintf(`SELECT DISTINCT c.card_number, c.cust_surname, c.cust_name, c.cust_patronymic
+ FROM customer_card c
+ WHERE NOT EXISTS (
+   SELECT *
+   FROM product
+   WHERE NOT EXISTS (
+     SELECT *
+     FROM sale s
+     JOIN checks ch ON s.fk_check_number = ch.check_number
+     WHERE s.fk_UPC = (SELECT UPC FROM store_product WHERE fk_id_product = product.id_product)
+     AND ch.fk_card_number = c.card_number %s
+   )
  );
-`, dateFilter)
+ `, dateFilter)
 	s.logger.Infof("executing query: %s", query)
 	rows, err := s.db.Query(query, args...)
 	if err != nil {
@@ -216,18 +202,17 @@ func (s *statisticsStorage) GetCustomersChecks(opts *service.GetCustomersChecksO
 	}
 
 	query := fmt.Sprintf(`
-  SELECT c.card_number AS customer_id,
-    c.cust_surname, 
-    c.cust_name, 
-    c.cust_patronymic,
-    COUNT(ch.check_number) AS check_count, 
-    AVG(ch.sum_total) AS avg_check_price, 
-    SUM(ch.sum_total) AS total_check_amount 
-  FROM customer_card c 
-  LEFT JOIN checks ch ON c.card_number = ch.fk_card_number 
-  %s
-  GROUP BY c.card_number, c.cust_surname, c.cust_name, c.cust_patronymic;
-`, dateFilter)
+ 	SELECT c.card_number AS customer_id,
+     c.cust_surname, 
+     c.cust_name, 
+     c.cust_patronymic,
+     COUNT(ch.check_number) AS check_count, 
+     AVG(ch.sum_total) AS avg_check_price, 
+     SUM(ch.sum_total) AS total_check_amount 
+ 	FROM customer_card c 
+ 	LEFT JOIN checks ch ON c.card_number = ch.fk_card_number 
+ 	GROUP BY c.card_number, c.cust_surname, c.cust_name, c.cust_patronymic;
+ `, dateFilter)
 	s.logger.Infof("executing query: %s", query)
 	rows, err := s.db.Query(query, args...)
 	if err != nil {
