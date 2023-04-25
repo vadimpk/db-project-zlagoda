@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import RoundButton from "../UI/buttons/RoundButton";
 import BigButton from "../UI/buttons/BigButton";
 import InputTextForm from "../UI/inputs/text-password/InputTextForm";
@@ -6,115 +6,153 @@ import Radio from "../UI/inputs/radio/Radio";
 import DateForm from "../UI/inputs/date/DateForm";
 
 const EmployeeFormPopup = ({setVisible, create, selectedRow, edit}) => {
-    const [employee, setEmployee] = useState(selectedRow ||
+    const [employee, setEmployee] = useState(
         {
-        ID:  '',
-        fullName: {
-            surname: '',
-            name: '',
-            lastName: ''
-        },
-        position: '',
-        salary: '',
-        startDate: '',
-        birthDate: '',
+        id:  '',
+        surname: '',
+        name: '',
+        patronymic: '',
+        role: '',
+        salary: 0,
+        date_of_birth: '',
+        date_of_start: '',
         phone: '',
-        address: {
-            city: '',
-            street: '',
-            zipCode: ''
-        }
+        city: '',
+        street: '',
+        zip: '',
+        password: ''
     });
+
+    useEffect(() => {
+        if (selectedRow!==undefined) {
+            setEmployee(selectedRow)
+            console.log(selectedRow)
+        }
+    },[selectedRow]);
 
     const addNewEmployee = (e) => {
         e.preventDefault()
         if (validateForm()) {
+        const dateB = employee.date_of_birth
+        employee.date_of_birth=new Date(dateB)
+        const dateS = employee.date_of_start
+        employee.date_of_start = new Date(dateS)
+        const salary = parseFloat(employee.salary)
+        employee.salary=salary
         create(employee)
+
     }
         setEmployee({
-            ID: '',
-            fullName: {
-                name: '',
-                surname: '',
-                lastName: ''
-            },
-            position: '',
-            salary: '',
-            startDate: '',
-            birthDate: '',
+            id:  '',
+            surname: '',
+            name: '',
+            patronymic: '',
+            role: '',
+            salary: 0,
+            date_of_birth: '',
+            date_of_start: '',
             phone: '',
-            address: {
-                city: '',
-                street: '',
-                zipCode: ''
-            }})
+            city: '',
+            street: '',
+            zip: '',
+            password: ''
+        })
         setVisible(false)
     }
     const editEmployee = (e) => {
         e.preventDefault()
-        setEmployee({...employee, ID: selectedRow.ID})
-        console.log(selectedRow.ID)
+        setEmployee({...employee, id: selectedRow.id})
         if (validateForm()) {
-            edit(employee, selectedRow.ID)
+            const dateB = employee.date_of_birth
+            employee.date_of_birth=new Date(dateB)
+            const dateS = employee.date_of_start
+            employee.date_of_start = new Date(dateS)
+            const salary = parseFloat(employee.salary)
+            employee.salary=salary
+            edit(employee, selectedRow.id)
         }
         setEmployee({
-            ID: '',
-            fullName: {
-                name: '',
-                surname: '',
-                lastName: ''
-            },
-            position: '',
-            salary: '',
-            startDate: '',
-            birthDate: '',
+            id:  '',
+            surname: '',
+            name: '',
+            patronymic: '',
+            role: '',
+            salary: 0,
+            date_of_birth: '',
+            date_of_start: '',
             phone: '',
-            address: {
-                city: '',
-                street: '',
-                zipCode: ''
-            }})
+            city: '',
+            street: '',
+            zip: '',
+            password: ''
+        })
         setVisible(false)
     }
 
     const validateForm = () => {
-        const nameRegex = /^[іїа-яА-Я]+$/;
-        const phoneRegex = /^\+380\d{9}$/;
-        const zipCodeRegex = /^\d{5}$/;
-        const errors = {};
-
-        if (!employee.fullName.surname || !nameRegex.test(employee.fullName.surname.trim())) {
-            errors.surname = 'Некоректне прізвище';
-        }
-        if (!employee.fullName.name || !nameRegex.test(employee.fullName.name.trim())) {
-            errors.name = 'Некоректне ім\'я';
-        }
-        if ((!employee.ID)&&selectedRow===undefined) {
-            errors.ID = 'Некоректний ID';
-        }
-        if (!employee.salary || isNaN(employee.salary)) {
-            errors.salary = 'Некоректна зарплата';
-        }
-        if (!employee.phone || !phoneRegex.test(employee.phone)) {
-            errors.phone = 'Некоректний номер телефону';
-        }
-        if (!employee.address.city || !nameRegex.test(employee.address.city.trim())) {
-            errors.city = 'Некоректне місто';
-        }
-        if (!employee.address.street || !nameRegex.test(employee.address.street.trim())) {
-            errors.street = 'Некоректна вулиця';
-        }
-        if (!employee.address.zipCode || !zipCodeRegex.test(employee.address.zipCode)) {
-            errors.zipCode = 'Некоректний індекс';
-        }
-        if (!employee.startDate) {
-            errors.startDate = 'Вкажіть дату початку роботи';
-        }
-        if (!employee.birthDate) {
-            errors.birthDate = 'Вкажіть дату народження';
+        const errors ={}
+            const nameRegExp = /^[а-щА-ЩЬьЮюЯяЇїІіЄєҐґ']{1,50}$/;
+            const phoneRegExp = /^\+380\d{9}$/;
+            const salaryRegExp = /^\d+(\.\d+)?$/;
+            const zipRegExp = /^\d{5}(\d{4})?$/;
+        const addressRegExp = /^[а-щА-ЩЬьЮюЯяЇїІіЄєҐґ0-9'.,\s-]{1,50}$/;
+        const now = new Date();
+        const birthDate = new Date(employee.date_of_birth);
+        let age = now.getFullYear() - birthDate.getFullYear();
+        const monthDiff = now.getMonth() - birthDate.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < birthDate.getDate())) {
+            age--;
         }
 
-        if (Object.keys(errors).length > 0) {
+            if (!nameRegExp.test(employee.name)) {
+                errors.name="Ім'я має містити від 1 до 50 букв українського алфавіту";
+            }
+
+            if (!nameRegExp.test(employee.surname)) {
+                errors.surname="Прізвище має містити від 1 до 50 букв українського алфавіту";
+            }
+
+            if (!nameRegExp.test(employee.patronymic)) {
+                errors.patronymic="По-батькові має містити від 1 до 50 букв українського алфавіту";
+            }
+
+            if (employee.id.length>10) {
+                errors.id="id має містити не більше 10 цифр";
+            }
+
+            if (!salaryRegExp.test(employee.salary)) {
+                errors.salary="Зарплата має бути числом";
+            }
+
+            if (!phoneRegExp.test(employee.phone)) {
+                errors.phone="Телефон має мати довжину 13 символів, починатись з +380 і містити лише цифри";
+            }
+
+            if (!addressRegExp.test(employee.city)) {
+                errors.city="Місто має містити від 1 до 50 букв, цифр та знаків пунктуації";
+            }
+
+            if (!addressRegExp.test(employee.street)) {
+                errors.street="Вулиця має містити від 1 до 50 букв, цифр та знаків пунктуації";
+            }
+
+            if (!zipRegExp.test(employee.zip)) {
+                errors.zip="Індекс має містити 5 цифр (або 9, якщо використовується формат XXXXX-XXXX)";
+            }
+
+            if (!employee.date_of_start) {
+                errors.date_of_start="Вкажіть дату початку роботи";
+            }
+
+            if (!employee.password) {
+                errors.password="Вкажіть пароль";
+            }
+
+            if (age < 18) {
+                errors.date_of_birth="Вік працівника повинен бути не менше 18 років";
+            }
+
+            if (Object.keys(errors).length > 0) {
             const errorMessages = Object.values(errors).join('\n');
             alert(errorMessages);
             return false;
@@ -139,43 +177,25 @@ const EmployeeFormPopup = ({setVisible, create, selectedRow, edit}) => {
                                 <InputTextForm
                                     name={"name"}
                                     placeholder={"Ім'я"}
-                                    value={employee.fullName.name}
-                                    onChange={e => setEmployee({
-                                        ...employee,
-                                        fullName: {
-                                            ...employee.fullName,
-                                            name: e.target.value
-                                        }
-                                    })}>Ім'я</InputTextForm>
+                                    value={employee.name}
+                                    onChange={e => setEmployee({...employee,name: e.target.value})}>Ім'я</InputTextForm>
                                 <InputTextForm
                                     name={"surname"}
                                     placeholder={"Прізвище"}
-                                    value={employee.fullName.surname}
-                                    onChange={e => setEmployee({
-                                        ...employee,
-                                        fullName: {
-                                            ...employee.fullName,
-                                            surname: e.target.value
-                                        }
-                                    })}>Прізвище</InputTextForm>
+                                    value={employee.surname}
+                                    onChange={e => setEmployee({...employee, surname: e.target.value})}>Прізвище</InputTextForm>
                                 <InputTextForm
                                     name={"secondName"}
                                     placeholder={"По-батькові"}
-                                    value={employee.fullName.lastName}
-                                    onChange={e => setEmployee({
-                                        ...employee,
-                                        fullName: {
-                                            ...employee.fullName,
-                                            lastName: e.target.value
-                                        }
-                                    })}>По-батькові</InputTextForm>
+                                    value={employee.patronymic}
+                                    onChange={e => setEmployee({...employee,patronymic: e.target.value})}>По-батькові</InputTextForm>
                             </div>
                             <div className="form-content">
                                 <InputTextForm
                                     name={"id"}
-                                    placeholder={"ID"}
-                                    value={ selectedRow===undefined ? employee.ID : selectedRow.ID}
-                                    onChange={e => setEmployee({...employee, ID: e.target.value})}>ID</InputTextForm>
+                                    placeholder={"id"}
+                                    value={ employee.id}
+                                    onChange={e => setEmployee({...employee, id: e.target.value})}>id</InputTextForm>
                                 <InputTextForm
                                     name={"salary"}
                                     placeholder={"Зарплата"}
@@ -193,56 +213,47 @@ const EmployeeFormPopup = ({setVisible, create, selectedRow, edit}) => {
                             <Radio
                                 name={"position"}
                                 id={"cashier"}
-                                onClick={() => setEmployee({...employee, position: 'Касир'})}>Касир</Radio>
+                                checked={employee.role === 'Касир'}
+                                onChange={() => setEmployee({...employee, role: 'Касир'})}>Касир</Radio>
                             <Radio
                                 name={"position"}
                                 id={"manager"}
-                                onClick={() => setEmployee({...employee, position: 'Менеджер'})}>Менеджер</Radio>
+                                checked={employee.role === 'Менеджер'}
+                                onChange={() => setEmployee({ ...employee, role: 'Менеджер' })}>Менеджер</Radio>
                         </div>
                         <div className="form-main">
                             <div className="form-content">
                                 <InputTextForm
                                     name={"city"}
                                     placeholder={"Місто"}
-                                    value={employee.address.city}
-                                    onChange={e => setEmployee({
-                                        ...employee,
-                                        address: {
-                                            ...employee.address,
-                                            city: e.target.value
-                                        }
-                                    })}>Місто</InputTextForm>
+                                    value={employee.city}
+                                    onChange={e => setEmployee({...employee, city: e.target.value })}>Місто</InputTextForm>
                                 <InputTextForm
                                     name={"street"}
                                     placeholder={"Вулиця"}
-                                    value={employee.address.street}
-                                    onChange={e => setEmployee({
-                                        ...employee,
-                                        address: {
-                                            ...employee.address,
-                                            street: e.target.value
-                                        }
-                                    })}>Вулиця</InputTextForm>
+                                    value={employee.street}
+                                    onChange={e => setEmployee({...employee, street: e.target.value})}>Вулиця</InputTextForm>
                                 <InputTextForm
                                     name={"index"}
-                                    value={employee.address.zipCode}
-                                    onChange={e => setEmployee({
-                                        ...employee,
-                                        address: {
-                                            ...employee.address,
-                                            zipCode: e.target.value
-                                        }
-                                    })}>Індекс</InputTextForm>
+                                    value={employee.zip}
+                                    onChange={e => setEmployee({...employee, zip: e.target.value})}>Індекс</InputTextForm>
                             </div>
                             <div className="form-content">
                                 <DateForm
                                     name={"startWork"}
-                                    value={employee.startDate}
-                                    onChange={e => setEmployee({...employee, startDate: e.target.value})}>Дата початку роботи</DateForm>
+                                    value={employee.date_of_start.substr(0, 10)}
+                                    onChange={e => setEmployee({...employee, date_of_start: e.target.value})}>Дата початку роботи</DateForm>
                                 <DateForm
                                     name={"birth"}
-                                    value={employee.birthDate}
-                                    onChange={e => setEmployee({...employee, birthDate: e.target.value})}>Дата народження</DateForm>
+                                    value={employee.date_of_birth.substr(0, 10)}
+                                    onChange={e => setEmployee({...employee, date_of_birth: e.target.value})}>
+                                    Дата народження
+                                </DateForm>
+                                <InputTextForm
+                                    name={"street"}
+                                    placeholder={"Пароль"}
+                                    value={employee.password}
+                                    onChange={e => setEmployee({...employee, password: e.target.value})}>Пароль</InputTextForm>
                             </div>
                         </div>
             {selectedRow===undefined

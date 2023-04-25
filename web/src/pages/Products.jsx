@@ -14,140 +14,197 @@ import Table from "../components/UI/table/Table";
 import CustomerFormPopup from "../components/popups/CustomerFormPopup";
 import ModalForm from "../components/UI/Modal/ModalForm";
 import ProductFormPopup from "../components/popups/ProductStoreFormPopup";
-
+import axios from "axios";
 const Products = () => {
-    const {isManager, setIsManager} = useContext(ManagerContext);
-    //EXAMPLE
-    const [products, setProducts] = useState( [
-        {
-            UPC:'1234567890',
-            ID:'1234567890',
-            name:'Хліб Київхліб Супер тост світлий нарізаний 350г',
-            amount:'126',
-            price:'23,6',
-            category:'Хлібобулочні вироби',
-            manufacturer:'ТД "Золотий Урожай"',
-            characteristics:'Тостовий різаний хліб ідеально підходить для смаження на сковороді та приготування тостів.',
-            sale: true
-        },
-        {
-            UPC:'1234567891',
-            ID:'1234567890',
-            name:'Рис',
-            amount:'56',
-            price:'59,8',
-            category:'Бакалія',
-            manufacturer:'Єгипет',
-            characteristics:'дуже смачний рис, напевно',
-            sale:false
-        },
-        {
-            UPC:'1234567896',
-            ID:'1234567890',
-            name:'Шоколад',
-            amount:'23',
-            price:'42',
-            category:'Солодощі',
-            manufacturer:'Рошен',
-            characteristics:'порошенко вподобав допис',
-            sale: true
-        }
-    ]);
-    //example
-    const categories = ['Категорія','Бакалія','Солодощі','Хлібобулочні вироби','Напої','Молочні продукти'];
+    const authToken = localStorage.getItem('authToken');
+    const employee = JSON.parse(localStorage.getItem('employee'));
+    const isManager = employee.role!=='Касир';
+    const [products, setProducts] = useState( []);
+    const [selectPromotion, setSelectPromotion] = useState('');
+    const [selectSort, setSelectSort] = useState('');
+    const [isEditing, setIsEditing] = useState(false);
     const [product, setProduct] = useState({
-        UPC:'',
-        ID:'',
         name:'',
-        amount:'',
-        price:'',
-        category:'',
-        manufacturer:'',
-        characteristics:'',
-        sale: false
+        count:0,
+        price:0,
+        product_id:0,
+        characteristics: ''
     });
-    const [selectedRow, setSelectedRow] = useState({
-        UPC:'',
-        ID:'',
-        name:'',
-        amount:'',
-        price:'',
-        category:'',
-        manufacturer:'',
-        characteristics:'',
-        sale: false
-    });
-    const tableData = ["UPC", "ID", 'Назва', "Кількість", "Ціна", "Категорія", "Виробник", "Характеристика"];
+    const [selectedRow, setSelectedRow] = useState({});
+    const tableData = ["UPC", "ID", 'Назва', "Кількість", "Ціна", "Акційний товар"];
     const [modal, setModal] = useState(false);
     const [isOpenSearch, setOpenSearch] = useState(false);
-    const [onSale, setOnSale] = useState(false);
-    const [notOnSale, setNotOnSale] = useState(false);
-    const [selectedOption, setSelectedOption] = useState("");
-    const [filteredP, setFilteredP] = useState(products);
 
     function handleSearch(upc) {
-        const product = products.find( e => e.UPC===upc)
-        setProduct(product)
-        setOpenSearch(true)
+        axios.get(`http://localhost:8082/product/store/${upc}`, {
+            headers: {
+                Authorization: `Bearer ${authToken}`
+            }
+        })
+            .then(response => {
+                const productId = response.data.product_id;
+                Promise.all([getProductName(productId), getCharacteristics(productId)])
+                    .then(responses => {
+                        const [name, characteristics] = responses;
+                        const updatedProduct = {
+                            ...product,
+                            product_id: productId,
+                            count: response.data.count,
+                            price: response.data.price,
+                            name,
+                            characteristics
+                        };
+                        setProduct(updatedProduct);
+                        setOpenSearch(true);
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
+            })
+            .catch(error => {
+                alert('Товар не знайдено')
+                console.log(error);
+            });
     }
+    const getCharacteristics = (id) => {
+        return axios.get(`http://localhost:8082/product/${id}`, {
+            headers: {
+                Authorization: `Bearer ${authToken}`
+            }
+        })
+            .then(response => {
+                return response.data.characteristics;
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+    const getProductName = async (id) => {
+        try {
+            const response = await axios.get(`http://localhost:8082/product/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${authToken}`
+                }
+            });
+            return response.data.name;
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
-    function handleSale(){
-        setOnSale(!onSale)
-    }
-    function handleNotSale(){
-        setNotOnSale(!notOnSale)
-    }
-    function handleSelect (category) {
-        setSelectedOption(category);
-    }
     useEffect(() => {
-        const filtered = products.filter(item => {
-            if (selectedOption && selectedOption !== 'Категорія') {
-                return item.category === selectedOption;
+            const params = {
+                sortAscending: true,
+            };
+        if (isManager) {
+            params.sortCount = true;
+        } else {
+            params.sortName = true;
+        }
+            if (selectPromotion==='promotional') {
+                params.promotion = true;
             }
-            if (onSale && item.sale) {
-                return true;
+            if (selectPromotion==='not-promotional') {
+                params.promotion = false;
             }
-            if (notOnSale && !item.sale) {
-                return true;
-            }
-            return !selectedOption && !onSale && !notOnSale;
-        });
-
-        setFilteredP(filtered);
-    }, [products, selectedOption, onSale, notOnSale]);
+        if (selectSort==='name-sort') {
+            params.sortName = true;
+        }
+        if (selectSort==='count-sort') {
+            params.sortCount = true;
+        }
+            axios.get('http://localhost:8082/product/store', {
+                headers: {
+                    Authorization: `Bearer ${authToken}`
+                },
+                params
+            })
+                .then(response => {
+                    const products = response.data;
+                    const promises = products.map(product => getProductName(product.product_id));
+                    Promise.all(promises).then(names => {
+                        const productsWithNames = products.map((product, index) => {
+                            return { ...product, name: names[index] };
+                        });
+                        setProducts(productsWithNames);
+                    });
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+    }, [selectPromotion, selectSort]);
 
     function handleAdd() {
-        setSelectedRow(undefined);
+        setIsEditing(false);
         setModal(true);
     }
     function handleEdit() {
-        if (selectedRow.UPC===''){
+        if (selectedRow.id===undefined){
             alert('Виберіть товар для редагування')
         } else {
+            setIsEditing(true);
             setModal(true)
         }
     }
     function handleDelete() {
-        if (selectedRow.UPC===''){
+        if (selectedRow.id===undefined){
             alert('Виберіть товар для видалення')
         } else {
-            setProducts(prevProducts => prevProducts.filter(product => product.UPC !== selectedRow.UPC));
+            axios.delete(`http://localhost:8082/product/store/${selectedRow.id}`,{
+                headers: {
+                    Authorization: `Bearer ${authToken}`
+                }
+            })
+                .then(response => {
+                    console.log(response.data);
+                })
+                .catch(error => {
+                    alert('Сервер відхилив ваш запит на видалення')
+                    console.log(error);
+                });
         }
     }
+
     const createProduct = (newProduct) => {
-        setProducts(prevProduct => [...prevProduct, newProduct]);
+         axios.post('http://localhost:8082/product/store', newProduct, {
+            headers: {
+                Authorization: `Bearer ${authToken}`
+            }
+        })
+            .then(response => {
+                console.log(response.data);
+            })
+            .catch(error => {
+                alert('Такий товар уже існує')
+                console.log(error);
+            });
         setModal(false)
     }
     const editProduct = (newProduct, upc) => {
-        newProduct.UPC=upc
-        setProducts(products.map(e => {
-            if (e.UPC===upc){
-                return newProduct;
+        newProduct.id=upc
+        axios.put(`http://localhost:8082/product/store/${upc}`, newProduct,{
+            headers: {
+                Authorization: `Bearer ${authToken}`
             }
-            return e
-        }));
+        })
+            .then(response => {
+                console.log(response.data);
+            })
+            .catch(error => {
+                alert('Такий товар уже існує')
+                console.log(error);
+            });
         setModal(false)
+    }
+    function changeFieldsOrder(arr) {
+        return arr.map(({ id, count, product_id, name, category_id, price,promotional, promotional_id}) => ({
+            id,
+            product_id,
+            name,
+            count,
+            price,
+            promotional1 : promotional? 'Так' : 'Ні'
+        }));
     }
     return (
         <div>
@@ -158,14 +215,22 @@ const Products = () => {
                     <Modal visible={isOpenSearch} setVisible={setOpenSearch}>
                         <ProductPopup product={product} setVisible={setOpenSearch}/>
                     </Modal>
-                    <Checkbox
-                        name={"sale"}
-                        checked={onSale}
-                        onChange={handleSale}>Акційні товари</Checkbox>
-                    <Checkbox
-                        name={"nosale"}
-                        checked={notOnSale}
-                        onChange={handleNotSale}>Не акційні товари</Checkbox>
+                    <Select style={{ marginLeft: '15px' }} onChange={(e) => setSelectPromotion(e.target.value)}>
+                        <option key={1} value={'promotional'}>
+                            Акційний
+                        </option>
+                        <option key={2} value={'not-promotional'}>
+                            Не акційний
+                        </option>
+                    </Select>
+                    <Select style={{ marginLeft: '15px' }} onChange={(e) => setSelectSort(e.target.value)}>
+                        <option key={1} value={'name-sort'}>
+                            За алфавітом
+                        </option>
+                        <option key={2} value={'count-sort'}>
+                            За кількістю
+                        </option>
+                    </Select>
                 </div>
                     {
                      isManager
@@ -177,23 +242,13 @@ const Products = () => {
                         <PrintButton/>
                          </div>
                      :
-                         <div className="filter-left">
-                        <Select value={selectedOption} onChange={(e) => handleSelect(e.target.value)}>
-                            {
-                                categories.map((item, index) => (
-                                    <option key={index} value={item}>
-                                        {item}
-                                    </option>
-                                ))
-                            }
-                        </Select>
-                         </div>
+                         null
                     }
                 <ModalForm visible={modal} setVisible={setModal}>
-                    <ProductFormPopup setVisible={setModal} create={createProduct} edit={editProduct} selectedRow={selectedRow===undefined ? undefined : products.find(product => product.UPC === selectedRow.UPC)}/>
+                    <ProductFormPopup setVisible={setModal} create={createProduct} edit={editProduct} selectedRow={isEditing ? products.find(product => product.id === selectedRow.id):undefined }/>
                 </ModalForm>
             </div>
-            <Table tableData={tableData} rowData={filteredP} setSelectedRow={setSelectedRow}/>
+            <Table tableData={tableData} rowData={changeFieldsOrder(products)} setSelectedRow={setSelectedRow}/>
         </div>
     );
 };

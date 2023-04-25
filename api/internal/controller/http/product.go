@@ -23,7 +23,7 @@ func setupProductRoutes(options *Options, handler *gin.Engine) {
 	{
 		productGroup.POST("/", newAuthMiddleware(options, "Менеджер"), routes.createProduct)
 		productGroup.GET("/:id", newAuthMiddleware(options, ""), routes.getProduct)
-		productGroup.GET("/", newAuthMiddleware(options, ""), routes.listProducts)
+		productGroup.GET("/", corsMiddleware(), newAuthMiddleware(options, ""), routes.listProducts)
 		productGroup.PUT("/:id", newAuthMiddleware(options, "Менеджер"), routes.updateProduct)
 		productGroup.DELETE("/:id", newAuthMiddleware(options, "Менеджер"), routes.deleteProduct)
 	}
@@ -31,7 +31,7 @@ func setupProductRoutes(options *Options, handler *gin.Engine) {
 	categoryGroup := productGroup.Group("/category")
 	{
 		categoryGroup.POST("/", newAuthMiddleware(options, "Менеджер"), routes.createCategory)
-		categoryGroup.GET("/", newAuthMiddleware(options, ""), routes.listCategories)
+		categoryGroup.GET("/", corsMiddleware(), newAuthMiddleware(options, ""), routes.listCategories)
 		categoryGroup.PUT("/:id", newAuthMiddleware(options, "Менеджер"), routes.updateCategory)
 		categoryGroup.DELETE("/:id", newAuthMiddleware(options, "Менеджер"), routes.deleteCategory)
 	}
@@ -40,7 +40,7 @@ func setupProductRoutes(options *Options, handler *gin.Engine) {
 	{
 		storeProductGroup.POST("/", newAuthMiddleware(options, "Менеджер"), routes.createStoreProduct)
 		storeProductGroup.GET("/:id", newAuthMiddleware(options, ""), routes.getStoreProduct)
-		storeProductGroup.GET("/", newAuthMiddleware(options, ""), routes.listStoreProducts)
+		storeProductGroup.GET("/", newAuthMiddleware(options, ""), corsMiddleware(), routes.listStoreProducts)
 		storeProductGroup.PUT("/:id", newAuthMiddleware(options, "Менеджер"), routes.updateStoreProduct)
 		storeProductGroup.DELETE("/:id", newAuthMiddleware(options, "Менеджер"), routes.deleteStoreProduct)
 

@@ -27,7 +27,7 @@ func setupEmployeeRoutes(options *Options, handler *gin.Engine) {
 		group.PUT("/:id", newAuthMiddleware(options, "Менеджер"), routes.updateEmployee)
 		group.DELETE("/:id", newAuthMiddleware(options, "Менеджер"), routes.deleteEmployee)
 
-		group.POST("/login", routes.login)
+		group.POST("/login", corsMiddleware(), routes.login)
 	}
 }
 

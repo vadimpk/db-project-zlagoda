@@ -4,6 +4,7 @@ import Checks from "../pages/Checks";
 import Products from "../pages/Products";
 import Login from "../pages/Login";
 import Category from "../pages/Category";
+import Statistics from "../pages/Statistics";
 
 
 export const managerRoutes = [
@@ -12,12 +13,14 @@ export const managerRoutes = [
     {path: '/customers', element: <Customers/>, exact: true},
     {path: '/checks', element: <Checks/>, exact: true},
     {path: '/products', element: <Products/>, exact: true},
-    {path: '/categories', element: <Category/>, exact: true}
+    {path: '/categories', element: <Category/>, exact: true},
+    {path: '/statistics', element: <Statistics/>, exact: true}
 ]
 
 export const cashierRoutes = [
     {path: '/', element: <Login/>, exact: true},
     {path: '/customers', element: <Customers/>, exact: true},
     {path: '/checks', element: <Checks/>, exact: true},
-    {path: '/products', element: <Products/>, exact: true}
+    {path: '/products', element: <Products/>, exact: true},
+    {path: '/categories', element: <Category/>, exact: true}
 ]
