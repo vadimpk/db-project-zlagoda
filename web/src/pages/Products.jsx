@@ -17,40 +17,80 @@ import ProductFormPopup from "../components/popups/ProductStoreFormPopup";
 import axios from "axios";
 const Products = () => {
     const authToken = localStorage.getItem('authToken');
-
-    const {isManager, setIsManager} = useContext(ManagerContext);
-    const [productsInStore, setProductsInStore] = useState( []);
+    const employee = JSON.parse(localStorage.getItem('employee'));
+    const isManager = employee.role!=='Касир';
     const [products, setProducts] = useState( []);
     const [selectPromotion, setSelectPromotion] = useState('');
     const [selectSort, setSelectSort] = useState('');
-
+    const [isEditing, setIsEditing] = useState(false);
     const [product, setProduct] = useState({
-        id:0,
-        product_id:0,
         name:'',
         count:0,
         price:0,
-        promotional: false,
-        promotional_id: 0
-    });
-    const [selectedRow, setSelectedRow] = useState({
-        id:0,
         product_id:0,
-        name:'',
-        count:0,
-        price:0,
-        promotional: false,
-        promotional_id: 0
+        characteristics: ''
     });
+    const [selectedRow, setSelectedRow] = useState({});
     const tableData = ["UPC", "ID", 'Назва', "Кількість", "Ціна", "Акційний товар"];
     const [modal, setModal] = useState(false);
     const [isOpenSearch, setOpenSearch] = useState(false);
 
     function handleSearch(upc) {
-            const product = productsInStore.find(e => e.id === upc)
-            setProduct(product)
-            setOpenSearch(true)
+        axios.get(`http://localhost:8082/product/store/${upc}`, {
+            headers: {
+                Authorization: `Bearer ${authToken}`
+            }
+        })
+            .then(response => {
+                const productId = response.data.product_id;
+                Promise.all([getProductName(productId), getCharacteristics(productId)])
+                    .then(responses => {
+                        const [name, characteristics] = responses;
+                        const updatedProduct = {
+                            ...product,
+                            product_id: productId,
+                            count: response.data.count,
+                            price: response.data.price,
+                            name,
+                            characteristics
+                        };
+                        setProduct(updatedProduct);
+                        setOpenSearch(true);
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
+            })
+            .catch(error => {
+                alert('Товар не знайдено')
+                console.log(error);
+            });
     }
+    const getCharacteristics = (id) => {
+        return axios.get(`http://localhost:8082/product/${id}`, {
+            headers: {
+                Authorization: `Bearer ${authToken}`
+            }
+        })
+            .then(response => {
+                return response.data.characteristics;
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+    const getProductName = async (id) => {
+        try {
+            const response = await axios.get(`http://localhost:8082/product/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${authToken}`
+                }
+            });
+            return response.data.name;
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
     useEffect(() => {
             const params = {
@@ -80,43 +120,80 @@ const Products = () => {
                 params
             })
                 .then(response => {
-                    setProductsInStore(response.data);
+                    const products = response.data;
+                    const promises = products.map(product => getProductName(product.product_id));
+                    Promise.all(promises).then(names => {
+                        const productsWithNames = products.map((product, index) => {
+                            return { ...product, name: names[index] };
+                        });
+                        setProducts(productsWithNames);
+                    });
                 })
                 .catch(error => {
                     console.log(error);
                 });
-    }, [ selectPromotion, selectSort]);
+    }, [selectPromotion, selectSort]);
 
     function handleAdd() {
-        setSelectedRow(undefined);
+        setIsEditing(false);
         setModal(true);
     }
     function handleEdit() {
-        if (selectedRow.id===''){
+        if (selectedRow.id===undefined){
             alert('Виберіть товар для редагування')
         } else {
+            setIsEditing(true);
             setModal(true)
         }
     }
     function handleDelete() {
-        if (selectedRow.id===''){
+        if (selectedRow.id===undefined){
             alert('Виберіть товар для видалення')
         } else {
-            setProductsInStore(prevProducts => prevProducts.filter(product => product.id !== selectedRow.id));
+            axios.delete(`http://localhost:8082/product/store/${selectedRow.id}`,{
+                headers: {
+                    Authorization: `Bearer ${authToken}`
+                }
+            })
+                .then(response => {
+                    console.log(response.data);
+                })
+                .catch(error => {
+                    alert('Сервер відхилив ваш запит на видалення')
+                    console.log(error);
+                });
         }
     }
+
     const createProduct = (newProduct) => {
-        setProductsInStore(prevProduct => [...prevProduct, newProduct]);
+         axios.post('http://localhost:8082/product/store', newProduct, {
+            headers: {
+                Authorization: `Bearer ${authToken}`
+            }
+        })
+            .then(response => {
+                console.log(response.data);
+            })
+            .catch(error => {
+                alert('Такий товар уже існує')
+                console.log(error);
+            });
         setModal(false)
     }
     const editProduct = (newProduct, upc) => {
         newProduct.id=upc
-        setProductsInStore(productsInStore.map(e => {
-            if (e.id===upc){
-                return newProduct;
+        axios.put(`http://localhost:8082/product/store/${upc}`, newProduct,{
+            headers: {
+                Authorization: `Bearer ${authToken}`
             }
-            return e
-        }));
+        })
+            .then(response => {
+                console.log(response.data);
+            })
+            .catch(error => {
+                alert('Такий товар уже існує')
+                console.log(error);
+            });
         setModal(false)
     }
     function changeFieldsOrder(arr) {
@@ -168,10 +245,10 @@ const Products = () => {
                          null
                     }
                 <ModalForm visible={modal} setVisible={setModal}>
-                    <ProductFormPopup setVisible={setModal} create={createProduct} edit={editProduct} selectedRow={selectedRow===undefined ? undefined : products.find(product => product.id === selectedRow.id)}/>
+                    <ProductFormPopup setVisible={setModal} create={createProduct} edit={editProduct} selectedRow={isEditing ? products.find(product => product.id === selectedRow.id):undefined }/>
                 </ModalForm>
             </div>
-            <Table tableData={tableData} rowData={changeFieldsOrder(productsInStore)} setSelectedRow={setSelectedRow}/>
+            <Table tableData={tableData} rowData={changeFieldsOrder(products)} setSelectedRow={setSelectedRow}/>
         </div>
     );
 };
