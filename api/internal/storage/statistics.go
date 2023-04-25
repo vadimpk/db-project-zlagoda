@@ -149,33 +149,21 @@ func (s *statisticsStorage) GetCustomersBuyAllCategories(opts *service.GetCustom
 	var dateFilter string
 	var args []interface{}
 	if opts.StartDate != nil && opts.EndDate != nil {
-		dateFilter = "WHERE ch.print_date BETWEEN $1 AND $2 "
+		dateFilter = "AND ch.print_date BETWEEN $1 AND $2 "
 		args = append(args, opts.StartDate, opts.EndDate)
 	}
 
 	query := fmt.Sprintf(`SELECT DISTINCT c.card_number, c.cust_surname, c.cust_name, c.cust_patronymic
 FROM customer_card c
 WHERE NOT EXISTS (
-  SELECT k.category_number
-  FROM category k
-  WHERE k.category_number NOT IN (
-    SELECT p.fk_category_number
-    FROM product p
-    WHERE NOT EXISTS (
-      SELECT s.fk_UPC
-      FROM store_product s
-      WHERE s.fk_id_product = p.id_product
-      AND EXISTS (
-        SELECT sa.fk_check_number
-        FROM sale sa
-        WHERE sa.fk_UPC = s.UPC
-        AND sa.fk_check_number IN (
-          SELECT ch.check_number
-          FROM checks ch
-          WHERE ch.fk_card_number = c.card_number
-        )
-      )
-    )
+  SELECT *
+  FROM product
+  WHERE NOT EXISTS (
+    SELECT *
+    FROM sale s
+    JOIN checks ch ON s.fk_check_number = ch.check_number
+    WHERE s.fk_UPC = (SELECT UPC FROM store_product WHERE fk_id_product = product.id_product)
+    AND ch.fk_card_number = c.card_number %s
   )
 );
 `, dateFilter)
