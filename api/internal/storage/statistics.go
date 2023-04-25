@@ -23,7 +23,6 @@ func NewStatisticsStorage(logger *logger.Logger, db *sql.DB) service.StatisticsS
 var _ service.StatisticsService = (*statisticsStorage)(nil)
 
 func (s *statisticsStorage) GetSalesByCategory(opts *service.GetSalesByCategoryOptions) ([]*entity.CategorySale, error) {
-
 	var dateFilter string
 	var args []interface{}
 	if opts.StartDate != nil && opts.EndDate != nil {
@@ -155,19 +154,34 @@ func (s *statisticsStorage) GetCustomersBuyAllCategories(opts *service.GetCustom
 		args = append(args, opts.StartDate, opts.EndDate)
 	}
 
-	query := fmt.Sprintf(`SELECT DISTINCT c.card_number, c.cust_surname, c.cust_name, c.cust_patronymic
- FROM customer_card c
- WHERE NOT EXISTS (
-   SELECT *
-   FROM product
-   WHERE NOT EXISTS (
-     SELECT *
-     FROM sale s
-     JOIN checks ch ON s.fk_check_number = ch.check_number
-     WHERE s.fk_UPC = (SELECT UPC FROM store_product WHERE fk_id_product = product.id_product)
-     AND ch.fk_card_number = c.card_number %s
-   )
- );
+	query := fmt.Sprintf(`SELECT DISTINCT
+    cc.card_number,
+    cc.cust_surname,
+    cc.cust_name,
+    cc.cust_patronymic
+FROM
+    customer_card cc
+WHERE
+    NOT EXISTS (
+        SELECT
+            c.category_number
+        FROM
+            category c
+        WHERE
+            NOT EXISTS (
+                SELECT
+                    1
+                FROM
+                    sale s
+                JOIN checks ch ON s.fk_check_number = ch.check_number
+                JOIN store_product sp ON s.fk_UPC = sp.UPC
+                JOIN product p ON sp.fk_id_product = p.id_product
+                WHERE
+                    ch.fk_card_number = cc.card_number
+                    AND p.fk_category_number = c.category_number
+                    %s
+            )
+    );
  `, dateFilter)
 	s.logger.Infof("executing query: %s", query)
 	rows, err := s.db.Query(query, args...)
