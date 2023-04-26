@@ -23,7 +23,6 @@ func NewStatisticsStorage(logger *logger.Logger, db *sql.DB) service.StatisticsS
 var _ service.StatisticsService = (*statisticsStorage)(nil)
 
 func (s *statisticsStorage) GetSalesByCategory(opts *service.GetSalesByCategoryOptions) ([]*entity.CategorySale, error) {
-
 	var dateFilter string
 	var args []interface{}
 	if opts.StartDate != nil && opts.EndDate != nil {
@@ -51,7 +50,7 @@ JOIN
     category c ON p.fk_category_number = c.category_number
 LEFT JOIN
     customer_card cc ON ch.fk_card_number = cc.card_number
- %s 
+ %s
 GROUP BY
     c.category_number, c.category_name
 ORDER BY
@@ -111,7 +110,7 @@ LEFT JOIN
     customer_card cc ON ch.fk_card_number = cc.card_number
 WHERE
     e.empl_role = 'Касир'
- %s 
+ %s
 GROUP BY
     e.id_employee, e.empl_surname, e.empl_name
 ORDER BY
@@ -151,38 +150,39 @@ func (s *statisticsStorage) GetCustomersBuyAllCategories(opts *service.GetCustom
 	var dateFilter string
 	var args []interface{}
 	if opts.StartDate != nil && opts.EndDate != nil {
-		dateFilter = "AND ch.print_date >= $1 AND ch.print_date <= $2"
+		dateFilter = "AND ch.print_date BETWEEN $1 AND $2 "
 		args = append(args, opts.StartDate, opts.EndDate)
 	}
 
-	query := fmt.Sprintf(`
-SELECT DISTINCT c.card_number, c.cust_surname, c.cust_name, c.cust_patronymic
-FROM customer_card c
-WHERE NOT EXISTS (
-  SELECT k.category_number
-  FROM category k
-  WHERE k.category_number NOT IN (
-    SELECT p.fk_category_number
-    FROM product p
-    WHERE NOT EXISTS (
-      SELECT s.upc
-      FROM store_product s
-      WHERE s.fk_id_product = p.id_product
-      AND EXISTS (
-        SELECT sa.fk_check_number
-        FROM sale sa
-        WHERE sa.fk_UPC = s.UPC
-        AND sa.fk_check_number IN (
-          SELECT ch.check_number
-          FROM checks ch
-          WHERE ch.fk_card_number = c.card_number
-          %s
-        )
-      )
-    )
-  )
- );
-`, dateFilter)
+	query := fmt.Sprintf(`SELECT DISTINCT
+    cc.card_number,
+    cc.cust_surname,
+    cc.cust_name,
+    cc.cust_patronymic
+FROM
+    customer_card cc
+WHERE
+    NOT EXISTS (
+        SELECT
+            c.category_number
+        FROM
+            category c
+        WHERE
+            NOT EXISTS (
+                SELECT
+                    1
+                FROM
+                    sale s
+                JOIN checks ch ON s.fk_check_number = ch.check_number
+                JOIN store_product sp ON s.fk_UPC = sp.UPC
+                JOIN product p ON sp.fk_id_product = p.id_product
+                WHERE
+                    ch.fk_card_number = cc.card_number
+                    AND p.fk_category_number = c.category_number
+                    %s
+            )
+    );
+ `, dateFilter)
 	s.logger.Infof("executing query: %s", query)
 	rows, err := s.db.Query(query, args...)
 	if err != nil {
@@ -216,18 +216,18 @@ func (s *statisticsStorage) GetCustomersChecks(opts *service.GetCustomersChecksO
 	}
 
 	query := fmt.Sprintf(`
-  SELECT c.card_number AS customer_id,
-    c.cust_surname, 
-    c.cust_name, 
-    c.cust_patronymic,
-    COUNT(ch.check_number) AS check_count, 
-    AVG(ch.sum_total) AS avg_check_price, 
-    SUM(ch.sum_total) AS total_check_amount 
-  FROM customer_card c 
-  LEFT JOIN checks ch ON c.card_number = ch.fk_card_number 
-  %s
-  GROUP BY c.card_number, c.cust_surname, c.cust_name, c.cust_patronymic;
-`, dateFilter)
+ 	SELECT c.card_number AS customer_id,
+     c.cust_surname,
+     c.cust_name,
+     c.cust_patronymic,
+     COUNT(ch.check_number) AS check_count,
+     AVG(ch.sum_total) AS avg_check_price,
+     SUM(ch.sum_total) AS total_check_amount
+ 	FROM customer_card c
+ 	LEFT JOIN checks ch ON c.card_number = ch.fk_card_number
+ 	%s
+ 	GROUP BY c.card_number, c.cust_surname, c.cust_name, c.cust_patronymic;
+ `, dateFilter)
 	s.logger.Infof("executing query: %s", query)
 	rows, err := s.db.Query(query, args...)
 	if err != nil {
@@ -306,7 +306,7 @@ func (s *statisticsStorage) GetEmployeesWithCheckSum(opts *service.GetEmployeesW
 	query := fmt.Sprintf(`
 	SELECT *
 	FROM employee e
-	WHERE e.id_employee IN (
+	WHERE NOT (id_employee NOT IN (
 			SELECT DISTINCT fk_id_employee
 			FROM checks ch
 			WHERE ch.sum_total > %f

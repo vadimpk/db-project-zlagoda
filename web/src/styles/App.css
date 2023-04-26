@@ -183,6 +183,28 @@
 }
 
 
+.dataResult {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 999;
+    max-height: 200px;
+    overflow-y: scroll;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-top: none;
+    width: 100%;
+}
+.dataItem {
+    display: block;
+    padding: 5px;
+    cursor: pointer;
+}
+
+.dataItem:hover {
+    background-color: #f1f1f1;
+}
+
 
 
 

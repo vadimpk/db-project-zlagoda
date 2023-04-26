@@ -1,15 +1,17 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import RoundButton from "../UI/buttons/RoundButton";
 import BigButton from "../UI/buttons/BigButton";
 import InputTextForm from "../UI/inputs/text-password/InputTextForm";
+import {updateProducts} from "../../functions";
+import DropSearch from "../UI/SearchBar/DropSearch";
 
 const ProductFormPopup = ({setVisible, create}) => {
+    const products = JSON.parse(localStorage.getItem('products'));
     const [product, setProduct] = useState(
         {
             store_product_id:'',
             product_count: 0
         });
-
     const addNewProduct = (e) => {
         e.preventDefault();
         if(validateForm()) {
@@ -24,6 +26,9 @@ const ProductFormPopup = ({setVisible, create}) => {
         setVisible(false)
     }
 
+    useEffect(() => {
+        updateProducts();
+    }, []);
     const validateForm = () => {
         const errors ={};
         const pricePattern = /^\d+(\.\d+)?$/; // дозволено тільки цифри та десяткові точки
@@ -48,14 +53,7 @@ const ProductFormPopup = ({setVisible, create}) => {
             </div>
             <div className="form-main">
                 <div className="form-content">
-                    <InputTextForm
-                        name={"store_product_id"}
-                        placeholder={"UPC товару"}
-                        value={product.store_product_id}
-                        onChange={e => setProduct({
-                            ...product,
-                            store_product_id: e.target.value
-                        })}>Назва</InputTextForm>
+                    <DropSearch data={products} placeholder={'Введіть назву'} setProduct={setProduct} product={product}>UPC</DropSearch>
                     <InputTextForm
                         name={"product_count"}
                         placeholder={"Кількість"}

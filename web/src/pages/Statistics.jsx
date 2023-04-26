@@ -27,7 +27,7 @@ const Statistics = () => {
     const [productName, setProductName] = useState(null);
     const headersCustCat = ["Номер карти", "Прізвище", 'Ім\'я', "По-батькові"];
     const [customersCategory, setCustomersCategory] = useState(null);
-    const headersCustCheck = ["Номер карти", "Прізвище", 'Ім\'я', "По-батькові", "Кількість чеків", 'Усього', "Середній чек"];
+    const headersCustCheck = ["Номер карти", "Прізвище", 'Ім\'я', "По-батькові", "Кількість чеків", "Середній чек",'Усього',];
     const [customersCheck, setCustomersCheck] = useState(null);
     const headersEmplCheck = ["ID", "Прізвище", 'Ім\'я', "Кількість чеків",'Загальна ціна чеків', "Середній чек", "Загальна знижка",'Кількість клієнтів'];
     const [employeesCheck, setEmployeesCheck] = useState(null);

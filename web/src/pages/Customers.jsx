@@ -149,12 +149,20 @@ const Customers = () => {
                         ?
                             <>
                                 <RoundButton onClick={handleDelete}>&minus;</RoundButton>
-                                <PrintButton onClick={handlePrint}/>
                             </>
                             :
                         null
                     }
                     <RoundButton onClick={handleEdit}><img src={edit} width="14px" height="12px"/></RoundButton>
+                    {
+                        isManager
+                            ?
+                            <>
+                                <PrintButton onClick={handlePrint}/>
+                            </>
+                            :
+                            null
+                    }
                     <ModalForm visible={modal} setVisible={setModal}>
                         <CustomerFormPopup setVisible={setModal} create={createCustomer} edit={editCustomer} selectedRow={isEditing  ? customers.find(customer => customer.id === selectedRow.id):undefined}/>
                     </ModalForm>

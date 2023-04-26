@@ -106,7 +106,6 @@ const Category = () => {
     }
     function handleAddProduct() {
         setSelectedRowProduct(undefined);
-        console.log('undefined set')
         setModalProduct(true);
     }
     function handleEditProduct() {
@@ -145,7 +144,7 @@ const Category = () => {
                 console.log(response.data);
             })
             .catch(error => {
-                alert('Такий товар уже існує')
+                alert('Такий товар уже існує або були введені некоректні дані')
                 console.log(error);
             });
         setModalProduct(false);
@@ -162,7 +161,7 @@ const Category = () => {
                 console.log(response.data);
             })
             .catch(error => {
-                alert('Такий товар уже існує')
+                alert('Такий товар уже існує або були введені некоректні дані')
                 console.log(error);
             });
         setModalProduct(false)
@@ -228,7 +227,11 @@ const Category = () => {
                 }
             })
                 .then(response => {
-                    setProducts(response.data);
+                    if(response.data==null){
+                        alert('Товарів у цій категорії немає');
+                    }else{
+                        setProducts(response.data);
+                    }
                 })
                 .catch(error => {
                     console.log(error);
@@ -292,7 +295,11 @@ const Category = () => {
                     }
                 </div>
                 <ModalForm visible={modalCategory} setVisible={setModalCategory}>
-                    <CategoryFormPopup setVisible={setModalCategory} create={createCategory} edit={editCategory} selectedRow={selectedRowCategory===undefined ? undefined : categories.find(category => category.id === selectedRowCategory.id)}/>
+                    <CategoryFormPopup
+                        setVisible={setModalCategory}
+                        create={createCategory}
+                        edit={editCategory}
+                        selectedRow={selectedRowCategory===undefined ? undefined : categories.find(category => category.id === selectedRowCategory.id)}/>
                 </ModalForm>
                 <div className="filter-left">
                     <Select onChange={(e) => setSelect(e.target.value)}>
@@ -322,7 +329,7 @@ const Category = () => {
                         setVisible={setModalProduct}
                         create={createProduct}
                         edit={editProduct}
-                        selectedRow={selectedRowProduct===undefined||selectedRowProduct ? undefined : products.find(product => product.id === selectedRowProduct.id)}/>
+                        selectedRow={selectedRowProduct===undefined ? undefined : products.find(product => product.id === selectedRowProduct.id)}/>
                 </ModalForm>
             </div>
             <div className="two-tables-div">
