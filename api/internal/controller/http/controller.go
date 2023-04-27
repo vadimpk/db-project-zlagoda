@@ -24,7 +24,7 @@ type Options struct {
 
 func New(options Options) http.Handler {
 	handler := gin.New()
-	//handler.Use(corsMiddleware())
+	handler.Use(corsMiddleware())
 
 	validate := validator.New()
 	options.validate = *validate
@@ -81,29 +81,6 @@ func newAuthMiddleware(opts *Options, role string) gin.HandlerFunc {
 		return
 	}
 }
-
-//
-//// corsMiddleware - used to allow incoming cross-origin requests.
-//func corsMiddleware(c *gin.Context) {
-//	c.Header("Access-Control-Allow-Origin", "*")
-//	c.Header("Access-Control-Allow-Methods", "*")
-//	c.Header("Access-Control-Allow-Headers", "*")
-//	c.Header("Content-Type", "application/json")
-//	c.Header("Content-Type", "application/json")
-//	//c.Header("Access-Control-Allow-Origin", "http://localhost:3000")
-//	//c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-//	//c.Header("Access-Control-Allow-Headers", "Origin, Content-Type, Content-Length, Accept-Encoding, Authorization")
-//	//c.Header("Access-Control-Allow-Credentials", "true")
-//	//
-//	//// Якщо запит методом OPTIONS, повертаємо статус 200
-//	//if c.Request.Method == "OPTIONS" {
-//	//	c.AbortWithStatus(200)
-//	//	return
-//	//}
-//	//
-//	//c.Next()
-//	c.Next()
-//}
 
 func corsMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {

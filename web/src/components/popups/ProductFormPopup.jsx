@@ -2,8 +2,11 @@ import React, {useEffect, useState} from 'react';
 import RoundButton from "../UI/buttons/RoundButton";
 import BigButton from "../UI/buttons/BigButton";
 import InputTextForm from "../UI/inputs/text-password/InputTextForm";
+import axios from "axios";
 
 const ProductFormPopup = ({setVisible, create, selectedRow, edit}) => {
+    const authToken = localStorage.getItem('authToken');
+    const [categories, setCategories] = useState( []);
     const [product, setProduct] = useState(
         {
             id:0,
@@ -23,8 +26,24 @@ const ProductFormPopup = ({setVisible, create, selectedRow, edit}) => {
                 characteristics:''
             })
         }
-
     },[selectedRow]);
+    useEffect(() => {
+        axios.get('http://localhost:8082/product/category', {
+            headers: {
+                Authorization: `Bearer ${authToken}`
+            },
+            params: {
+                sortAscending: true,
+                sortName: true
+            }
+        })
+            .then(response => {
+                setCategories(response.data);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    },[]);
 
     const addNewProduct = (e) => {
         e.preventDefault()
@@ -61,6 +80,29 @@ const ProductFormPopup = ({setVisible, create, selectedRow, edit}) => {
         })
         setVisible(false)
     }
+
+    const [filteredCategories, setFilteredCategories] = useState([]);
+    const [wordEntered, setWordEntered] = useState(product.category_id);
+
+    const handleFilter = (event) => {
+        const searchWord = event.target.value;
+        setWordEntered(searchWord);
+        const newFilter = categories.filter((value) => {
+            return value.name.toLowerCase().includes(searchWord.toLowerCase());
+        });
+
+        if (searchWord === "") {
+            setFilteredCategories([]);
+        } else {
+            setFilteredCategories(newFilter);
+        }
+    };
+    const handleSelectedCategory = (id) => {
+        setProduct({...product, category_id: id})
+        setWordEntered(id);
+        setFilteredCategories([]);
+    };
+
     const validateForm = () => {
         const errors = {};
 
@@ -112,19 +154,25 @@ const ProductFormPopup = ({setVisible, create, selectedRow, edit}) => {
                         })}>Назва</InputTextForm>
                 </div>
                 <div className="form-content">
-                    {/*<InputTextForm
-                    name={""}
-                    placeholder={"Виробник"}
-                    value={product.manufacturer}
-                    onChange={e => setProduct({
-                        ...product,
-                        manufacturer : e.target.value
-                    })}>Виробник</InputTextForm>*/}
+                    <div style={{position: 'relative'}}>
                     <InputTextForm
                         name={"ID"}
                         placeholder={"ID"}
-                        value={ product.category_id}
-                        onChange={e => setProduct({...product, category_id: e.target.value})}>ID категорії</InputTextForm>
+                        value={wordEntered}
+                        onChange={handleFilter}>ID категорії</InputTextForm>
+                    {filteredCategories.length != 0 && (
+                        <div className="dataResult">
+                            {filteredCategories.map((value, key) => {
+                                return (
+                                    <p className="dataItem" key={key} onClick={() => handleSelectedCategory(value.id)}>
+                                        {value.name}
+                                    </p>
+                                );
+                            })}
+                        </div>
+                    )}
+                    </div>
+
                     <InputTextForm
                         name={"characteristics"}
                         placeholder={"Характеристика"}

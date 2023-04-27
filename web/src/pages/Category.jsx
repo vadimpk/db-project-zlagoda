@@ -12,6 +12,9 @@ import ModalForm from "../components/UI/Modal/ModalForm";
 import CategoryFormPopup from "../components/popups/CategoryFormPopup";
 import ProductFormPopup from "../components/popups/ProductFormPopup";
 import axios from "axios";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import {handleDownloadPdf} from "../functions";
 
 const Category = () => {
     const authToken = localStorage.getItem('authToken');
@@ -103,7 +106,6 @@ const Category = () => {
     }
     function handleAddProduct() {
         setSelectedRowProduct(undefined);
-        console.log('undefined set')
         setModalProduct(true);
     }
     function handleEditProduct() {
@@ -142,7 +144,7 @@ const Category = () => {
                 console.log(response.data);
             })
             .catch(error => {
-                alert('Такий товар уже існує')
+                alert('Такий товар уже існує або були введені некоректні дані')
                 console.log(error);
             });
         setModalProduct(false);
@@ -159,7 +161,7 @@ const Category = () => {
                 console.log(response.data);
             })
             .catch(error => {
-                alert('Такий товар уже існує')
+                alert('Такий товар уже існує або були введені некоректні дані')
                 console.log(error);
             });
         setModalProduct(false)
@@ -225,7 +227,11 @@ const Category = () => {
                 }
             })
                 .then(response => {
-                    setProducts(response.data);
+                    if(response.data==null){
+                        alert('Товарів у цій категорії немає');
+                    }else{
+                        setProducts(response.data);
+                    }
                 })
                 .catch(error => {
                     console.log(error);
@@ -243,7 +249,11 @@ const Category = () => {
                     }
                 })
                 .then(response => {
-                    setProducts(response.data);
+                    if(response.data!==null) {
+                        setProducts(response.data);
+                    }else {
+                        alert("Товарів з такою назвою немає");
+                    }
                 }).catch(error => {
                     console.log(error);
                     alert("Товарів з такою назвою немає");
@@ -258,6 +268,14 @@ const Category = () => {
             };
         });
     }
+    const printRefP = React.useRef();
+    const printRefC = React.useRef();
+    function handlePrintProducts(){
+        handleDownloadPdf(printRefP,'Products');
+    }
+    function handlePrintCategories(){
+        handleDownloadPdf(printRefC,'Categories');
+    }
     return (
         <div>
             <Navbar/>
@@ -267,7 +285,7 @@ const Category = () => {
                     isManager
                     ?
                     <>
-                    <PrintButton/>
+                    <PrintButton onClick={handlePrintCategories}/>
                     <RoundButton onClick={handleEditCategory}><img src={edit} width="14px" height="12px"/></RoundButton>
                     <RoundButton onClick={handleDeleteCategory}>&minus;</RoundButton>
                     <RoundButton onClick={handleAddCategory}>+</RoundButton>
@@ -277,7 +295,11 @@ const Category = () => {
                     }
                 </div>
                 <ModalForm visible={modalCategory} setVisible={setModalCategory}>
-                    <CategoryFormPopup setVisible={setModalCategory} create={createCategory} edit={editCategory} selectedRow={selectedRowCategory===undefined ? undefined : categories.find(category => category.id === selectedRowCategory.id)}/>
+                    <CategoryFormPopup
+                        setVisible={setModalCategory}
+                        create={createCategory}
+                        edit={editCategory}
+                        selectedRow={selectedRowCategory===undefined ? undefined : categories.find(category => category.id === selectedRowCategory.id)}/>
                 </ModalForm>
                 <div className="filter-left">
                     <Select onChange={(e) => setSelect(e.target.value)}>
@@ -296,7 +318,7 @@ const Category = () => {
                             <RoundButton onClick={handleAddProduct}>+</RoundButton>
                             <RoundButton onClick={handleDeleteProduct}>&minus;</RoundButton>
                             <RoundButton onClick={handleEditProduct}><img src={edit} width="14px" height="12px"/></RoundButton>
-                            <PrintButton/>
+                            <PrintButton onClick={handlePrintProducts}/>
                             </>
                         :
                         null
@@ -314,12 +336,17 @@ const Category = () => {
                 {
                     isManager
                         ?
-                        <Table tableData={tableDataCategory} rowData={categories}
+                        <div ref={printRefC}>
+                        <Table tableData={tableDataCategory}
+                               rowData={categories}
                                setSelectedRow={setSelectedRowCategory}/>
+                        </div>
                         :
                         null
                 }
+                <div ref={printRefP}>
                 <Table tableData={tableDataProduct} rowData={transformProducts(products)} setSelectedRow={setSelectedRowProduct}/>
+                </div>
             </div>
         </div>
     );

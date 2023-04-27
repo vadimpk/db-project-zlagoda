@@ -12,6 +12,7 @@ import ModalForm from "../components/UI/Modal/ModalForm";
 import CheckProductFormPopup from "../components/popups/CheckProductFormPopup";
 import axios from "axios";
 import SearchInput from "../components/UI/inputs/text-password/SearchInput";
+import {handleDownloadPdf, updateProducts} from "../functions";
 
 const Checks = () => {
     const authToken = localStorage.getItem('authToken');
@@ -31,7 +32,7 @@ const Checks = () => {
     const [selectedCheck, setSelectedCheck] = useState();
     const [selectedCashier, setSelectedCashier] = useState("");
     const [customerId, setCustomerId] = useState('');
-
+    const [customers, setCustomers] = useState([]);
     const transformedData = checks ? checks.map(({ id, date, total_price, vat, customer_card_id, employee_id }) => {
         const cashier = cashiers.find(cashier => cashier.employee_id === employee_id);
         const employeeName = isManager ? (cashier ? cashier.fullName : null) : null;
@@ -59,7 +60,8 @@ const Checks = () => {
     async function fetchData() {
         try {
             const params = {}
-            const currentDate = new Date().toISOString().slice(0, 10);
+            const currentDate = new Date();
+            currentDate.setHours(0, 0, 0, 0);
             if (!isManager) {
                 params.employeeID=employee.id;
                 params.startDate= currentDate;
@@ -69,6 +71,7 @@ const Checks = () => {
                     Authorization: `Bearer ${authToken}`,
                 }, params
             });
+
             setChecks(checksResponse.data);
 
             const cashiersResponse = await axios.get(
@@ -97,27 +100,48 @@ const Checks = () => {
 
     useEffect(() => {
         fetchData();
+        axios.get('http://localhost:8082/customer-card', {
+            headers: {
+                Authorization: `Bearer ${authToken}`
+            },
+            params: {
+                sortAscending: true,
+                sortSurname: true
+            }
+        })
+            .then(response => {
+                setCustomers(response.data);
+            })
+            .catch(error => {
+                console.log(error);
+            });
     }, []);
+
     useEffect(() => {
+        if ((startDate !== undefined && endDate !== undefined)||(selectedCashier.employee_id !== "" && isManager)) {
         const params = {};
-        if (startDate!==undefined&&endDate!==undefined) {
+        if (startDate !== undefined && endDate !== undefined) {
             params.startDate = new Date(startDate);
             params.endDate = new Date(endDate);
         }
-        if(selectedCashier.employee_id!==""){
+        if (selectedCashier.employee_id !== "" && isManager) {
             params.employeeID = selectedCashier.employee_id;
+        } else {
+            params.employeeID = employee.id;
         }
-            axios.get("http://localhost:8082/check", {
-                headers: {
-                    Authorization: `Bearer ${authToken}`,
-                },
-                params
-            }).then(response => {
-                if(response.data===null){
-                    setChecks([]);
-                }
-                setChecks(response.data);
-            })
+        axios.get("http://localhost:8082/check", {
+            headers: {
+                Authorization: `Bearer ${authToken}`,
+            },
+            params
+        }).then(response => {
+            if (response.data === null) {
+                setChecks([]);
+            }
+            console.log(response.data)
+            setChecks(response.data);
+        })
+    }
     }, [startDate, endDate, selectedCashier])
     useEffect(() => {
         let data;
@@ -148,57 +172,13 @@ const Checks = () => {
                         });
                         setSelectedCheck(transformedData)
                     }else {
-                        alert('Чеків з таким номером немає');
-                        setSelectedCheck();
+                        console.log(response.data);
+                        alert('Чек пустий');
+
                     }
                 })
         }
     }, [selectedRow]);
-
-    async function updateProducts() {
-        const productsResponse = await axios.get("http://localhost:8082/product", {
-            headers: {
-                Authorization: `Bearer ${authToken}`,
-            },
-        });
-        const arr1 = productsResponse.data.map(({ id, name }) => ({ id, name }));
-
-        const storeResponse = await axios.get(
-            "http://localhost:8082/product/store",
-            {
-                headers: {
-                    Authorization: `Bearer ${authToken}`,
-                },
-            }
-        );
-        const arr2 = storeResponse.data.map(({ id, product_id, price }) => ({
-            upc: id,
-            id: product_id,
-            product_price: price
-        }));
-
-        const result = [];
-        arr1.forEach(item1 => {
-            const matches = arr2.filter(item2 => item2.id === item1.id);
-            if (matches.length === 0) {
-                result.push({
-                    name: item1.name,
-                    upc: null,
-                    product_price: null
-                });
-            } else {
-                matches.forEach(match => {
-                    result.push({
-                        name: item1.name,
-                        upc: match.upc,
-                        product_price: match.product_price
-                    });
-                });
-            }
-        });
-
-        localStorage.setItem("products", JSON.stringify(result));
-    }
 
     function handleSearch(id) {
         setSelectedRow(prevState => {
@@ -259,6 +239,7 @@ const Checks = () => {
         }
         setModal(true);
         setCustomerId('');
+        setWordEntered('');
     }
 
     const addProduct = (newProduct) => {
@@ -307,7 +288,32 @@ const Checks = () => {
             items: []
         });
     }
+    const printRef = React.useRef();
+    function handlePrint(){
+        handleDownloadPdf(printRef,'Checks');
+    }
 
+    const [filteredCustomers, setFilteredCustomers] = useState([]);
+    const [wordEntered, setWordEntered] = useState('');
+
+    const handleFilter = (event) => {
+        const searchWord = event.target.value;
+        setWordEntered(searchWord);
+        const newFilter = customers.filter((value) => {
+            return value.surname.toLowerCase().includes(searchWord.toLowerCase());
+        });
+
+        if (searchWord === "") {
+            setFilteredCustomers([]);
+        } else {
+            setFilteredCustomers(newFilter);
+        }
+    };
+    const handleSelectedCustomer = (id) => {
+        setCustomerId(id);
+        setWordEntered(id);
+        setFilteredCustomers([]);
+    };
     return (
         <div>
             <Navbar/>
@@ -346,20 +352,31 @@ const Checks = () => {
                         <div className="filter-left">
                             <RoundButton onClick={handleDelete}>&minus;</RoundButton>
                             <RoundButton onClick={handleSum}>$</RoundButton>
-                            <PrintButton/>
+                            <PrintButton onClick={handlePrint}/>
                         </div>
                             <Modal visible={isOpenSearch} setVisible={setOpenSearch}>
                                 <CheckPopup setVisible={setOpenSearch} startDate={startDate} endDate={endDate} sum={sum} cashier={selectedCashier.fullName}/>
                             </Modal>
                     </>
                         :
-                        <div className="filter-left">
+                        <div className="filter-left" style={{position: 'relative', margin:'10px 0'}}>
                             <SearchInput
                                 placeholder={"Введіть номер карти клієнта"}
-                                value={customerId}
-                                onChange={event => setCustomerId(event.target.value)}
+                                value={wordEntered}
+                                onChange={handleFilter}
                                 showMagnifier={true}
                             />
+                            {filteredCustomers.length != 0 && (
+                                <div className="dataResult">
+                                    {filteredCustomers.map((value, key) => {
+                                        return (
+                                            <p className="dataItem" key={key} onClick={() => handleSelectedCustomer(value.id)}>
+                                                {value.surname} {value.name} {value.patronymic}
+                                            </p>
+                                        );
+                                    })}
+                                </div>
+                            )}
                             <RoundButton onClick={handleAddCheck}>+</RoundButton>
                         </div>
                 }
@@ -368,10 +385,12 @@ const Checks = () => {
                 </ModalForm>
             </div>
             <div className="two-tables-div">
+                <div ref={printRef}>
                 <Table
                     tableData={ isManager ? checksHeadersM : checksHeaders}
                     rowData={transformedData}
                     setSelectedRow={setSelectedRow}/>
+                </div>
                 {
                     selectedCheck!==undefined
                     ?

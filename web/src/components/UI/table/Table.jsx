@@ -1,13 +1,13 @@
 import React, {useState} from 'react';
 import classes from './Table.module.css'
 
-function Table({tableData, rowData, setSelectedRow}) {
+function Table({tableData, rowData, setSelectedRow, ...props}) {
     const columns = rowData.length > 0 ? Object.keys(rowData[0]) : [];
     const handleRowClick = (row) => {
         setSelectedRow(row);
     };
     return (
-        <table className={classes.table}>
+        <table className={classes.table} {...props}>
             <thead>
             <tr>
                 {tableData.map(column => (

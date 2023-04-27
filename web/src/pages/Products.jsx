@@ -1,20 +1,17 @@
 import React, {useContext, useEffect, useState} from 'react';
 import Navbar from "../components/UI/Navbar/Navbar";
 import Searchbar from "../components/UI/SearchBar/Searchbar";
-import Checkbox from "../components/UI/inputs/checkbox/Checkbox";
 import RoundButton from "../components/UI/buttons/RoundButton";
 import edit from "../assets/images/edit.svg";
 import PrintButton from "../components/UI/buttons/PrintButton";
-import {ManagerContext} from "../context";
 import Select from "../components/UI/select/Select";
-import EmployeePopup from "../components/popups/EmployeePopup";
 import Modal from "../components/UI/Modal/Modal";
 import ProductPopup from "../components/popups/ProductPopup";
 import Table from "../components/UI/table/Table";
-import CustomerFormPopup from "../components/popups/CustomerFormPopup";
 import ModalForm from "../components/UI/Modal/ModalForm";
 import ProductFormPopup from "../components/popups/ProductStoreFormPopup";
 import axios from "axios";
+import {handleDownloadPdf} from "../functions";
 const Products = () => {
     const authToken = localStorage.getItem('authToken');
     const employee = JSON.parse(localStorage.getItem('employee'));
@@ -112,6 +109,7 @@ const Products = () => {
         }
         if (selectSort==='count-sort') {
             params.sortCount = true;
+            params.sortName = undefined;
         }
             axios.get('http://localhost:8082/product/store', {
                 headers: {
@@ -121,13 +119,17 @@ const Products = () => {
             })
                 .then(response => {
                     const products = response.data;
-                    const promises = products.map(product => getProductName(product.product_id));
-                    Promise.all(promises).then(names => {
-                        const productsWithNames = products.map((product, index) => {
-                            return { ...product, name: names[index] };
+                    if(products!==null) {
+                        const promises = products.map(product => getProductName(product.product_id));
+                        Promise.all(promises).then(names => {
+                            const productsWithNames = products.map((product, index) => {
+                                return {...product, name: names[index]};
+                            });
+                            setProducts(productsWithNames);
                         });
-                        setProducts(productsWithNames);
-                    });
+                    }else {
+                        setProducts([]);
+                    }
                 })
                 .catch(error => {
                     console.log(error);
@@ -206,6 +208,10 @@ const Products = () => {
             promotional1 : promotional? 'Так' : 'Ні'
         }));
     }
+    const printRef = React.useRef();
+    function handlePrint(){
+        handleDownloadPdf(printRef,'ProductsInStore');
+    }
     return (
         <div>
             <Navbar/>
@@ -239,7 +245,7 @@ const Products = () => {
                          <RoundButton onClick={handleAdd}>+</RoundButton>
                         <RoundButton onClick={handleDelete}>&minus;</RoundButton>
                         <RoundButton onClick={handleEdit}><img src={edit} width="14px" height="12px"/></RoundButton>
-                        <PrintButton/>
+                        <PrintButton onClick={handlePrint}/>
                          </div>
                      :
                          null
@@ -248,7 +254,9 @@ const Products = () => {
                     <ProductFormPopup setVisible={setModal} create={createProduct} edit={editProduct} selectedRow={isEditing ? products.find(product => product.id === selectedRow.id):undefined }/>
                 </ModalForm>
             </div>
+            <div ref={printRef}>
             <Table tableData={tableData} rowData={changeFieldsOrder(products)} setSelectedRow={setSelectedRow}/>
+            </div>
         </div>
     );
 };

@@ -50,7 +50,7 @@ JOIN
     category c ON p.fk_category_number = c.category_number
 LEFT JOIN
     customer_card cc ON ch.fk_card_number = cc.card_number
- %s 
+ %s
 GROUP BY
     c.category_number, c.category_name
 ORDER BY
@@ -110,7 +110,7 @@ LEFT JOIN
     customer_card cc ON ch.fk_card_number = cc.card_number
 WHERE
     e.empl_role = 'Касир'
- %s 
+ %s
 GROUP BY
     e.id_employee, e.empl_surname, e.empl_name
 ORDER BY
@@ -217,14 +217,14 @@ func (s *statisticsStorage) GetCustomersChecks(opts *service.GetCustomersChecksO
 
 	query := fmt.Sprintf(`
  	SELECT c.card_number AS customer_id,
-     c.cust_surname, 
-     c.cust_name, 
+     c.cust_surname,
+     c.cust_name,
      c.cust_patronymic,
-     COUNT(ch.check_number) AS check_count, 
-     AVG(ch.sum_total) AS avg_check_price, 
-     SUM(ch.sum_total) AS total_check_amount 
- 	FROM customer_card c 
- 	LEFT JOIN checks ch ON c.card_number = ch.fk_card_number 
+     COUNT(ch.check_number) AS check_count,
+     AVG(ch.sum_total) AS avg_check_price,
+     SUM(ch.sum_total) AS total_check_amount
+ 	FROM customer_card c
+ 	LEFT JOIN checks ch ON c.card_number = ch.fk_card_number
  	%s
  	GROUP BY c.card_number, c.cust_surname, c.cust_name, c.cust_patronymic;
  `, dateFilter)
@@ -305,13 +305,13 @@ WHERE
 func (s *statisticsStorage) GetEmployeesWithCheckSum(opts *service.GetEmployeesWithCheckSumOptions) ([]*entity.Employee, error) {
 	query := fmt.Sprintf(`
 	SELECT *
-	FROM employee e
-	WHERE e.id_employee IN (
-			SELECT DISTINCT fk_id_employee
-			FROM checks ch
-			WHERE ch.sum_total > %f
-		)
-	AND e.empl_role = 'Касир';
+    	FROM employee e
+    	WHERE e.id_employee IN (
+    			SELECT DISTINCT fk_id_employee
+    			FROM checks ch
+    			WHERE NOT ch.sum_total < %f
+    		)
+    	AND NOT e.empl_role = 'Менеджер';
 `, opts.Sum)
 
 	s.logger.Infof("executing query: %s", query)
